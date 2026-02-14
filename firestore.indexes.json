@@ -1,0 +1,36 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "posts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "sentiment", "order": "ASCENDING" },
+        { "fieldPath": "score", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "posts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "sentiment", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "posts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "authorId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "votes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "postId", "order": "ASCENDING" },
+        { "fieldPath": "userId", "order": "ASCENDING" }
+      ]
+    }
+  ]
+}
