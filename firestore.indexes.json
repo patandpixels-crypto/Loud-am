@@ -29,7 +29,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "postId", "order": "ASCENDING" },
-        { "fieldPath": "userId", "order": "ASCENDING" }
+        { "fieldPath": "voterId", "order": "ASCENDING" }
       ]
     },
     {

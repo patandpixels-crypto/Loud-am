@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { doc, runTransaction } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -14,6 +14,33 @@ interface PostCardProps {
   rank?: number;
 }
 
+function getAnonId(): string {
+  if (typeof window === "undefined") return "";
+  let id = localStorage.getItem("loud_anon_id");
+  if (!id) {
+    id = "anon_" + Math.random().toString(36).substring(2) + Date.now().toString(36);
+    localStorage.setItem("loud_anon_id", id);
+  }
+  return id;
+}
+
+function getLocalVote(postId: string): "up" | "down" | null {
+  if (typeof window === "undefined") return null;
+  const votes = JSON.parse(localStorage.getItem("loud_votes") || "{}");
+  return votes[postId] || null;
+}
+
+function setLocalVote(postId: string, voteType: "up" | "down" | null) {
+  if (typeof window === "undefined") return;
+  const votes = JSON.parse(localStorage.getItem("loud_votes") || "{}");
+  if (voteType) {
+    votes[postId] = voteType;
+  } else {
+    delete votes[postId];
+  }
+  localStorage.setItem("loud_votes", JSON.stringify(votes));
+}
+
 export default function PostCard({ post, rank }: PostCardProps) {
   const { user } = useAuth();
   const [score, setScore] = useState(post.score);
@@ -22,13 +49,20 @@ export default function PostCard({ post, rank }: PostCardProps) {
 
   const timeAgo = getTimeAgo(post.createdAt);
 
+  // Load existing vote from localStorage on mount
+  useEffect(() => {
+    setUserVote(getLocalVote(post.id));
+  }, [post.id]);
+
   const handleVote = async (voteType: "up" | "down") => {
-    if (!user || voting) return;
+    if (voting) return;
     setVoting(true);
+
+    const voterId = user?.uid || getAnonId();
 
     try {
       const votesRef = collection(db, "votes");
-      const q = query(votesRef, where("postId", "==", post.id), where("userId", "==", user.uid));
+      const q = query(votesRef, where("postId", "==", post.id), where("voterId", "==", voterId));
       const existingVotes = await getDocs(q);
 
       const postRef = doc(db, "posts", post.id);
@@ -51,10 +85,11 @@ export default function PostCard({ post, rank }: PostCardProps) {
           });
           setScore((prev) => voteType === "up" ? prev - 1 : prev + 1);
           setUserVote(null);
+          setLocalVote(post.id, null);
         } else {
           // Switch vote
           await deleteDoc(existingVote.ref);
-          await addDoc(votesRef, { postId: post.id, userId: user.uid, voteType });
+          await addDoc(votesRef, { postId: post.id, voterId: voterId, userId: user?.uid || "", voteType });
           await runTransaction(db, async (transaction) => {
             const postDoc = await transaction.get(postRef);
             if (!postDoc.exists()) return;
@@ -66,10 +101,11 @@ export default function PostCard({ post, rank }: PostCardProps) {
           });
           setScore((prev) => voteType === "up" ? prev + 2 : prev - 2);
           setUserVote(voteType);
+          setLocalVote(post.id, voteType);
         }
       } else {
         // New vote
-        await addDoc(votesRef, { postId: post.id, userId: user.uid, voteType });
+        await addDoc(votesRef, { postId: post.id, voterId: voterId, userId: user?.uid || "", voteType });
         await runTransaction(db, async (transaction) => {
           const postDoc = await transaction.get(postRef);
           if (!postDoc.exists()) return;
@@ -81,9 +117,27 @@ export default function PostCard({ post, rank }: PostCardProps) {
         });
         setScore((prev) => voteType === "up" ? prev + 1 : prev - 1);
         setUserVote(voteType);
+        setLocalVote(post.id, voteType);
       }
     } catch (err) {
       console.error("Vote error:", err);
+      // Fallback: just update locally if Firestore fails for anon users
+      if (!user) {
+        const currentVote = getLocalVote(post.id);
+        if (currentVote === voteType) {
+          setScore((prev) => voteType === "up" ? prev - 1 : prev + 1);
+          setUserVote(null);
+          setLocalVote(post.id, null);
+        } else if (currentVote) {
+          setScore((prev) => voteType === "up" ? prev + 2 : prev - 2);
+          setUserVote(voteType);
+          setLocalVote(post.id, voteType);
+        } else {
+          setScore((prev) => voteType === "up" ? prev + 1 : prev - 1);
+          setUserVote(voteType);
+          setLocalVote(post.id, voteType);
+        }
+      }
     } finally {
       setVoting(false);
     }
@@ -99,7 +153,7 @@ export default function PostCard({ post, rank }: PostCardProps) {
           )}
           <button
             onClick={() => handleVote("up")}
-            disabled={!user || voting}
+            disabled={voting}
             className={`rounded-lg p-1.5 transition-colors ${
               userVote === "up"
                 ? "bg-positive/20 text-positive"
@@ -117,7 +171,7 @@ export default function PostCard({ post, rank }: PostCardProps) {
           </span>
           <button
             onClick={() => handleVote("down")}
-            disabled={!user || voting}
+            disabled={voting}
             className={`rounded-lg p-1.5 transition-colors ${
               userVote === "down"
                 ? "bg-negative/20 text-negative"

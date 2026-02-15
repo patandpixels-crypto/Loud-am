@@ -7,7 +7,7 @@ import { Post } from "@/lib/types";
 import PostCard from "@/components/PostCard";
 import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
-import { FiTrendingUp, FiPlus, FiFilter } from "react-icons/fi";
+import { FiTrendingUp, FiPlus, FiFilter, FiSearch } from "react-icons/fi";
 
 type FilterType = "all" | "positive" | "negative";
 type SortType = "score" | "recent";
@@ -18,6 +18,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>("all");
   const [sort, setSort] = useState<SortType>("score");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -75,6 +76,18 @@ export default function HomePage() {
             Join the Conversation
           </Link>
         )}
+      </div>
+
+      {/* Search Bar */}
+      <div className="relative mb-6">
+        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+        <input
+          type="text"
+          placeholder="Search by person or brand name..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-white placeholder-zinc-500 outline-none focus:border-accent"
+        />
       </div>
 
       {/* Leaderboard Header */}
@@ -149,35 +162,49 @@ export default function HomePage() {
       </div>
 
       {/* Posts */}
-      {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
-        </div>
-      ) : posts.length === 0 ? (
-        <div className="rounded-2xl border border-card-border bg-card-bg py-16 text-center">
-          <p className="mb-2 text-xl font-bold text-zinc-300">No posts yet</p>
-          <p className="mb-4 text-zinc-500">Be the first to speak up!</p>
-          {user && (
-            <Link
-              href="/post/new"
-              className="inline-flex items-center gap-1.5 rounded-full bg-accent px-5 py-2.5 font-semibold text-white hover:bg-accent-hover"
-            >
-              <FiPlus size={16} />
-              Create Post
-            </Link>
-          )}
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {posts.map((post, index) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              rank={sort === "score" ? index + 1 : undefined}
-            />
-          ))}
-        </div>
-      )}
+      {(() => {
+        const filtered = searchQuery.trim()
+          ? posts.filter((p) =>
+              p.targetName.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+          : posts;
+
+        return loading ? (
+          <div className="flex justify-center py-20">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-2xl border border-card-border bg-card-bg py-16 text-center">
+            <p className="mb-2 text-xl font-bold text-zinc-300">
+              {searchQuery.trim() ? "No results found" : "No posts yet"}
+            </p>
+            <p className="mb-4 text-zinc-500">
+              {searchQuery.trim()
+                ? `No posts about "${searchQuery}" found.`
+                : "Be the first to speak up!"}
+            </p>
+            {!searchQuery.trim() && user && (
+              <Link
+                href="/post/new"
+                className="inline-flex items-center gap-1.5 rounded-full bg-accent px-5 py-2.5 font-semibold text-white hover:bg-accent-hover"
+              >
+                <FiPlus size={16} />
+                Create Post
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map((post, index) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                rank={!searchQuery.trim() && sort === "score" ? index + 1 : undefined}
+              />
+            ))}
+          </div>
+        );
+      })()}
     </div>
   );
 }
