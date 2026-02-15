@@ -31,5 +31,35 @@ service cloud.firestore {
       allow delete: if request.auth != null
         && resource.data.userId == request.auth.uid;
     }
+
+    // Company Sections
+    match /companySections/{sectionId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.creatorId == request.auth.uid;
+      allow update: if request.auth != null;
+    }
+
+    // Section Posts
+    match /sectionPosts/{postId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.authorId == request.auth.uid;
+      allow update: if request.auth != null;
+    }
+
+    // Section Replies
+    match /sectionReplies/{replyId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.authorId == request.auth.uid;
+    }
+
+    // Section Access (payments)
+    match /sectionAccess/{accessId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid;
+    }
   }
 }

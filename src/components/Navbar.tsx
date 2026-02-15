@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
-import { FiPlus, FiLogOut, FiShield, FiUser } from "react-icons/fi";
+import { FiPlus, FiLogOut, FiShield, FiUser, FiBriefcase } from "react-icons/fi";
 
 export default function Navbar() {
   const { user, userProfile, signOut } = useAuth();
@@ -26,6 +26,13 @@ export default function Navbar() {
               >
                 <FiPlus size={16} />
                 Post
+              </Link>
+              <Link
+                href="/sections"
+                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-card-bg hover:text-white"
+              >
+                <FiBriefcase size={16} />
+                <span className="hidden sm:inline">Sections</span>
               </Link>
               {userProfile?.isAdmin && (
                 <Link

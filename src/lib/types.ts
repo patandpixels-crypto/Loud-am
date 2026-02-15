@@ -29,3 +29,47 @@ export interface Vote {
   userId: string;
   voteType: "up" | "down";
 }
+
+// Company Sections
+export interface CompanySection {
+  id: string;
+  companyName: string;
+  description: string;
+  creatorId: string;
+  creatorName: string;
+  staffIds: string[]; // UIDs of permitted staff
+  staffEmails: string[]; // emails for display
+  postCount: number;
+  createdAt: number;
+}
+
+export interface SectionPost {
+  id: string;
+  sectionId: string;
+  title: string;
+  content: string;
+  authorId: string;
+  authorName: string;
+  isAnonymous: boolean;
+  replyCount: number;
+  createdAt: number;
+}
+
+export interface SectionReply {
+  id: string;
+  postId: string;
+  sectionId: string;
+  content: string; // max 200 words
+  authorId: string;
+  authorName: string;
+  isPaidUser: boolean; // true if non-staff who paid $3
+  createdAt: number;
+}
+
+export interface SectionAccess {
+  id: string;
+  sectionId: string;
+  userId: string;
+  paidAt: number;
+  amount: number; // $3
+}
