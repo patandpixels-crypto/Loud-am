@@ -61,6 +61,22 @@ export default function SectionDetailPage() {
   const [addingStaff, setAddingStaff] = useState(false);
   const [staffError, setStaffError] = useState("");
 
+  const fetchPosts = async () => {
+    try {
+      const postsQuery = query(
+        collection(db, "sectionPosts"),
+        where("sectionId", "==", sectionId),
+        orderBy("createdAt", "desc")
+      );
+      const postsSnap = await getDocs(postsQuery);
+      setPosts(
+        postsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as SectionPost[]
+      );
+    } catch (err) {
+      console.error("Error fetching posts:", err);
+    }
+  };
+
   useEffect(() => {
     const fetchSection = async () => {
       try {
@@ -87,34 +103,34 @@ export default function SectionDetailPage() {
           setHasAccess(true);
           // If staff by email but not by ID, update staffIds
           if (user && !sectionData.staffIds.includes(user.uid)) {
-            const { updateDoc, arrayUnion } = await import("firebase/firestore");
-            await updateDoc(doc(db, "companySections", sectionId), {
-              staffIds: arrayUnion(user.uid),
-            });
+            try {
+              const { updateDoc, arrayUnion } = await import("firebase/firestore");
+              await updateDoc(doc(db, "companySections", sectionId), {
+                staffIds: arrayUnion(user.uid),
+              });
+            } catch (err) {
+              console.error("Error updating staffIds:", err);
+            }
           }
         } else if (user) {
           // Check if user has paid
-          const accessQuery = query(
-            collection(db, "sectionAccess"),
-            where("sectionId", "==", sectionId),
-            where("userId", "==", user.uid)
-          );
-          const accessSnap = await getDocs(accessQuery);
-          if (!accessSnap.empty) {
-            setHasAccess(true);
+          try {
+            const accessQuery = query(
+              collection(db, "sectionAccess"),
+              where("sectionId", "==", sectionId),
+              where("userId", "==", user.uid)
+            );
+            const accessSnap = await getDocs(accessQuery);
+            if (!accessSnap.empty) {
+              setHasAccess(true);
+            }
+          } catch (err) {
+            console.error("Error checking access:", err);
           }
         }
 
-        // Fetch posts
-        const postsQuery = query(
-          collection(db, "sectionPosts"),
-          where("sectionId", "==", sectionId),
-          orderBy("createdAt", "desc")
-        );
-        const postsSnap = await getDocs(postsQuery);
-        setPosts(
-          postsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as SectionPost[]
-        );
+        // Fetch posts separately so access-check failures don't block it
+        await fetchPosts();
       } catch (err) {
         console.error("Error fetching section:", err);
       } finally {
@@ -144,6 +160,9 @@ export default function SectionDetailPage() {
 
       setHasAccess(true);
       setShowPaywall(false);
+
+      // Refetch posts now that user has access
+      await fetchPosts();
     } catch (err) {
       console.error("Payment error:", err);
     } finally {
@@ -367,7 +386,7 @@ export default function SectionDetailPage() {
       ) : (
         <div className="space-y-4">
           {posts.map((post) => (
-            <Link key={post.id} href={`/sections/${sectionId}/post/${post.id}`}>
+            <Link key={post.id} href={`/sections/${sectionId}/post/${post.id}`} className="block">
               <div className="group rounded-2xl border border-card-border bg-card-bg p-5 transition-colors hover:border-zinc-600">
                 <h3 className="mb-2 text-lg font-bold text-white group-hover:text-accent">
                   {post.title}

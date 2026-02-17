@@ -87,6 +87,7 @@ export default function NewSectionPostPage() {
         postCount: increment(1),
       });
 
+      router.refresh();
       router.push(`/sections/${sectionId}`);
     } catch (err) {
       console.error("Error creating post:", err);
