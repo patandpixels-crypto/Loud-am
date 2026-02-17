@@ -9,7 +9,6 @@ import {
   collection,
   query,
   where,
-  orderBy,
   getDocs,
   addDoc,
 } from "firebase/firestore";
@@ -65,13 +64,12 @@ export default function SectionDetailPage() {
     try {
       const postsQuery = query(
         collection(db, "sectionPosts"),
-        where("sectionId", "==", sectionId),
-        orderBy("createdAt", "desc")
+        where("sectionId", "==", sectionId)
       );
       const postsSnap = await getDocs(postsQuery);
-      setPosts(
-        postsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as SectionPost[]
-      );
+      const fetched = postsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as SectionPost[];
+      fetched.sort((a, b) => b.createdAt - a.createdAt);
+      setPosts(fetched);
     } catch (err) {
       console.error("Error fetching posts:", err);
     }
@@ -117,11 +115,11 @@ export default function SectionDetailPage() {
           try {
             const accessQuery = query(
               collection(db, "sectionAccess"),
-              where("sectionId", "==", sectionId),
               where("userId", "==", user.uid)
             );
             const accessSnap = await getDocs(accessQuery);
-            if (!accessSnap.empty) {
+            const hasPaid = accessSnap.docs.some((d) => d.data().sectionId === sectionId);
+            if (hasPaid) {
               setHasAccess(true);
             }
           } catch (err) {

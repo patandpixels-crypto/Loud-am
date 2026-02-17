@@ -9,7 +9,6 @@ import {
   collection,
   query,
   where,
-  orderBy,
   getDocs,
   addDoc,
   updateDoc,
@@ -82,11 +81,11 @@ export default function SectionPostPage() {
         } else if (user) {
           const accessQuery = query(
             collection(db, "sectionAccess"),
-            where("sectionId", "==", sectionId),
             where("userId", "==", user.uid)
           );
           const accessSnap = await getDocs(accessQuery);
-          if (!accessSnap.empty) setHasAccess(true);
+          const hasPaid = accessSnap.docs.some((d) => d.data().sectionId === sectionId);
+          if (hasPaid) setHasAccess(true);
         }
 
         // Fetch post
@@ -100,13 +99,12 @@ export default function SectionPostPage() {
         // Fetch replies
         const repliesQuery = query(
           collection(db, "sectionReplies"),
-          where("postId", "==", postId),
-          orderBy("createdAt", "asc")
+          where("postId", "==", postId)
         );
         const repliesSnap = await getDocs(repliesQuery);
-        setReplies(
-          repliesSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as SectionReply[]
-        );
+        const fetchedReplies = repliesSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as SectionReply[];
+        fetchedReplies.sort((a, b) => a.createdAt - b.createdAt);
+        setReplies(fetchedReplies);
       } catch (err) {
         console.error("Error:", err);
       } finally {
