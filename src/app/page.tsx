@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, query, orderBy, getDocs, limit, where } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Post } from "@/lib/types";
 import PostCard from "@/components/PostCard";
@@ -24,29 +24,25 @@ export default function HomePage() {
     const fetchPosts = async () => {
       setLoading(true);
       try {
-        let q;
         const postsRef = collection(db, "posts");
-
-        if (filter !== "all") {
-          q = query(
-            postsRef,
-            where("sentiment", "==", filter),
-            orderBy(sort === "score" ? "score" : "createdAt", "desc"),
-            limit(50)
-          );
-        } else {
-          q = query(
-            postsRef,
-            orderBy(sort === "score" ? "score" : "createdAt", "desc"),
-            limit(50)
-          );
-        }
-
-        const snapshot = await getDocs(q);
-        const fetchedPosts = snapshot.docs.map((doc) => ({
+        const snapshot = await getDocs(postsRef);
+        let fetchedPosts = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         })) as Post[];
+
+        // Filter client-side
+        if (filter !== "all") {
+          fetchedPosts = fetchedPosts.filter((p) => p.sentiment === filter);
+        }
+
+        // Sort client-side
+        if (sort === "score") {
+          fetchedPosts.sort((a, b) => b.score - a.score);
+        } else {
+          fetchedPosts.sort((a, b) => b.createdAt - a.createdAt);
+        }
+
         setPosts(fetchedPosts);
       } catch (err) {
         console.error("Error fetching posts:", err);

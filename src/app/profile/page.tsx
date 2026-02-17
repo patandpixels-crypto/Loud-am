@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, query, where, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
 import { Post } from "@/lib/types";
@@ -24,13 +24,12 @@ export default function ProfilePage() {
       try {
         const q = query(
           collection(db, "posts"),
-          where("authorId", "==", user.uid),
-          orderBy("createdAt", "desc")
+          where("authorId", "==", user.uid)
         );
         const snapshot = await getDocs(q);
-        setPosts(
-          snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Post[]
-        );
+        const fetched = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Post[];
+        fetched.sort((a, b) => b.createdAt - a.createdAt);
+        setPosts(fetched);
       } catch (err) {
         console.error("Error fetching user posts:", err);
       } finally {
