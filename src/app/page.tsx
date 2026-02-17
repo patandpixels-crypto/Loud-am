@@ -79,7 +79,7 @@ export default function HomePage() {
         <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
         <input
           type="text"
-          placeholder="Search by person or brand name..."
+          placeholder="Search by name, brand, or social media link..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-white placeholder-zinc-500 outline-none focus:border-accent"
@@ -159,9 +159,11 @@ export default function HomePage() {
 
       {/* Posts */}
       {(() => {
-        const filtered = searchQuery.trim()
+        const q = searchQuery.trim().toLowerCase();
+        const filtered = q
           ? posts.filter((p) =>
-              p.targetName.toLowerCase().includes(searchQuery.toLowerCase())
+              p.targetName.toLowerCase().includes(q) ||
+              p.targetLinks.some((link) => link.toLowerCase().includes(q))
             )
           : posts;
 
