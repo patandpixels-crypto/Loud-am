@@ -76,7 +76,7 @@ export default function NewSectionPostPage() {
         title: title.trim(),
         content: content.trim(),
         authorId: user.uid,
-        authorName: userProfile.displayName,
+        authorName: userProfile.codeName || userProfile.displayName,
         isAnonymous,
         replyCount: 0,
         createdAt: Date.now(),

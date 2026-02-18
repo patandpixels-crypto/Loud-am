@@ -113,8 +113,9 @@ export default function ProfilePage() {
             <FiUser size={28} className="text-accent" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">{user.displayName || "User"}</h1>
-            <p className="text-sm text-zinc-400">{user.email}</p>
+            <h1 className="text-xl font-bold">{userProfile?.codeName || "User"}</h1>
+            <p className="text-sm text-zinc-400">{user.displayName || "User"}</p>
+            <p className="text-xs text-zinc-500">{user.email}</p>
             {userProfile && (
               <p className="mt-1 flex items-center gap-1 text-xs text-zinc-500">
                 <FiCalendar size={12} />

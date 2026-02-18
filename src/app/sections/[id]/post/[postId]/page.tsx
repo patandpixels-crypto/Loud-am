@@ -189,7 +189,7 @@ export default function SectionPostPage() {
         sectionId,
         content: replyContent.trim(),
         authorId: user.uid,
-        authorName: userProfile.displayName,
+        authorName: userProfile.codeName || userProfile.displayName,
         isPaidUser: !isStaff,
         createdAt: Date.now(),
       };

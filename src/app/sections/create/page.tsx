@@ -64,7 +64,7 @@ export default function CreateSectionPage() {
         companyName: companyName.trim(),
         description: description.trim(),
         creatorId: user.uid,
-        creatorName: userProfile.displayName,
+        creatorName: userProfile.codeName || userProfile.displayName,
         staffIds: [user.uid],
         staffEmails: [user.email?.toLowerCase(), ...staffEmails],
         postCount: 0,

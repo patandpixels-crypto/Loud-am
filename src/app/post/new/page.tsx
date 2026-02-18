@@ -62,7 +62,7 @@ export default function NewPostPage() {
         targetLinks,
         sentiment,
         authorId: user.uid,
-        authorName: user.displayName || userProfile?.displayName || "Unknown",
+        authorName: userProfile?.codeName || "Unknown",
         isAnonymous,
         upvotes: 0,
         downvotes: 0,

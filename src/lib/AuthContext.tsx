@@ -9,9 +9,10 @@ import {
   signOut as firebaseSignOut,
   updateProfile,
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import { UserProfile } from "./types";
+import { generateCodeName } from "./codename";
 
 interface AuthContextType {
   user: User | null;
@@ -35,7 +36,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (user) {
         const profileDoc = await getDoc(doc(db, "users", user.uid));
         if (profileDoc.exists()) {
-          setUserProfile(profileDoc.data() as UserProfile);
+          const profile = profileDoc.data() as UserProfile;
+          // Backfill codeName for existing users who don't have one
+          if (!profile.codeName) {
+            const codeName = generateCodeName();
+            try {
+              await updateDoc(doc(db, "users", user.uid), { codeName });
+              profile.codeName = codeName;
+            } catch {
+              profile.codeName = `User${user.uid.substring(0, 6)}`;
+            }
+          }
+          setUserProfile(profile);
         }
       } else {
         setUserProfile(null);
@@ -56,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       uid: cred.user.uid,
       email,
       displayName,
+      codeName: generateCodeName(),
       isAdmin: false,
       createdAt: Date.now(),
     };

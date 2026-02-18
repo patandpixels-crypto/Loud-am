@@ -53,13 +53,13 @@ export default function HomePage() {
 
         if (!topUserId) return;
 
-        // Get their display name
+        // Get their codename
         const userDoc = await getDoc(doc(db, "users", topUserId));
-        const displayName = userDoc.exists()
-          ? userDoc.data().displayName
+        const codeName = userDoc.exists()
+          ? (userDoc.data().codeName || userDoc.data().displayName)
           : "Anonymous";
 
-        setTopEarner({ name: displayName, amount: topAmount });
+        setTopEarner({ name: codeName, amount: topAmount });
       } catch (err) {
         console.error("Error fetching top earner:", err);
       }
