@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
-import { Post, SectionPost } from "@/lib/types";
+import { Post, SectionPost, Earning } from "@/lib/types";
 import PostCard from "@/components/PostCard";
 import Link from "next/link";
-import { FiUser, FiCalendar, FiPlus, FiBriefcase } from "react-icons/fi";
+import { FiUser, FiCalendar, FiPlus, FiBriefcase, FiDollarSign } from "react-icons/fi";
 
 function getTimeAgo(timestamp: number): string {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -26,6 +26,7 @@ export default function ProfilePage() {
   const { user, userProfile, loading: authLoading } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [sectionPosts, setSectionPosts] = useState<SectionPost[]>([]);
+  const [earnings, setEarnings] = useState<Earning[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function ProfilePage() {
       return;
     }
 
-    const fetchUserPosts = async () => {
+    const fetchUserData = async () => {
       try {
         // Fetch homepage posts
         const postsQuery = query(
@@ -55,13 +56,27 @@ export default function ProfilePage() {
         const fetchedSectionPosts = sectionSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as SectionPost[];
         fetchedSectionPosts.sort((a, b) => b.createdAt - a.createdAt);
         setSectionPosts(fetchedSectionPosts);
+
+        // Fetch earnings
+        try {
+          const earningsQuery = query(
+            collection(db, "earnings"),
+            where("userId", "==", user.uid)
+          );
+          const earningsSnap = await getDocs(earningsQuery);
+          const fetchedEarnings = earningsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Earning[];
+          fetchedEarnings.sort((a, b) => b.createdAt - a.createdAt);
+          setEarnings(fetchedEarnings);
+        } catch (err) {
+          console.error("Error fetching earnings:", err);
+        }
       } catch (err) {
         console.error("Error fetching user posts:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchUserPosts();
+    fetchUserData();
   }, [authLoading, user]);
 
   if (authLoading) {
@@ -87,6 +102,7 @@ export default function ProfilePage() {
   }
 
   const totalPosts = posts.length + sectionPosts.length;
+  const totalEarnings = earnings.reduce((sum, e) => sum + e.amount, 0);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
@@ -105,6 +121,27 @@ export default function ProfilePage() {
                 Joined {new Date(userProfile.createdAt).toLocaleDateString()}
               </p>
             )}
+          </div>
+        </div>
+      </div>
+
+      {/* Earnings Card */}
+      <div className="mb-6 rounded-2xl border border-positive/30 bg-positive/5 p-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-positive/20">
+              <FiDollarSign size={20} className="text-positive" />
+            </div>
+            <div>
+              <p className="text-sm text-zinc-400">Total Earnings</p>
+              <p className="text-2xl font-black text-positive">
+                ${totalEarnings.toFixed(2)}
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-zinc-500">From {earnings.length} payments</p>
+            <p className="text-xs text-zinc-500">50% revenue share on section access</p>
           </div>
         </div>
       </div>
@@ -132,6 +169,37 @@ export default function ProfilePage() {
           <p className="text-xs text-zinc-400">Section</p>
         </div>
       </div>
+
+      {/* Earnings History */}
+      {earnings.length > 0 && (
+        <div className="mb-6">
+          <h2 className="mb-3 text-lg font-bold">Earnings History</h2>
+          <div className="space-y-2">
+            {earnings.slice(0, 10).map((earning) => (
+              <div
+                key={earning.id}
+                className="flex items-center justify-between rounded-xl border border-card-border bg-card-bg px-4 py-3"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-positive/10">
+                    <FiDollarSign size={14} className="text-positive" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-white">Section post earning</p>
+                    <p className="text-xs text-zinc-500">{getTimeAgo(earning.createdAt)}</p>
+                  </div>
+                </div>
+                <p className="text-sm font-bold text-positive">+${earning.amount.toFixed(2)}</p>
+              </div>
+            ))}
+            {earnings.length > 10 && (
+              <p className="text-center text-xs text-zinc-500">
+                and {earnings.length - 10} more...
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* User's Posts */}
       <h2 className="mb-4 text-lg font-bold">Your Posts</h2>

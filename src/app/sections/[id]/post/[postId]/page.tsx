@@ -126,6 +126,37 @@ export default function SectionPostPage() {
         paidAt: Date.now(),
         amount: 3,
       });
+
+      // Distribute 50% ($1.50) of the payment to section post authors
+      try {
+        const sectionPostsQuery = query(
+          collection(db, "sectionPosts"),
+          where("sectionId", "==", sectionId)
+        );
+        const sectionPostsSnap = await getDocs(sectionPostsQuery);
+
+        if (!sectionPostsSnap.empty) {
+          const revenueShare = 1.5; // 50% of $3
+          const perPost = revenueShare / sectionPostsSnap.size;
+
+          for (const pd of sectionPostsSnap.docs) {
+            const pData = pd.data();
+            if (pData.authorId !== user.uid) {
+              await addDoc(collection(db, "earnings"), {
+                userId: pData.authorId,
+                sectionId,
+                sectionPostId: pd.id,
+                fromPaymentBy: user.uid,
+                amount: Math.round(perPost * 100) / 100,
+                createdAt: Date.now(),
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error distributing earnings:", err);
+      }
+
       setHasAccess(true);
       setShowPaywall(false);
     } catch (err) {

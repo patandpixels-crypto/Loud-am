@@ -73,3 +73,13 @@ export interface SectionAccess {
   paidAt: number;
   amount: number; // $3
 }
+
+export interface Earning {
+  id: string;
+  userId: string;
+  sectionId: string;
+  sectionPostId: string;
+  fromPaymentBy: string; // userId of the person who paid
+  amount: number;
+  createdAt: number;
+}

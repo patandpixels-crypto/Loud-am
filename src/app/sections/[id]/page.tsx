@@ -156,6 +156,37 @@ export default function SectionDetailPage() {
         amount: 3,
       });
 
+      // Distribute 50% ($1.50) of the payment to section post authors
+      try {
+        const sectionPostsQuery = query(
+          collection(db, "sectionPosts"),
+          where("sectionId", "==", sectionId)
+        );
+        const sectionPostsSnap = await getDocs(sectionPostsQuery);
+
+        if (!sectionPostsSnap.empty) {
+          const revenueShare = 1.5; // 50% of $3
+          const perPost = revenueShare / sectionPostsSnap.size;
+
+          for (const postDoc of sectionPostsSnap.docs) {
+            const postData = postDoc.data();
+            // Don't pay yourself
+            if (postData.authorId !== user.uid) {
+              await addDoc(collection(db, "earnings"), {
+                userId: postData.authorId,
+                sectionId,
+                sectionPostId: postDoc.id,
+                fromPaymentBy: user.uid,
+                amount: Math.round(perPost * 100) / 100,
+                createdAt: Date.now(),
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error distributing earnings:", err);
+      }
+
       setHasAccess(true);
       setShowPaywall(false);
 
