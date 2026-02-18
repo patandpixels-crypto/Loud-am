@@ -1,11 +1,37 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
-import { FiPlus, FiLogOut, FiShield, FiUser, FiBriefcase } from "react-icons/fi";
+import { FiPlus, FiLogOut, FiShield, FiUser, FiBriefcase, FiDollarSign } from "react-icons/fi";
 
 export default function Navbar() {
   const { user, userProfile, signOut } = useAuth();
+  const [totalEarnings, setTotalEarnings] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!user) {
+      setTotalEarnings(null);
+      return;
+    }
+
+    const fetchEarnings = async () => {
+      try {
+        const earningsQuery = query(
+          collection(db, "earnings"),
+          where("userId", "==", user.uid)
+        );
+        const snap = await getDocs(earningsQuery);
+        const total = snap.docs.reduce((sum, d) => sum + (d.data().amount || 0), 0);
+        setTotalEarnings(total);
+      } catch {
+        setTotalEarnings(0);
+      }
+    };
+    fetchEarnings();
+  }, [user]);
 
   return (
     <nav className="sticky top-0 z-50 border-b border-card-border bg-background/80 backdrop-blur-md">
@@ -20,6 +46,15 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           {user ? (
             <>
+              {totalEarnings !== null && totalEarnings > 0 && (
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-1 rounded-full border border-positive/30 bg-positive/10 px-3 py-1.5 text-sm font-bold text-positive transition-colors hover:bg-positive/20"
+                >
+                  <FiDollarSign size={14} />
+                  {totalEarnings.toFixed(2)}
+                </Link>
+              )}
               <Link
                 href="/post/new"
                 className="flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"

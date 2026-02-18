@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Post } from "@/lib/types";
+import { Post, Earning } from "@/lib/types";
 import PostCard from "@/components/PostCard";
 import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
-import { FiTrendingUp, FiPlus, FiFilter, FiSearch } from "react-icons/fi";
+import { FiTrendingUp, FiPlus, FiFilter, FiSearch, FiAward } from "react-icons/fi";
 
 type FilterType = "all" | "positive" | "negative";
 type SortType = "score" | "recent";
@@ -19,6 +19,53 @@ export default function HomePage() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [sort, setSort] = useState<SortType>("score");
   const [searchQuery, setSearchQuery] = useState("");
+  const [topEarner, setTopEarner] = useState<{ name: string; amount: number } | null>(null);
+
+  // Fetch top earner of the month
+  useEffect(() => {
+    const fetchTopEarner = async () => {
+      try {
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+        const earningsSnap = await getDocs(collection(db, "earnings"));
+        const monthEarnings = earningsSnap.docs
+          .map((d) => d.data() as Earning)
+          .filter((e) => e.createdAt >= monthStart);
+
+        if (monthEarnings.length === 0) return;
+
+        // Aggregate by userId
+        const totals: Record<string, number> = {};
+        for (const e of monthEarnings) {
+          totals[e.userId] = (totals[e.userId] || 0) + e.amount;
+        }
+
+        // Find the top earner
+        let topUserId = "";
+        let topAmount = 0;
+        for (const [uid, amount] of Object.entries(totals)) {
+          if (amount > topAmount) {
+            topUserId = uid;
+            topAmount = amount;
+          }
+        }
+
+        if (!topUserId) return;
+
+        // Get their display name
+        const userDoc = await getDoc(doc(db, "users", topUserId));
+        const displayName = userDoc.exists()
+          ? userDoc.data().displayName
+          : "Anonymous";
+
+        setTopEarner({ name: displayName, amount: topAmount });
+      } catch (err) {
+        console.error("Error fetching top earner:", err);
+      }
+    };
+    fetchTopEarner();
+  }, []);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -71,6 +118,22 @@ export default function HomePage() {
           >
             Join the Conversation
           </Link>
+        )}
+
+        {/* Top Earner of the Month */}
+        {topEarner && (
+          <div className="mx-auto mt-5 flex max-w-sm items-center gap-3 rounded-xl border border-positive/20 bg-positive/5 px-4 py-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-positive/20">
+              <FiAward size={18} className="text-positive" />
+            </div>
+            <div className="text-left">
+              <p className="text-xs font-medium text-zinc-400">Top Earner This Month</p>
+              <p className="text-sm font-bold text-white">
+                {topEarner.name}{" "}
+                <span className="text-positive">${topEarner.amount.toFixed(2)}</span>
+              </p>
+            </div>
+          </div>
         )}
       </div>
 
