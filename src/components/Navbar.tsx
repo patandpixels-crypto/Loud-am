@@ -37,7 +37,7 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 border-b border-card-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <Link href="/" className="group flex items-center gap-2">
-          <span className="text-2xl font-black tracking-tight transition-transform duration-300 group-hover:scale-105">
+          <span className="logo-text text-2xl transition-transform duration-300 group-hover:scale-105">
             <span className="gradient-text">LOUD</span>
             <span className="text-foreground">-AM!</span>
           </span>

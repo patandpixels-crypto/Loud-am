@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
+import { Bangers } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/AuthContext";
 import Navbar from "@/components/Navbar";
+
+const bangers = Bangers({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-playful",
+});
 
 export const metadata: Metadata = {
   title: "LOUD-AM! | Speak Your Truth",
@@ -16,12 +23,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className={`${bangers.variable} antialiased`}>
         <AuthProvider>
           <Navbar />
           <main className="min-h-[calc(100vh-64px)]">{children}</main>
           <footer className="border-t border-card-border py-8 text-center">
-            <p className="gradient-text inline-block text-sm font-bold">
+            <p className="logo-text gradient-text inline-block text-sm">
               LOUD-AM!
             </p>
             <p className="mt-1 text-xs text-zinc-600">

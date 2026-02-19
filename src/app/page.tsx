@@ -104,7 +104,7 @@ export default function HomePage() {
     <div className="mx-auto max-w-3xl px-4 py-6">
       {/* Hero */}
       <div className="mb-8 text-center">
-        <h1 className="animate-float text-4xl font-black sm:text-5xl">
+        <h1 className="logo-text animate-float text-5xl sm:text-6xl">
           <span className="gradient-text">LOUD</span>
           <span className="text-foreground">-AM!</span>
         </h1>

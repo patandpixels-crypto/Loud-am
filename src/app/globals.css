@@ -62,7 +62,7 @@ body {
 /* Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  50% { transform: translateY(-2px); }
 }
 
 @keyframes wiggle {
@@ -97,6 +97,12 @@ body {
 
 .animate-pop {
   animation: pop 0.3s ease-in-out;
+}
+
+/* Playful logo font */
+.logo-text {
+  font-family: var(--font-playful), cursive;
+  letter-spacing: 0.05em;
 }
 
 /* Gradient text */
