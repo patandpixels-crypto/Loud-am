@@ -59,7 +59,7 @@ export default function AdminPage() {
   if (authLoading || loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-2/30 border-t-accent" />
       </div>
     );
   }
@@ -72,7 +72,7 @@ export default function AdminPage() {
         <p className="text-sm text-zinc-500">You don&apos;t have permission to view this page.</p>
         <Link
           href="/"
-          className="rounded-full bg-accent px-6 py-2 font-semibold text-white hover:bg-accent-hover"
+          className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2 font-bold text-white shadow-lg shadow-accent/20"
         >
           Go Home
         </Link>
@@ -83,24 +83,26 @@ export default function AdminPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
       <div className="mb-6 flex items-center gap-3">
-        <FiShield size={24} className="text-accent" />
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <FiShield size={24} className="text-accent-2" />
+        <h1 className="text-2xl font-black">
+          <span className="gradient-text">Admin Dashboard</span>
+        </h1>
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-card-border bg-card-bg p-4">
+        <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
           <p className="text-sm text-zinc-400">Total Posts</p>
-          <p className="text-3xl font-bold">{posts.length}</p>
+          <p className="text-3xl font-black">{posts.length}</p>
         </div>
-        <div className="rounded-xl border border-card-border bg-card-bg p-4">
+        <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
           <p className="text-sm text-zinc-400">Anonymous Posts</p>
-          <p className="text-3xl font-bold text-accent">
+          <p className="text-3xl font-black text-accent-2">
             {posts.filter((p) => p.isAnonymous).length}
           </p>
         </div>
-        <div className="rounded-xl border border-card-border bg-card-bg p-4">
+        <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
           <p className="text-sm text-zinc-400">Public Posts</p>
-          <p className="text-3xl font-bold text-positive">
+          <p className="text-3xl font-black text-positive">
             {posts.filter((p) => !p.isAnonymous).length}
           </p>
         </div>
@@ -111,16 +113,16 @@ export default function AdminPage() {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-card-border bg-card-bg">
               <tr>
-                <th className="px-4 py-3 font-semibold text-zinc-300">Post</th>
-                <th className="px-4 py-3 font-semibold text-zinc-300">About</th>
-                <th className="px-4 py-3 font-semibold text-zinc-300">Author Identity</th>
-                <th className="px-4 py-3 font-semibold text-zinc-300">Type</th>
-                <th className="px-4 py-3 font-semibold text-zinc-300">Score</th>
+                <th className="px-4 py-3 font-bold text-zinc-300">Post</th>
+                <th className="px-4 py-3 font-bold text-zinc-300">About</th>
+                <th className="px-4 py-3 font-bold text-zinc-300">Author Identity</th>
+                <th className="px-4 py-3 font-bold text-zinc-300">Type</th>
+                <th className="px-4 py-3 font-bold text-zinc-300">Score</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-card-border">
               {posts.map((post) => (
-                <tr key={post.id} className="hover:bg-card-bg/50">
+                <tr key={post.id} className="transition-colors hover:bg-card-bg/50">
                   <td className="px-4 py-3">
                     <Link
                       href={`/post/${post.id}`}
@@ -136,7 +138,7 @@ export default function AdminPage() {
                     <div className="flex flex-col gap-0.5">
                       <div className="flex items-center gap-1.5">
                         {post.isAnonymous ? (
-                          <FiEyeOff size={14} className="text-accent" />
+                          <FiEyeOff size={14} className="text-accent-2" />
                         ) : (
                           <FiEye size={14} className="text-positive" />
                         )}
@@ -153,7 +155,7 @@ export default function AdminPage() {
                   </td>
                   <td className="px-4 py-3">
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
                         post.sentiment === "positive"
                           ? "bg-positive/10 text-positive"
                           : "bg-negative/10 text-negative"
@@ -164,7 +166,7 @@ export default function AdminPage() {
                   </td>
                   <td className="px-4 py-3">
                     <span
-                      className={`font-bold ${
+                      className={`font-black ${
                         post.score > 0
                           ? "text-positive"
                           : post.score < 0

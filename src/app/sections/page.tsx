@@ -41,7 +41,7 @@ export default function SectionsPage() {
   if (authLoading || loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-2/30 border-t-accent" />
       </div>
     );
   }
@@ -51,7 +51,7 @@ export default function SectionsPage() {
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-black text-white">
-            Company <span className="text-accent">Sections</span>
+            Company <span className="gradient-text">Sections</span>
           </h1>
           <p className="mt-1 text-sm text-zinc-400">
             Insider company talk. Staff-only posting. Pay $3 to read & reply.
@@ -60,7 +60,7 @@ export default function SectionsPage() {
         {user && (
           <Link
             href="/sections/create"
-            className="flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+            className="btn-bounce flex items-center gap-2 rounded-full bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-accent/20"
           >
             <FiPlus size={16} />
             Create Section
@@ -76,13 +76,13 @@ export default function SectionsPage() {
           placeholder="Search companies..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-white placeholder-zinc-500 outline-none focus:border-accent"
+          className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
         />
       </div>
 
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-card-border py-16">
-          <p className="text-lg font-semibold text-zinc-400">No company sections yet</p>
+          <p className="text-lg font-bold text-zinc-400">No company sections yet</p>
           <p className="mt-1 text-sm text-zinc-500">
             {user ? "Be the first to create one!" : "Sign in to create a company section."}
           </p>

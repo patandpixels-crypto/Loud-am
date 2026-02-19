@@ -82,7 +82,7 @@ export default function ProfilePage() {
   if (authLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-2/30 border-t-accent" />
       </div>
     );
   }
@@ -93,7 +93,7 @@ export default function ProfilePage() {
         <p className="text-zinc-400">Sign in to view your profile.</p>
         <Link
           href="/login"
-          className="rounded-full bg-accent px-6 py-2 font-semibold text-white hover:bg-accent-hover"
+          className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2 font-bold text-white shadow-lg shadow-accent/20"
         >
           Sign In
         </Link>
@@ -107,9 +107,9 @@ export default function ProfilePage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
       {/* Profile Card */}
-      <div className="mb-6 rounded-2xl border border-card-border bg-card-bg p-6">
+      <div className="card-glow mb-6 rounded-2xl border border-card-border bg-card-bg p-6">
         <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/20">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-accent/20 to-accent-2/20">
             <FiUser size={28} className="text-accent" />
           </div>
           <div>
@@ -127,15 +127,15 @@ export default function ProfilePage() {
       </div>
 
       {/* Earnings Card */}
-      <div className="mb-6 rounded-2xl border border-positive/30 bg-positive/5 p-5">
+      <div className="card-glow mb-6 rounded-2xl border border-accent-2/30 bg-accent-2/5 p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-positive/20">
-              <FiDollarSign size={20} className="text-positive" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-2/20">
+              <FiDollarSign size={20} className="text-accent-2" />
             </div>
             <div>
               <p className="text-sm text-zinc-400">Total Earnings</p>
-              <p className="text-2xl font-black text-positive">
+              <p className="text-2xl font-black text-accent-2">
                 ${totalEarnings.toFixed(2)}
               </p>
             </div>
@@ -149,24 +149,24 @@ export default function ProfilePage() {
 
       {/* Stats */}
       <div className="mb-6 grid grid-cols-4 gap-3">
-        <div className="rounded-xl border border-card-border bg-card-bg p-4 text-center">
-          <p className="text-2xl font-bold">{totalPosts}</p>
+        <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4 text-center">
+          <p className="text-2xl font-black">{totalPosts}</p>
           <p className="text-xs text-zinc-400">Total Posts</p>
         </div>
-        <div className="rounded-xl border border-card-border bg-card-bg p-4 text-center">
-          <p className="text-2xl font-bold text-positive">
+        <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4 text-center">
+          <p className="text-2xl font-black text-positive">
             {posts.filter((p) => p.sentiment === "positive").length}
           </p>
           <p className="text-xs text-zinc-400">Positive</p>
         </div>
-        <div className="rounded-xl border border-card-border bg-card-bg p-4 text-center">
-          <p className="text-2xl font-bold text-negative">
+        <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4 text-center">
+          <p className="text-2xl font-black text-negative">
             {posts.filter((p) => p.sentiment === "negative").length}
           </p>
           <p className="text-xs text-zinc-400">Negative</p>
         </div>
-        <div className="rounded-xl border border-card-border bg-card-bg p-4 text-center">
-          <p className="text-2xl font-bold text-accent">{sectionPosts.length}</p>
+        <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4 text-center">
+          <p className="text-2xl font-black text-accent-3">{sectionPosts.length}</p>
           <p className="text-xs text-zinc-400">Section</p>
         </div>
       </div>
@@ -179,18 +179,18 @@ export default function ProfilePage() {
             {earnings.slice(0, 10).map((earning) => (
               <div
                 key={earning.id}
-                className="flex items-center justify-between rounded-xl border border-card-border bg-card-bg px-4 py-3"
+                className="card-glow flex items-center justify-between rounded-xl border border-card-border bg-card-bg px-4 py-3"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-positive/10">
-                    <FiDollarSign size={14} className="text-positive" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-2/10">
+                    <FiDollarSign size={14} className="text-accent-2" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-white">Section post earning</p>
                     <p className="text-xs text-zinc-500">{getTimeAgo(earning.createdAt)}</p>
                   </div>
                 </div>
-                <p className="text-sm font-bold text-positive">+${earning.amount.toFixed(2)}</p>
+                <p className="text-sm font-bold text-accent-2">+${earning.amount.toFixed(2)}</p>
               </div>
             ))}
             {earnings.length > 10 && (
@@ -206,14 +206,14 @@ export default function ProfilePage() {
       <h2 className="mb-4 text-lg font-bold">Your Posts</h2>
       {loading ? (
         <div className="flex justify-center py-10">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-2/30 border-t-accent" />
         </div>
       ) : posts.length === 0 && sectionPosts.length === 0 ? (
-        <div className="rounded-2xl border border-card-border bg-card-bg py-12 text-center">
+        <div className="rounded-2xl border border-dashed border-card-border bg-card-bg py-12 text-center">
           <p className="mb-2 text-zinc-300">You haven&apos;t posted anything yet.</p>
           <Link
             href="/post/new"
-            className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-accent px-5 py-2.5 font-semibold text-white hover:bg-accent-hover"
+            className="btn-bounce mt-2 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
           >
             <FiPlus size={16} />
             Create Your First Post
@@ -230,7 +230,7 @@ export default function ProfilePage() {
             <>
               {posts.length > 0 && (
                 <div className="flex items-center gap-2 pt-4">
-                  <FiBriefcase size={16} className="text-accent" />
+                  <FiBriefcase size={16} className="text-accent-2" />
                   <h3 className="text-sm font-semibold text-zinc-400">Section Posts</h3>
                 </div>
               )}
@@ -240,9 +240,9 @@ export default function ProfilePage() {
                   href={`/sections/${sp.sectionId}/post/${sp.id}`}
                   className="block"
                 >
-                  <div className="group rounded-2xl border border-card-border bg-card-bg p-5 transition-colors hover:border-zinc-600">
+                  <div className="card-glow group rounded-2xl border border-card-border bg-card-bg p-5">
                     <div className="mb-1 flex items-center gap-2">
-                      <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">
+                      <span className="rounded-full bg-accent-2/10 px-2 py-0.5 text-xs font-bold text-accent-2">
                         Section
                       </span>
                     </div>
@@ -255,9 +255,9 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-2 text-xs text-zinc-500">
                       <FiUser size={12} />
                       <span>{sp.isAnonymous ? "Anonymous" : sp.authorName}</span>
-                      <span>&middot;</span>
+                      <span className="text-accent-2">&middot;</span>
                       <span>{getTimeAgo(sp.createdAt)}</span>
-                      <span>&middot;</span>
+                      <span className="text-accent-2">&middot;</span>
                       <span>{sp.replyCount} {sp.replyCount === 1 ? "reply" : "replies"}</span>
                     </div>
                   </div>

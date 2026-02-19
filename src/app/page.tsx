@@ -104,17 +104,17 @@ export default function HomePage() {
     <div className="mx-auto max-w-3xl px-4 py-6">
       {/* Hero */}
       <div className="mb-8 text-center">
-        <h1 className="text-4xl font-black sm:text-5xl">
-          <span className="text-accent">LOUD</span>
+        <h1 className="animate-float text-4xl font-black sm:text-5xl">
+          <span className="gradient-text">LOUD</span>
           <span className="text-foreground">-AM!</span>
         </h1>
-        <p className="mt-2 text-zinc-400">
-          Speak your truth about people and brands. Be heard.
+        <p className="mt-3 text-zinc-400">
+          Speak your truth about people and brands. <span className="font-semibold text-accent-3">Be heard.</span>
         </p>
         {!user && (
           <Link
             href="/login"
-            className="mt-4 inline-block rounded-full bg-accent px-6 py-2.5 font-semibold text-white transition-colors hover:bg-accent-hover"
+            className="btn-bounce mt-4 inline-block rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
           >
             Join the Conversation
           </Link>
@@ -122,15 +122,15 @@ export default function HomePage() {
 
         {/* Top Earner of the Month */}
         {topEarner && (
-          <div className="mx-auto mt-5 flex max-w-sm items-center gap-3 rounded-xl border border-positive/20 bg-positive/5 px-4 py-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-positive/20">
-              <FiAward size={18} className="text-positive" />
+          <div className="mx-auto mt-5 flex max-w-sm items-center gap-3 rounded-xl border border-accent-2/20 bg-accent-2/5 px-4 py-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-2/20">
+              <FiAward size={18} className="text-accent-2" />
             </div>
             <div className="text-left">
               <p className="text-xs font-medium text-zinc-400">Top Earner This Month</p>
               <p className="text-sm font-bold text-white">
                 {topEarner.name}{" "}
-                <span className="text-positive">${topEarner.amount.toFixed(2)}</span>
+                <span className="text-accent-2">${topEarner.amount.toFixed(2)}</span>
               </p>
             </div>
           </div>
@@ -145,7 +145,7 @@ export default function HomePage() {
           placeholder="Search by name, brand, or social media link..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-white placeholder-zinc-500 outline-none focus:border-accent"
+          className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
         />
       </div>
 
@@ -160,12 +160,12 @@ export default function HomePage() {
 
         <div className="flex items-center gap-2">
           {/* Sort Toggle */}
-          <div className="flex overflow-hidden rounded-lg border border-card-border">
+          <div className="flex overflow-hidden rounded-xl border border-card-border">
             <button
               onClick={() => setSort("score")}
-              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 text-xs font-bold transition-all ${
                 sort === "score"
-                  ? "bg-accent text-white"
+                  ? "bg-gradient-to-r from-accent to-accent-2 text-white"
                   : "text-zinc-400 hover:text-white"
               }`}
             >
@@ -173,9 +173,9 @@ export default function HomePage() {
             </button>
             <button
               onClick={() => setSort("recent")}
-              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 text-xs font-bold transition-all ${
                 sort === "recent"
-                  ? "bg-accent text-white"
+                  ? "bg-gradient-to-r from-accent to-accent-2 text-white"
                   : "text-zinc-400 hover:text-white"
               }`}
             >
@@ -184,13 +184,13 @@ export default function HomePage() {
           </div>
 
           {/* Filter */}
-          <div className="flex items-center gap-1 overflow-hidden rounded-lg border border-card-border">
+          <div className="flex items-center gap-1 overflow-hidden rounded-xl border border-card-border">
             <FiFilter size={14} className="ml-2 text-zinc-500" />
             <button
               onClick={() => setFilter("all")}
-              className={`px-2 py-1.5 text-xs font-medium transition-colors ${
+              className={`px-2 py-1.5 text-xs font-bold transition-all ${
                 filter === "all"
-                  ? "bg-accent text-white"
+                  ? "bg-gradient-to-r from-accent to-accent-2 text-white"
                   : "text-zinc-400 hover:text-white"
               }`}
             >
@@ -198,7 +198,7 @@ export default function HomePage() {
             </button>
             <button
               onClick={() => setFilter("positive")}
-              className={`px-2 py-1.5 text-xs font-medium transition-colors ${
+              className={`px-2 py-1.5 text-xs font-bold transition-all ${
                 filter === "positive"
                   ? "bg-positive text-white"
                   : "text-zinc-400 hover:text-white"
@@ -208,7 +208,7 @@ export default function HomePage() {
             </button>
             <button
               onClick={() => setFilter("negative")}
-              className={`px-2 py-1.5 text-xs font-medium transition-colors ${
+              className={`px-2 py-1.5 text-xs font-bold transition-all ${
                 filter === "negative"
                   ? "bg-negative text-white"
                   : "text-zinc-400 hover:text-white"
@@ -232,22 +232,22 @@ export default function HomePage() {
 
         return loading ? (
           <div className="flex justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-2/30 border-t-accent" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-card-border bg-card-bg py-16 text-center">
+          <div className="rounded-2xl border border-dashed border-card-border bg-card-bg py-16 text-center">
             <p className="mb-2 text-xl font-bold text-zinc-300">
               {searchQuery.trim() ? "No results found" : "No posts yet"}
             </p>
             <p className="mb-4 text-zinc-500">
               {searchQuery.trim()
-                ? `No posts about "${searchQuery}" found.`
+                ? `Nothing about "${searchQuery}" yet. Be the first!`
                 : "Be the first to speak up!"}
             </p>
             {!searchQuery.trim() && user && (
               <Link
                 href="/post/new"
-                className="inline-flex items-center gap-1.5 rounded-full bg-accent px-5 py-2.5 font-semibold text-white hover:bg-accent-hover"
+                className="btn-bounce inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
               >
                 <FiPlus size={16} />
                 Create Post

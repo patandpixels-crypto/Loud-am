@@ -20,8 +20,13 @@ export default function RootLayout({
         <AuthProvider>
           <Navbar />
           <main className="min-h-[calc(100vh-64px)]">{children}</main>
-          <footer className="border-t border-card-border py-6 text-center text-xs text-zinc-600">
-            LOUD-AM! &copy; {new Date().getFullYear()} &mdash; Speak your truth.
+          <footer className="border-t border-card-border py-8 text-center">
+            <p className="gradient-text inline-block text-sm font-bold">
+              LOUD-AM!
+            </p>
+            <p className="mt-1 text-xs text-zinc-600">
+              &copy; {new Date().getFullYear()} &mdash; Speak your truth, be heard.
+            </p>
           </footer>
         </AuthProvider>
       </body>

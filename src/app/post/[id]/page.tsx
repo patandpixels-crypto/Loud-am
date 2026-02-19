@@ -34,7 +34,7 @@ export default function PostPage() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-2/30 border-t-accent" />
       </div>
     );
   }
@@ -45,7 +45,7 @@ export default function PostPage() {
         <p className="text-xl font-bold text-zinc-400">Post not found</p>
         <button
           onClick={() => router.push("/")}
-          className="rounded-full bg-accent px-6 py-2 font-semibold text-white hover:bg-accent-hover"
+          className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2 font-bold text-white shadow-lg shadow-accent/20"
         >
           Go Home
         </button>
@@ -57,7 +57,7 @@ export default function PostPage() {
     <div className="mx-auto max-w-3xl px-4 py-6">
       <Link
         href="/"
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white"
+        className="btn-bounce mb-4 inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-accent-3"
       >
         <FiArrowLeft size={16} />
         Back to Leaderboard
@@ -66,7 +66,7 @@ export default function PostPage() {
       <PostCard post={post} />
 
       {/* Full content section */}
-      <div className="mt-4 rounded-2xl border border-card-border bg-card-bg p-6">
+      <div className="card-glow mt-4 rounded-2xl border border-card-border bg-card-bg p-6">
         <h2 className="mb-3 text-lg font-bold">Full Review</h2>
         <p className="whitespace-pre-wrap leading-relaxed text-zinc-300">
           {post.content}
@@ -74,7 +74,7 @@ export default function PostPage() {
 
         {post.targetLinks.length > 0 && (
           <div className="mt-6">
-            <h3 className="mb-2 text-sm font-semibold text-zinc-400">Related Links</h3>
+            <h3 className="mb-2 text-sm font-bold text-zinc-400">Related Links</h3>
             <div className="space-y-2">
               {post.targetLinks.map((link, i) => (
                 <a
@@ -82,7 +82,7 @@ export default function PostPage() {
                   href={link.startsWith("http") ? link : `https://${link}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block text-accent hover:text-accent-hover"
+                  className="block text-accent-3 hover:text-accent-3/80"
                 >
                   {link}
                 </a>

@@ -28,7 +28,7 @@ export default function NewPostPage() {
         <p className="text-zinc-400">You need to sign in to create a post.</p>
         <Link
           href="/login"
-          className="rounded-full bg-accent px-6 py-2 font-semibold text-white hover:bg-accent-hover"
+          className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2 font-bold text-white shadow-lg shadow-accent/20"
         >
           Sign In
         </Link>
@@ -79,18 +79,20 @@ export default function NewPostPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">Create a Post</h1>
+      <h1 className="mb-6 text-2xl font-black">
+        <span className="gradient-text">Create a Post</span>
+      </h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          <div className="rounded-xl bg-negative/10 px-4 py-3 text-sm font-medium text-negative">
             {error}
           </div>
         )}
 
         {/* Target Info */}
-        <div className="rounded-2xl border border-card-border bg-card-bg p-6">
-          <h2 className="mb-4 text-lg font-semibold">Who is this about?</h2>
+        <div className="card-glow rounded-2xl border border-card-border bg-card-bg p-6">
+          <h2 className="mb-4 text-lg font-bold">Who is this about?</h2>
           <div className="space-y-4">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-zinc-300">
@@ -100,7 +102,7 @@ export default function NewPostPage() {
                 type="text"
                 value={targetName}
                 onChange={(e) => setTargetName(e.target.value)}
-                className="w-full rounded-lg border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none focus:border-accent"
+                className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                 placeholder="Person or brand name"
                 required
               />
@@ -113,9 +115,9 @@ export default function NewPostPage() {
                 <button
                   type="button"
                   onClick={() => setTargetType("person")}
-                  className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
+                  className={`btn-bounce flex-1 rounded-xl border px-4 py-2.5 text-sm font-bold transition-all ${
                     targetType === "person"
-                      ? "border-accent bg-accent/10 text-accent"
+                      ? "border-accent bg-accent/10 text-accent shadow-sm shadow-accent/10"
                       : "border-card-border text-zinc-400 hover:border-zinc-500"
                   }`}
                 >
@@ -124,9 +126,9 @@ export default function NewPostPage() {
                 <button
                   type="button"
                   onClick={() => setTargetType("brand")}
-                  className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
+                  className={`btn-bounce flex-1 rounded-xl border px-4 py-2.5 text-sm font-bold transition-all ${
                     targetType === "brand"
-                      ? "border-accent bg-accent/10 text-accent"
+                      ? "border-accent-3 bg-accent-3/10 text-accent-3 shadow-sm shadow-accent-3/10"
                       : "border-card-border text-zinc-400 hover:border-zinc-500"
                   }`}
                 >
@@ -149,13 +151,13 @@ export default function NewPostPage() {
                       addLink();
                     }
                   }}
-                  className="flex-1 rounded-lg border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none focus:border-accent"
+                  className="flex-1 rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                   placeholder="@handle or https://..."
                 />
                 <button
                   type="button"
                   onClick={addLink}
-                  className="rounded-lg border border-card-border px-3 text-zinc-400 transition-colors hover:border-accent hover:text-accent"
+                  className="btn-bounce rounded-xl border border-card-border px-3 text-zinc-400 transition-all hover:border-accent-3 hover:text-accent-3"
                 >
                   <FiPlus size={20} />
                 </button>
@@ -165,13 +167,13 @@ export default function NewPostPage() {
                   {targetLinks.map((link, i) => (
                     <span
                       key={i}
-                      className="flex items-center gap-1.5 rounded-full bg-input-bg px-3 py-1 text-sm text-zinc-300"
+                      className="flex items-center gap-1.5 rounded-full bg-accent-3/10 px-3 py-1 text-sm text-accent-3"
                     >
                       {link}
                       <button
                         type="button"
                         onClick={() => removeLink(i)}
-                        className="text-zinc-500 hover:text-red-400"
+                        className="text-zinc-500 hover:text-negative"
                       >
                         <FiX size={14} />
                       </button>
@@ -184,8 +186,8 @@ export default function NewPostPage() {
         </div>
 
         {/* Post Content */}
-        <div className="rounded-2xl border border-card-border bg-card-bg p-6">
-          <h2 className="mb-4 text-lg font-semibold">Your Review</h2>
+        <div className="card-glow rounded-2xl border border-card-border bg-card-bg p-6">
+          <h2 className="mb-4 text-lg font-bold">Your Review</h2>
           <div className="space-y-4">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-zinc-300">
@@ -195,9 +197,9 @@ export default function NewPostPage() {
                 <button
                   type="button"
                   onClick={() => setSentiment("positive")}
-                  className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
+                  className={`btn-bounce flex-1 rounded-xl border px-4 py-2.5 text-sm font-bold transition-all ${
                     sentiment === "positive"
-                      ? "border-positive bg-positive/10 text-positive"
+                      ? "border-positive bg-positive/10 text-positive shadow-sm shadow-positive/10"
                       : "border-card-border text-zinc-400 hover:border-zinc-500"
                   }`}
                 >
@@ -206,9 +208,9 @@ export default function NewPostPage() {
                 <button
                   type="button"
                   onClick={() => setSentiment("negative")}
-                  className={`flex-1 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${
+                  className={`btn-bounce flex-1 rounded-xl border px-4 py-2.5 text-sm font-bold transition-all ${
                     sentiment === "negative"
-                      ? "border-negative bg-negative/10 text-negative"
+                      ? "border-negative bg-negative/10 text-negative shadow-sm shadow-negative/10"
                       : "border-card-border text-zinc-400 hover:border-zinc-500"
                   }`}
                 >
@@ -224,7 +226,7 @@ export default function NewPostPage() {
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-lg border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none focus:border-accent"
+                className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                 placeholder="Sum it up in a few words"
                 required
                 maxLength={120}
@@ -237,7 +239,7 @@ export default function NewPostPage() {
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="min-h-[150px] w-full resize-y rounded-lg border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none focus:border-accent"
+                className="min-h-[150px] w-full resize-y rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                 placeholder="Tell your story. Be specific about what happened..."
                 required
               />
@@ -246,19 +248,19 @@ export default function NewPostPage() {
         </div>
 
         {/* Privacy */}
-        <div className="rounded-2xl border border-card-border bg-card-bg p-6">
-          <h2 className="mb-4 text-lg font-semibold">Privacy</h2>
+        <div className="card-glow rounded-2xl border border-card-border bg-card-bg p-6">
+          <h2 className="mb-4 text-lg font-bold">Privacy</h2>
           <button
             type="button"
             onClick={() => setIsAnonymous(!isAnonymous)}
-            className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-colors ${
+            className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all ${
               isAnonymous
-                ? "border-accent bg-accent/10"
+                ? "border-accent-2 bg-accent-2/10 shadow-sm shadow-accent-2/10"
                 : "border-card-border hover:border-zinc-500"
             }`}
           >
             {isAnonymous ? (
-              <FiEyeOff size={20} className="text-accent" />
+              <FiEyeOff size={20} className="text-accent-2" />
             ) : (
               <FiEye size={20} className="text-zinc-400" />
             )}
@@ -278,7 +280,7 @@ export default function NewPostPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-xl bg-accent py-4 text-lg font-bold text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
+          className="btn-bounce w-full rounded-xl bg-gradient-to-r from-accent to-accent-2 py-4 text-lg font-black text-white shadow-lg shadow-accent/20 disabled:opacity-50"
         >
           {loading ? "Publishing..." : "Publish Post"}
         </button>

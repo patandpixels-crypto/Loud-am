@@ -36,20 +36,20 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-card-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl font-black tracking-tight">
-            <span className="text-accent">LOUD</span>
+        <Link href="/" className="group flex items-center gap-2">
+          <span className="text-2xl font-black tracking-tight transition-transform duration-300 group-hover:scale-105">
+            <span className="gradient-text">LOUD</span>
             <span className="text-foreground">-AM!</span>
           </span>
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {user ? (
             <>
               {totalEarnings !== null && totalEarnings > 0 && (
                 <Link
                   href="/profile"
-                  className="flex items-center gap-1 rounded-full border border-positive/30 bg-positive/10 px-3 py-1.5 text-sm font-bold text-positive transition-colors hover:bg-positive/20"
+                  className="btn-bounce flex items-center gap-1 rounded-full border border-positive/30 bg-positive/10 px-3 py-1.5 text-sm font-bold text-positive"
                 >
                   <FiDollarSign size={14} />
                   {totalEarnings.toFixed(2)}
@@ -57,14 +57,14 @@ export default function Navbar() {
               )}
               <Link
                 href="/post/new"
-                className="flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+                className="btn-bounce flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-accent/20"
               >
                 <FiPlus size={16} />
                 Post
               </Link>
               <Link
                 href="/sections"
-                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-card-bg hover:text-white"
+                className="btn-bounce flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-card-bg hover:text-accent-3"
               >
                 <FiBriefcase size={16} />
                 <span className="hidden sm:inline">Sections</span>
@@ -72,7 +72,7 @@ export default function Navbar() {
               {userProfile?.isAdmin && (
                 <Link
                   href="/admin"
-                  className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-card-bg hover:text-white"
+                  className="btn-bounce flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-card-bg hover:text-accent-2"
                 >
                   <FiShield size={16} />
                   Admin
@@ -80,14 +80,14 @@ export default function Navbar() {
               )}
               <Link
                 href="/profile"
-                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-card-bg hover:text-white"
+                className="btn-bounce flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-card-bg hover:text-accent"
               >
                 <FiUser size={16} />
                 <span className="hidden sm:inline">{userProfile?.codeName || "Profile"}</span>
               </Link>
               <button
                 onClick={signOut}
-                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-card-bg hover:text-white"
+                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-negative/10 hover:text-negative"
               >
                 <FiLogOut size={16} />
               </button>
@@ -95,7 +95,7 @@ export default function Navbar() {
           ) : (
             <Link
               href="/login"
-              className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+              className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-5 py-2 text-sm font-bold text-white shadow-lg shadow-accent/20"
             >
               Sign In
             </Link>

@@ -54,22 +54,22 @@ export default function LoginPage() {
     <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-black">
-            <span className="text-accent">LOUD</span>
+          <h1 className="animate-float text-4xl font-black">
+            <span className="gradient-text">LOUD</span>
             <span className="text-foreground">-AM!</span>
           </h1>
           <p className="mt-2 text-zinc-400">
-            Speak your truth. Be heard.
+            Speak your truth. <span className="text-accent-3">Be heard.</span>
           </p>
         </div>
 
-        <div className="rounded-2xl border border-card-border bg-card-bg p-8">
+        <div className="card-glow rounded-2xl border border-card-border bg-card-bg p-8">
           <h2 className="mb-6 text-xl font-bold">
             {isSignUp ? "Create Account" : "Welcome Back"}
           </h2>
 
           {error && (
-            <div className="mb-4 rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-400">
+            <div className="mb-4 rounded-xl bg-negative/10 px-4 py-3 text-sm font-medium text-negative">
               {error}
             </div>
           )}
@@ -84,7 +84,7 @@ export default function LoginPage() {
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full rounded-lg border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-colors focus:border-accent"
+                  className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                   placeholder="How should we call you?"
                   required
                 />
@@ -98,7 +98,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-colors focus:border-accent"
+                className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                 placeholder="your@email.com"
                 required
               />
@@ -111,7 +111,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-colors focus:border-accent"
+                className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                 placeholder="Min. 6 characters"
                 required
                 minLength={6}
@@ -120,7 +120,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-accent py-3 font-semibold text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
+              className="btn-bounce w-full rounded-xl bg-gradient-to-r from-accent to-accent-2 py-3 font-bold text-white shadow-lg shadow-accent/20 disabled:opacity-50"
             >
               {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
             </button>
@@ -133,7 +133,7 @@ export default function LoginPage() {
                 setIsSignUp(!isSignUp);
                 setError("");
               }}
-              className="font-medium text-accent hover:text-accent-hover"
+              className="font-bold text-accent-3 hover:text-accent-3/80"
             >
               {isSignUp ? "Sign In" : "Sign Up"}
             </button>

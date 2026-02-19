@@ -20,13 +20,13 @@ function getTimeAgo(timestamp: number): string {
 export default function SectionCard({ section }: { section: CompanySection }) {
   return (
     <Link href={`/sections/${section.id}`}>
-      <div className="group rounded-2xl border border-card-border bg-card-bg p-5 transition-colors hover:border-zinc-600">
+      <div className="card-glow group rounded-2xl border border-card-border bg-card-bg p-5">
         <div className="mb-3 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent/10">
-            <FiBriefcase className="text-accent" size={24} />
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-accent-2/20">
+            <FiBriefcase className="text-accent-2" size={24} />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-lg font-bold text-white group-hover:text-accent">
+            <h3 className="truncate text-lg font-bold text-white transition-colors group-hover:text-accent-2">
               {section.companyName}
             </h3>
             <p className="text-xs text-zinc-500">Created {getTimeAgo(section.createdAt)}</p>
@@ -38,11 +38,11 @@ export default function SectionCard({ section }: { section: CompanySection }) {
         </p>
 
         <div className="flex items-center gap-4 text-xs text-zinc-500">
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1 text-accent-3">
             <FiUsers size={12} />
             {section.staffIds.length} staff
           </span>
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1 text-accent">
             <FiFileText size={12} />
             {section.postCount} posts
           </span>

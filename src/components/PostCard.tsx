@@ -144,26 +144,28 @@ export default function PostCard({ post, rank }: PostCardProps) {
   };
 
   return (
-    <div className="group rounded-2xl border border-card-border bg-card-bg transition-colors hover:border-zinc-600">
+    <div className="card-glow group rounded-2xl border border-card-border bg-card-bg">
       <div className="flex gap-3 p-4 sm:p-5">
         {/* Vote Column */}
         <div className="flex flex-col items-center gap-1">
           {rank && (
-            <span className="mb-1 text-xs font-bold text-zinc-500">#{rank}</span>
+            <span className={`mb-1 text-xs font-black ${rank <= 3 ? "text-accent-2" : "text-zinc-500"}`}>
+              #{rank}
+            </span>
           )}
           <button
             onClick={() => handleVote("up")}
             disabled={voting}
-            className={`rounded-lg p-1.5 transition-colors ${
+            className={`btn-bounce rounded-xl p-1.5 ${
               userVote === "up"
-                ? "bg-positive/20 text-positive"
-                : "text-zinc-500 hover:bg-zinc-800 hover:text-positive disabled:opacity-30"
+                ? "bg-positive/20 text-positive shadow-sm shadow-positive/20"
+                : "text-zinc-500 hover:bg-positive/10 hover:text-positive disabled:opacity-30"
             }`}
           >
             <FiArrowUp size={20} />
           </button>
           <span
-            className={`text-sm font-bold ${
+            className={`text-sm font-black ${
               score > 0 ? "text-positive" : score < 0 ? "text-negative" : "text-zinc-400"
             }`}
           >
@@ -172,10 +174,10 @@ export default function PostCard({ post, rank }: PostCardProps) {
           <button
             onClick={() => handleVote("down")}
             disabled={voting}
-            className={`rounded-lg p-1.5 transition-colors ${
+            className={`btn-bounce rounded-xl p-1.5 ${
               userVote === "down"
-                ? "bg-negative/20 text-negative"
-                : "text-zinc-500 hover:bg-zinc-800 hover:text-negative disabled:opacity-30"
+                ? "bg-negative/20 text-negative shadow-sm shadow-negative/20"
+                : "text-zinc-500 hover:bg-negative/10 hover:text-negative disabled:opacity-30"
             }`}
           >
             <FiArrowDown size={20} />
@@ -184,9 +186,9 @@ export default function PostCard({ post, rank }: PostCardProps) {
 
         {/* Content */}
         <div className="min-w-0 flex-1">
-          <div className="mb-1 flex flex-wrap items-center gap-2">
+          <div className="mb-1.5 flex flex-wrap items-center gap-2">
             <span
-              className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+              className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
                 post.sentiment === "positive"
                   ? "bg-positive/10 text-positive"
                   : "bg-negative/10 text-negative"
@@ -194,18 +196,18 @@ export default function PostCard({ post, rank }: PostCardProps) {
             >
               {post.sentiment === "positive" ? "Positive" : "Negative"}
             </span>
-            <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">
+            <span className="rounded-full bg-accent-3/10 px-2.5 py-0.5 text-xs font-medium text-accent-3">
               {post.targetType === "person" ? "Person" : "Brand"}
             </span>
           </div>
 
           <Link href={`/post/${post.id}`} className="block">
-            <h3 className="mb-1 text-lg font-bold leading-snug text-white group-hover:text-accent">
+            <h3 className="mb-1 text-lg font-bold leading-snug text-white transition-colors group-hover:text-accent">
               {post.title}
             </h3>
           </Link>
 
-          <p className="mb-2 text-sm font-medium text-accent">
+          <p className="mb-2 text-sm font-semibold text-accent-2">
             About: {post.targetName}
           </p>
 
@@ -221,7 +223,7 @@ export default function PostCard({ post, rank }: PostCardProps) {
                   href={link.startsWith("http") ? link : `https://${link}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 rounded-full bg-zinc-800 px-2.5 py-1 text-xs text-zinc-400 hover:text-accent"
+                  className="btn-bounce flex items-center gap-1 rounded-full bg-accent-3/10 px-2.5 py-1 text-xs text-accent-3 hover:bg-accent-3/20"
                 >
                   <FiExternalLink size={12} />
                   {link.length > 30 ? link.substring(0, 30) + "..." : link}
@@ -233,7 +235,7 @@ export default function PostCard({ post, rank }: PostCardProps) {
           <div className="flex items-center gap-2 text-xs text-zinc-500">
             <FiUser size={12} />
             <span>{post.isAnonymous ? "Anonymous" : post.authorName}</span>
-            <span>&middot;</span>
+            <span className="text-accent-2">&middot;</span>
             <span>{timeAgo}</span>
           </div>
         </div>
