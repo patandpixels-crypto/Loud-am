@@ -108,7 +108,7 @@ export default function NewSectionPostPage() {
   if (!section) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <p className="text-lg text-zinc-400">Section not found</p>
+        <p className="text-lg text-subtext">Section not found</p>
         <Link href="/sections" className="text-accent hover:underline">Back to sections</Link>
       </div>
     );
@@ -117,7 +117,7 @@ export default function NewSectionPostPage() {
   if (!user || !isStaff) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <p className="text-lg text-zinc-400">Only permitted staff can post in this section.</p>
+        <p className="text-lg text-subtext">Only permitted staff can post in this section.</p>
         <Link href={`/sections/${sectionId}`} className="text-accent hover:underline">
           Back to {section.companyName}
         </Link>
@@ -129,39 +129,39 @@ export default function NewSectionPostPage() {
     <div className="mx-auto max-w-2xl px-4 py-8">
       <Link
         href={`/sections/${sectionId}`}
-        className="mb-6 flex items-center gap-2 text-sm text-zinc-400 hover:text-white"
+        className="mb-6 flex items-center gap-2 text-sm text-subtext hover:text-heading"
       >
         <FiArrowLeft size={16} />
         Back to {section.companyName}
       </Link>
 
       <div className="rounded-2xl border border-card-border bg-card-bg p-6 sm:p-8">
-        <h1 className="mb-1 text-2xl font-black text-white">New Post</h1>
-        <p className="mb-6 text-sm text-zinc-400">
+        <h1 className="mb-1 text-2xl font-black text-heading">New Post</h1>
+        <p className="mb-6 text-sm text-subtext">
           Posting in <strong className="text-accent">{section.companyName}</strong>
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-300">Title</label>
+            <label className="mb-1.5 block text-sm font-medium text-subtle">Title</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What's this about?"
-              className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-accent"
+              className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-heading placeholder-muted outline-none focus:border-accent"
               maxLength={200}
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-300">Content</label>
+            <label className="mb-1.5 block text-sm font-medium text-subtle">Content</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Share what you know..."
               rows={8}
-              className="w-full resize-none rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm leading-relaxed text-white placeholder-zinc-500 outline-none focus:border-accent"
+              className="w-full resize-none rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm leading-relaxed text-heading placeholder-muted outline-none focus:border-accent"
             />
           </div>
 
@@ -172,7 +172,7 @@ export default function NewSectionPostPage() {
             className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 transition-colors ${
               isAnonymous
                 ? "border-accent bg-accent/10 text-accent"
-                : "border-card-border bg-input-bg text-zinc-400 hover:border-zinc-600"
+                : "border-card-border bg-input-bg text-subtext hover:border-zinc-600"
             }`}
           >
             <FiEyeOff size={18} />

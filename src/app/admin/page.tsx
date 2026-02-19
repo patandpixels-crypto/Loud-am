@@ -68,8 +68,8 @@ export default function AdminPage() {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
         <FiShield size={48} className="text-zinc-600" />
-        <p className="text-xl font-bold text-zinc-400">Admin Access Required</p>
-        <p className="text-sm text-zinc-500">You don&apos;t have permission to view this page.</p>
+        <p className="text-xl font-bold text-subtext">Admin Access Required</p>
+        <p className="text-sm text-muted">You don&apos;t have permission to view this page.</p>
         <Link
           href="/"
           className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2 font-bold text-white shadow-lg shadow-accent/20"
@@ -91,17 +91,17 @@ export default function AdminPage() {
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
-          <p className="text-sm text-zinc-400">Total Posts</p>
+          <p className="text-sm text-subtext">Total Posts</p>
           <p className="text-3xl font-black">{posts.length}</p>
         </div>
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
-          <p className="text-sm text-zinc-400">Anonymous Posts</p>
+          <p className="text-sm text-subtext">Anonymous Posts</p>
           <p className="text-3xl font-black text-accent-2">
             {posts.filter((p) => p.isAnonymous).length}
           </p>
         </div>
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
-          <p className="text-sm text-zinc-400">Public Posts</p>
+          <p className="text-sm text-subtext">Public Posts</p>
           <p className="text-3xl font-black text-positive">
             {posts.filter((p) => !p.isAnonymous).length}
           </p>
@@ -113,11 +113,11 @@ export default function AdminPage() {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-card-border bg-card-bg">
               <tr>
-                <th className="px-4 py-3 font-bold text-zinc-300">Post</th>
-                <th className="px-4 py-3 font-bold text-zinc-300">About</th>
-                <th className="px-4 py-3 font-bold text-zinc-300">Author Identity</th>
-                <th className="px-4 py-3 font-bold text-zinc-300">Type</th>
-                <th className="px-4 py-3 font-bold text-zinc-300">Score</th>
+                <th className="px-4 py-3 font-bold text-subtle">Post</th>
+                <th className="px-4 py-3 font-bold text-subtle">About</th>
+                <th className="px-4 py-3 font-bold text-subtle">Author Identity</th>
+                <th className="px-4 py-3 font-bold text-subtle">Type</th>
+                <th className="px-4 py-3 font-bold text-subtle">Score</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-card-border">
@@ -126,14 +126,14 @@ export default function AdminPage() {
                   <td className="px-4 py-3">
                     <Link
                       href={`/post/${post.id}`}
-                      className="font-medium text-white hover:text-accent"
+                      className="font-medium text-heading hover:text-accent"
                     >
                       {post.title.length > 40
                         ? post.title.substring(0, 40) + "..."
                         : post.title}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-zinc-400">{post.targetName}</td>
+                  <td className="px-4 py-3 text-subtext">{post.targetName}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-0.5">
                       <div className="flex items-center gap-1.5">
@@ -142,12 +142,12 @@ export default function AdminPage() {
                         ) : (
                           <FiEye size={14} className="text-positive" />
                         )}
-                        <span className="flex items-center gap-1 text-zinc-300">
+                        <span className="flex items-center gap-1 text-subtle">
                           <FiUser size={12} />
                           {post.authorProfile?.displayName || post.authorName}
                         </span>
                       </div>
-                      <span className="flex items-center gap-1 text-xs text-zinc-500">
+                      <span className="flex items-center gap-1 text-xs text-muted">
                         <FiMail size={10} />
                         {post.authorEmail || "Unknown"}
                       </span>
@@ -171,7 +171,7 @@ export default function AdminPage() {
                           ? "text-positive"
                           : post.score < 0
                           ? "text-negative"
-                          : "text-zinc-400"
+                          : "text-subtext"
                       }`}
                     >
                       {post.score > 0 ? "+" : ""}

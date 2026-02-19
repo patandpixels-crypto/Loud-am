@@ -42,7 +42,7 @@ export default function PostPage() {
   if (!post) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <p className="text-xl font-bold text-zinc-400">Post not found</p>
+        <p className="text-xl font-bold text-subtext">Post not found</p>
         <button
           onClick={() => router.push("/")}
           className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2 font-bold text-white shadow-lg shadow-accent/20"
@@ -57,7 +57,7 @@ export default function PostPage() {
     <div className="mx-auto max-w-3xl px-4 py-6">
       <Link
         href="/"
-        className="btn-bounce mb-4 inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-accent-3"
+        className="btn-bounce mb-4 inline-flex items-center gap-1.5 text-sm text-subtext hover:text-accent-3"
       >
         <FiArrowLeft size={16} />
         Back to Leaderboard
@@ -68,13 +68,13 @@ export default function PostPage() {
       {/* Full content section */}
       <div className="card-glow mt-4 rounded-2xl border border-card-border bg-card-bg p-6">
         <h2 className="mb-3 text-lg font-bold">Full Review</h2>
-        <p className="whitespace-pre-wrap leading-relaxed text-zinc-300">
+        <p className="whitespace-pre-wrap leading-relaxed text-subtle">
           {post.content}
         </p>
 
         {post.targetLinks.length > 0 && (
           <div className="mt-6">
-            <h3 className="mb-2 text-sm font-bold text-zinc-400">Related Links</h3>
+            <h3 className="mb-2 text-sm font-bold text-subtext">Related Links</h3>
             <div className="space-y-2">
               {post.targetLinks.map((link, i) => (
                 <a

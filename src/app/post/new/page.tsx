@@ -25,7 +25,7 @@ export default function NewPostPage() {
   if (!user) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <p className="text-zinc-400">You need to sign in to create a post.</p>
+        <p className="text-subtext">You need to sign in to create a post.</p>
         <Link
           href="/login"
           className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2 font-bold text-white shadow-lg shadow-accent/20"
@@ -95,20 +95,20 @@ export default function NewPostPage() {
           <h2 className="mb-4 text-lg font-bold">Who is this about?</h2>
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+              <label className="mb-1.5 block text-sm font-medium text-subtle">
                 Name
               </label>
               <input
                 type="text"
                 value={targetName}
                 onChange={(e) => setTargetName(e.target.value)}
-                className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+                className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                 placeholder="Person or brand name"
                 required
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+              <label className="mb-1.5 block text-sm font-medium text-subtle">
                 Type
               </label>
               <div className="flex gap-3">
@@ -118,7 +118,7 @@ export default function NewPostPage() {
                   className={`btn-bounce flex-1 rounded-xl border px-4 py-2.5 text-sm font-bold transition-all ${
                     targetType === "person"
                       ? "border-accent bg-accent/10 text-accent shadow-sm shadow-accent/10"
-                      : "border-card-border text-zinc-400 hover:border-zinc-500"
+                      : "border-card-border text-subtext hover:border-zinc-500"
                   }`}
                 >
                   Person
@@ -129,7 +129,7 @@ export default function NewPostPage() {
                   className={`btn-bounce flex-1 rounded-xl border px-4 py-2.5 text-sm font-bold transition-all ${
                     targetType === "brand"
                       ? "border-accent-3 bg-accent-3/10 text-accent-3 shadow-sm shadow-accent-3/10"
-                      : "border-card-border text-zinc-400 hover:border-zinc-500"
+                      : "border-card-border text-subtext hover:border-zinc-500"
                   }`}
                 >
                   Brand
@@ -137,7 +137,7 @@ export default function NewPostPage() {
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+              <label className="mb-1.5 block text-sm font-medium text-subtle">
                 Links / Social Media Handles
               </label>
               <div className="flex gap-2">
@@ -151,13 +151,13 @@ export default function NewPostPage() {
                       addLink();
                     }
                   }}
-                  className="flex-1 rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+                  className="flex-1 rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                   placeholder="@handle or https://..."
                 />
                 <button
                   type="button"
                   onClick={addLink}
-                  className="btn-bounce rounded-xl border border-card-border px-3 text-zinc-400 transition-all hover:border-accent-3 hover:text-accent-3"
+                  className="btn-bounce rounded-xl border border-card-border px-3 text-subtext transition-all hover:border-accent-3 hover:text-accent-3"
                 >
                   <FiPlus size={20} />
                 </button>
@@ -173,7 +173,7 @@ export default function NewPostPage() {
                       <button
                         type="button"
                         onClick={() => removeLink(i)}
-                        className="text-zinc-500 hover:text-negative"
+                        className="text-muted hover:text-negative"
                       >
                         <FiX size={14} />
                       </button>
@@ -190,7 +190,7 @@ export default function NewPostPage() {
           <h2 className="mb-4 text-lg font-bold">Your Review</h2>
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+              <label className="mb-1.5 block text-sm font-medium text-subtle">
                 Sentiment
               </label>
               <div className="flex gap-3">
@@ -200,7 +200,7 @@ export default function NewPostPage() {
                   className={`btn-bounce flex-1 rounded-xl border px-4 py-2.5 text-sm font-bold transition-all ${
                     sentiment === "positive"
                       ? "border-positive bg-positive/10 text-positive shadow-sm shadow-positive/10"
-                      : "border-card-border text-zinc-400 hover:border-zinc-500"
+                      : "border-card-border text-subtext hover:border-zinc-500"
                   }`}
                 >
                   Positive
@@ -211,7 +211,7 @@ export default function NewPostPage() {
                   className={`btn-bounce flex-1 rounded-xl border px-4 py-2.5 text-sm font-bold transition-all ${
                     sentiment === "negative"
                       ? "border-negative bg-negative/10 text-negative shadow-sm shadow-negative/10"
-                      : "border-card-border text-zinc-400 hover:border-zinc-500"
+                      : "border-card-border text-subtext hover:border-zinc-500"
                   }`}
                 >
                   Negative
@@ -219,27 +219,27 @@ export default function NewPostPage() {
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+              <label className="mb-1.5 block text-sm font-medium text-subtle">
                 Title
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+                className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                 placeholder="Sum it up in a few words"
                 required
                 maxLength={120}
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+              <label className="mb-1.5 block text-sm font-medium text-subtle">
                 Your Experience
               </label>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="min-h-[150px] w-full resize-y rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+                className="min-h-[150px] w-full resize-y rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                 placeholder="Tell your story. Be specific about what happened..."
                 required
               />
@@ -262,13 +262,13 @@ export default function NewPostPage() {
             {isAnonymous ? (
               <FiEyeOff size={20} className="text-accent-2" />
             ) : (
-              <FiEye size={20} className="text-zinc-400" />
+              <FiEye size={20} className="text-subtext" />
             )}
             <div>
               <p className="font-medium">
                 {isAnonymous ? "Posting Anonymously" : "Posting as " + (user.displayName || "yourself")}
               </p>
-              <p className="text-sm text-zinc-400">
+              <p className="text-sm text-subtext">
                 {isAnonymous
                   ? "Your identity will be hidden from other users. Only admins can see who you are."
                   : "Other users will see your display name on this post."}

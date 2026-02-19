@@ -14,6 +14,34 @@
   --input-bg: #1a1a2e;
   --glow-accent: rgba(255, 107, 107, 0.15);
   --glow-positive: rgba(0, 210, 211, 0.15);
+  --heading: #ffffff;
+  --subtext: #a1a1aa;
+  --muted: #71717a;
+  --subtle: #d4d4d8;
+  --surface: #27272a;
+  --overlay: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] {
+  --background: #f8f8fc;
+  --foreground: #1a1a2e;
+  --accent: #e05555;
+  --accent-hover: #c94444;
+  --accent-2: #e0a820;
+  --accent-3: #1a9fc4;
+  --positive: #059e9f;
+  --negative: #dc3545;
+  --card-bg: #ffffff;
+  --card-border: #e2e2ee;
+  --input-bg: #f0f0f8;
+  --glow-accent: rgba(224, 85, 85, 0.1);
+  --glow-positive: rgba(5, 158, 159, 0.1);
+  --heading: #1a1a2e;
+  --subtext: #52525b;
+  --muted: #71717a;
+  --subtle: #3f3f46;
+  --surface: #f0f0f8;
+  --overlay: rgba(0, 0, 0, 0.3);
 }
 
 @theme inline {
@@ -28,6 +56,12 @@
   --color-card-bg: var(--card-bg);
   --color-card-border: var(--card-border);
   --color-input-bg: var(--input-bg);
+  --color-heading: var(--heading);
+  --color-subtext: var(--subtext);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-surface: var(--surface);
+  --color-overlay: var(--overlay);
   --font-sans: "Inter", "Segoe UI", Arial, sans-serif;
   --font-mono: "Fira Code", "Courier New", monospace;
 }
@@ -36,6 +70,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* Fun selection color */

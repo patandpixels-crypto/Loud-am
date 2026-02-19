@@ -108,7 +108,7 @@ export default function HomePage() {
           <span className="gradient-text">LOUD</span>
           <span className="text-foreground">-AM!</span>
         </h1>
-        <p className="mt-3 text-zinc-400">
+        <p className="mt-3 text-subtext">
           Speak your truth about people and brands. <span className="font-semibold text-accent-3">Be heard.</span>
         </p>
         {!user && (
@@ -127,8 +127,8 @@ export default function HomePage() {
               <FiAward size={18} className="text-accent-2" />
             </div>
             <div className="text-left">
-              <p className="text-xs font-medium text-zinc-400">Top Earner This Month</p>
-              <p className="text-sm font-bold text-white">
+              <p className="text-xs font-medium text-subtext">Top Earner This Month</p>
+              <p className="text-sm font-bold text-heading">
                 {topEarner.name}{" "}
                 <span className="text-accent-2">${topEarner.amount.toFixed(2)}</span>
               </p>
@@ -139,13 +139,13 @@ export default function HomePage() {
 
       {/* Search Bar */}
       <div className="relative mb-6">
-        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={16} />
         <input
           type="text"
           placeholder="Search by name, brand, or social media link..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+          className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
         />
       </div>
 
@@ -166,7 +166,7 @@ export default function HomePage() {
               className={`px-3 py-1.5 text-xs font-bold transition-all ${
                 sort === "score"
                   ? "bg-gradient-to-r from-accent to-accent-2 text-white"
-                  : "text-zinc-400 hover:text-white"
+                  : "text-subtext hover:text-heading"
               }`}
             >
               Top
@@ -176,7 +176,7 @@ export default function HomePage() {
               className={`px-3 py-1.5 text-xs font-bold transition-all ${
                 sort === "recent"
                   ? "bg-gradient-to-r from-accent to-accent-2 text-white"
-                  : "text-zinc-400 hover:text-white"
+                  : "text-subtext hover:text-heading"
               }`}
             >
               New
@@ -185,13 +185,13 @@ export default function HomePage() {
 
           {/* Filter */}
           <div className="flex items-center gap-1 overflow-hidden rounded-xl border border-card-border">
-            <FiFilter size={14} className="ml-2 text-zinc-500" />
+            <FiFilter size={14} className="ml-2 text-muted" />
             <button
               onClick={() => setFilter("all")}
               className={`px-2 py-1.5 text-xs font-bold transition-all ${
                 filter === "all"
                   ? "bg-gradient-to-r from-accent to-accent-2 text-white"
-                  : "text-zinc-400 hover:text-white"
+                  : "text-subtext hover:text-heading"
               }`}
             >
               All
@@ -201,7 +201,7 @@ export default function HomePage() {
               className={`px-2 py-1.5 text-xs font-bold transition-all ${
                 filter === "positive"
                   ? "bg-positive text-white"
-                  : "text-zinc-400 hover:text-white"
+                  : "text-subtext hover:text-heading"
               }`}
             >
               +
@@ -211,7 +211,7 @@ export default function HomePage() {
               className={`px-2 py-1.5 text-xs font-bold transition-all ${
                 filter === "negative"
                   ? "bg-negative text-white"
-                  : "text-zinc-400 hover:text-white"
+                  : "text-subtext hover:text-heading"
               }`}
             >
               -
@@ -236,10 +236,10 @@ export default function HomePage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-card-border bg-card-bg py-16 text-center">
-            <p className="mb-2 text-xl font-bold text-zinc-300">
+            <p className="mb-2 text-xl font-bold text-subtle">
               {searchQuery.trim() ? "No results found" : "No posts yet"}
             </p>
-            <p className="mb-4 text-zinc-500">
+            <p className="mb-4 text-muted">
               {searchQuery.trim()
                 ? `Nothing about "${searchQuery}" yet. Be the first!`
                 : "Be the first to speak up!"}

@@ -50,10 +50,10 @@ export default function SectionsPage() {
     <div className="mx-auto max-w-5xl px-4 py-8">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-black text-white">
+          <h1 className="text-3xl font-black text-heading">
             Company <span className="gradient-text">Sections</span>
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-subtext">
             Insider company talk. Staff-only posting. Pay $3 to read & reply.
           </p>
         </div>
@@ -70,20 +70,20 @@ export default function SectionsPage() {
 
       {/* Search */}
       <div className="relative mb-6">
-        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
+        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={16} />
         <input
           type="text"
           placeholder="Search companies..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+          className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
         />
       </div>
 
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-card-border py-16">
-          <p className="text-lg font-bold text-zinc-400">No company sections yet</p>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="text-lg font-bold text-subtext">No company sections yet</p>
+          <p className="mt-1 text-sm text-muted">
             {user ? "Be the first to create one!" : "Sign in to create a company section."}
           </p>
         </div>

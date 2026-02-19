@@ -58,7 +58,7 @@ export default function LoginPage() {
             <span className="gradient-text">LOUD</span>
             <span className="text-foreground">-AM!</span>
           </h1>
-          <p className="mt-2 text-zinc-400">
+          <p className="mt-2 text-subtext">
             Speak your truth. <span className="text-accent-3">Be heard.</span>
           </p>
         </div>
@@ -77,41 +77,41 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+                <label className="mb-1.5 block text-sm font-medium text-subtle">
                   Display Name
                 </label>
                 <input
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+                  className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                   placeholder="How should we call you?"
                   required
                 />
               </div>
             )}
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+              <label className="mb-1.5 block text-sm font-medium text-subtle">
                 Email
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+                className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                 placeholder="your@email.com"
                 required
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+              <label className="mb-1.5 block text-sm font-medium text-subtle">
                 Password
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+                className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                 placeholder="Min. 6 characters"
                 required
                 minLength={6}
@@ -126,7 +126,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-zinc-400">
+          <div className="mt-6 text-center text-sm text-subtext">
             {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
             <button
               onClick={() => {
@@ -141,7 +141,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-4 text-center text-xs text-zinc-600">
-          <Link href="/" className="hover:text-zinc-400">
+          <Link href="/" className="hover:text-subtext">
             Back to home
           </Link>
         </p>

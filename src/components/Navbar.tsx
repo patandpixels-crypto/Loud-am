@@ -5,10 +5,12 @@ import Link from "next/link";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
-import { FiPlus, FiLogOut, FiShield, FiUser, FiBriefcase, FiDollarSign } from "react-icons/fi";
+import { useTheme } from "@/lib/ThemeContext";
+import { FiPlus, FiLogOut, FiShield, FiUser, FiBriefcase, FiDollarSign, FiSun, FiMoon } from "react-icons/fi";
 
 export default function Navbar() {
   const { user, userProfile, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [totalEarnings, setTotalEarnings] = useState<number | null>(null);
 
   useEffect(() => {
@@ -44,6 +46,15 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-2">
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="btn-bounce flex items-center justify-center rounded-full p-2 text-subtext transition-colors hover:bg-surface hover:text-accent-2"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <FiSun size={18} /> : <FiMoon size={18} />}
+          </button>
+
           {user ? (
             <>
               {totalEarnings !== null && totalEarnings > 0 && (
@@ -64,7 +75,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/sections"
-                className="btn-bounce flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-card-bg hover:text-accent-3"
+                className="btn-bounce flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-subtext transition-colors hover:bg-surface hover:text-accent-3"
               >
                 <FiBriefcase size={16} />
                 <span className="hidden sm:inline">Sections</span>
@@ -72,7 +83,7 @@ export default function Navbar() {
               {userProfile?.isAdmin && (
                 <Link
                   href="/admin"
-                  className="btn-bounce flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-card-bg hover:text-accent-2"
+                  className="btn-bounce flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-subtext transition-colors hover:bg-surface hover:text-accent-2"
                 >
                   <FiShield size={16} />
                   Admin
@@ -80,14 +91,14 @@ export default function Navbar() {
               )}
               <Link
                 href="/profile"
-                className="btn-bounce flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-card-bg hover:text-accent"
+                className="btn-bounce flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-subtext transition-colors hover:bg-surface hover:text-accent"
               >
                 <FiUser size={16} />
                 <span className="hidden sm:inline">{userProfile?.codeName || "Profile"}</span>
               </Link>
               <button
                 onClick={signOut}
-                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-negative/10 hover:text-negative"
+                className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-subtext transition-colors hover:bg-negative/10 hover:text-negative"
               >
                 <FiLogOut size={16} />
               </button>

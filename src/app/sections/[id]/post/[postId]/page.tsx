@@ -222,7 +222,7 @@ export default function SectionPostPage() {
   if (!section || !post) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <p className="text-lg text-zinc-400">Post not found</p>
+        <p className="text-lg text-subtext">Post not found</p>
         <Link href="/sections" className="text-accent hover:underline">Back to sections</Link>
       </div>
     );
@@ -232,8 +232,8 @@ export default function SectionPostPage() {
   if (!user) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <FiLock className="text-zinc-500" size={32} />
-        <p className="text-lg text-zinc-400">Sign in to view this post</p>
+        <FiLock className="text-muted" size={32} />
+        <p className="text-lg text-subtext">Sign in to view this post</p>
         <Link href="/login" className="rounded-full bg-accent px-6 py-2 text-sm font-semibold text-white">
           Sign In
         </Link>
@@ -247,7 +247,7 @@ export default function SectionPostPage() {
       <div className="mx-auto max-w-2xl px-4 py-8">
         <Link
           href={`/sections/${sectionId}`}
-          className="mb-6 flex items-center gap-2 text-sm text-zinc-400 hover:text-white"
+          className="mb-6 flex items-center gap-2 text-sm text-subtext hover:text-heading"
         >
           <FiArrowLeft size={16} />
           Back to {section.companyName}
@@ -255,37 +255,37 @@ export default function SectionPostPage() {
 
         <div className="flex flex-col items-center justify-center rounded-2xl border border-card-border bg-card-bg py-16">
           <FiLock className="mb-4 text-accent" size={40} />
-          <h2 className="mb-2 text-xl font-bold text-white">Unlock This Post</h2>
-          <p className="mb-6 text-sm text-zinc-400">
+          <h2 className="mb-2 text-xl font-bold text-heading">Unlock This Post</h2>
+          <p className="mb-6 text-sm text-subtext">
             Pay <strong className="text-accent">$3</strong> to read posts and reply in {section.companyName}
           </p>
           {showPaywall ? (
             <div className="w-full max-w-sm px-6">
               <div className="rounded-xl border border-card-border bg-input-bg p-6">
-                <div className="mb-4 rounded-lg bg-zinc-800 p-4">
+                <div className="mb-4 rounded-lg bg-surface p-4">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-zinc-400">Section access</span>
-                    <span className="font-bold text-white">$3.00</span>
+                    <span className="text-subtext">Section access</span>
+                    <span className="font-bold text-heading">$3.00</span>
                   </div>
                 </div>
                 <div className="mb-4 space-y-3">
                   <input
                     type="text"
                     placeholder="Card number"
-                    className="w-full rounded-lg border border-card-border bg-zinc-800 px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none focus:border-accent"
+                    className="w-full rounded-lg border border-card-border bg-surface px-4 py-2.5 text-sm text-heading placeholder-muted outline-none focus:border-accent"
                     maxLength={19}
                   />
                   <div className="flex gap-3">
                     <input
                       type="text"
                       placeholder="MM/YY"
-                      className="w-1/2 rounded-lg border border-card-border bg-zinc-800 px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none focus:border-accent"
+                      className="w-1/2 rounded-lg border border-card-border bg-surface px-4 py-2.5 text-sm text-heading placeholder-muted outline-none focus:border-accent"
                       maxLength={5}
                     />
                     <input
                       type="text"
                       placeholder="CVC"
-                      className="w-1/2 rounded-lg border border-card-border bg-zinc-800 px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none focus:border-accent"
+                      className="w-1/2 rounded-lg border border-card-border bg-surface px-4 py-2.5 text-sm text-heading placeholder-muted outline-none focus:border-accent"
                       maxLength={4}
                     />
                   </div>
@@ -309,7 +309,7 @@ export default function SectionPostPage() {
                 </button>
                 <button
                   onClick={() => setShowPaywall(false)}
-                  className="mt-3 w-full text-center text-xs text-zinc-500 hover:text-zinc-300"
+                  className="mt-3 w-full text-center text-xs text-muted hover:text-subtle"
                 >
                   Cancel
                 </button>
@@ -335,7 +335,7 @@ export default function SectionPostPage() {
     <div className="mx-auto max-w-3xl px-4 py-8">
       <Link
         href={`/sections/${sectionId}`}
-        className="mb-6 flex items-center gap-2 text-sm text-zinc-400 hover:text-white"
+        className="mb-6 flex items-center gap-2 text-sm text-subtext hover:text-heading"
       >
         <FiArrowLeft size={16} />
         Back to {section.companyName}
@@ -343,8 +343,8 @@ export default function SectionPostPage() {
 
       {/* Post */}
       <article className="mb-8 rounded-2xl border border-card-border bg-card-bg p-6 sm:p-8">
-        <h1 className="mb-3 text-2xl font-black leading-tight text-white">{post.title}</h1>
-        <div className="mb-4 flex items-center gap-3 text-sm text-zinc-500">
+        <h1 className="mb-3 text-2xl font-black leading-tight text-heading">{post.title}</h1>
+        <div className="mb-4 flex items-center gap-3 text-sm text-muted">
           <span className="flex items-center gap-1">
             <FiUser size={14} />
             {post.isAnonymous ? "Anonymous Staff" : post.authorName}
@@ -356,19 +356,19 @@ export default function SectionPostPage() {
             </span>
           )}
         </div>
-        <div className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
+        <div className="whitespace-pre-wrap text-sm leading-relaxed text-subtle">
           {post.content}
         </div>
       </article>
 
       {/* Replies */}
       <div className="mb-6">
-        <h2 className="mb-4 text-lg font-bold text-white">
+        <h2 className="mb-4 text-lg font-bold text-heading">
           Replies ({replies.length})
         </h2>
 
         {replies.length === 0 ? (
-          <p className="text-sm text-zinc-500">No replies yet. Be the first to reply!</p>
+          <p className="text-sm text-muted">No replies yet. Be the first to reply!</p>
         ) : (
           <div className="space-y-3">
             {replies.map((reply) => (
@@ -376,9 +376,9 @@ export default function SectionPostPage() {
                 key={reply.id}
                 className="rounded-xl border border-card-border bg-card-bg p-4"
               >
-                <div className="mb-2 flex items-center gap-2 text-xs text-zinc-500">
+                <div className="mb-2 flex items-center gap-2 text-xs text-muted">
                   <FiUser size={12} />
-                  <span className="font-medium text-zinc-300">{reply.authorName}</span>
+                  <span className="font-medium text-subtle">{reply.authorName}</span>
                   {reply.isPaidUser && (
                     <span className="rounded-full bg-accent/10 px-1.5 py-0.5 text-xs text-accent">
                       Paid
@@ -386,7 +386,7 @@ export default function SectionPostPage() {
                   )}
                   <span>{getTimeAgo(reply.createdAt)}</span>
                 </div>
-                <p className="text-sm leading-relaxed text-zinc-300">{reply.content}</p>
+                <p className="text-sm leading-relaxed text-subtle">{reply.content}</p>
               </div>
             ))}
           </div>
@@ -397,10 +397,10 @@ export default function SectionPostPage() {
       {hasAccess && (
         <form onSubmit={handleReply} className="rounded-2xl border border-card-border bg-card-bg p-5">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-zinc-300">Write a Reply</h3>
+            <h3 className="text-sm font-semibold text-subtle">Write a Reply</h3>
             {!isStaff && (
               <span
-                className={`text-xs ${wordCount > 200 ? "text-negative" : "text-zinc-500"}`}
+                className={`text-xs ${wordCount > 200 ? "text-negative" : "text-muted"}`}
               >
                 {wordCount}/200 words
               </span>
@@ -415,7 +415,7 @@ export default function SectionPostPage() {
                 : "Write your reply (max 200 words)..."
             }
             rows={4}
-            className="mb-3 w-full resize-none rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-accent"
+            className="mb-3 w-full resize-none rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-heading placeholder-muted outline-none focus:border-accent"
           />
           {replyError && (
             <p className="mb-3 rounded-lg bg-negative/10 px-4 py-2 text-sm text-negative">

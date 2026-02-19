@@ -90,7 +90,7 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <p className="text-zinc-400">Sign in to view your profile.</p>
+        <p className="text-subtext">Sign in to view your profile.</p>
         <Link
           href="/login"
           className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2 font-bold text-white shadow-lg shadow-accent/20"
@@ -114,10 +114,10 @@ export default function ProfilePage() {
           </div>
           <div>
             <h1 className="text-xl font-bold">{userProfile?.codeName || "User"}</h1>
-            <p className="text-sm text-zinc-400">{user.displayName || "User"}</p>
-            <p className="text-xs text-zinc-500">{user.email}</p>
+            <p className="text-sm text-subtext">{user.displayName || "User"}</p>
+            <p className="text-xs text-muted">{user.email}</p>
             {userProfile && (
-              <p className="mt-1 flex items-center gap-1 text-xs text-zinc-500">
+              <p className="mt-1 flex items-center gap-1 text-xs text-muted">
                 <FiCalendar size={12} />
                 Joined {new Date(userProfile.createdAt).toLocaleDateString()}
               </p>
@@ -134,15 +134,15 @@ export default function ProfilePage() {
               <FiDollarSign size={20} className="text-accent-2" />
             </div>
             <div>
-              <p className="text-sm text-zinc-400">Total Earnings</p>
+              <p className="text-sm text-subtext">Total Earnings</p>
               <p className="text-2xl font-black text-accent-2">
                 ${totalEarnings.toFixed(2)}
               </p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xs text-zinc-500">From {earnings.length} payments</p>
-            <p className="text-xs text-zinc-500">50% revenue share on section access</p>
+            <p className="text-xs text-muted">From {earnings.length} payments</p>
+            <p className="text-xs text-muted">50% revenue share on section access</p>
           </div>
         </div>
       </div>
@@ -151,23 +151,23 @@ export default function ProfilePage() {
       <div className="mb-6 grid grid-cols-4 gap-3">
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4 text-center">
           <p className="text-2xl font-black">{totalPosts}</p>
-          <p className="text-xs text-zinc-400">Total Posts</p>
+          <p className="text-xs text-subtext">Total Posts</p>
         </div>
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4 text-center">
           <p className="text-2xl font-black text-positive">
             {posts.filter((p) => p.sentiment === "positive").length}
           </p>
-          <p className="text-xs text-zinc-400">Positive</p>
+          <p className="text-xs text-subtext">Positive</p>
         </div>
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4 text-center">
           <p className="text-2xl font-black text-negative">
             {posts.filter((p) => p.sentiment === "negative").length}
           </p>
-          <p className="text-xs text-zinc-400">Negative</p>
+          <p className="text-xs text-subtext">Negative</p>
         </div>
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4 text-center">
           <p className="text-2xl font-black text-accent-3">{sectionPosts.length}</p>
-          <p className="text-xs text-zinc-400">Section</p>
+          <p className="text-xs text-subtext">Section</p>
         </div>
       </div>
 
@@ -186,15 +186,15 @@ export default function ProfilePage() {
                     <FiDollarSign size={14} className="text-accent-2" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">Section post earning</p>
-                    <p className="text-xs text-zinc-500">{getTimeAgo(earning.createdAt)}</p>
+                    <p className="text-sm font-medium text-heading">Section post earning</p>
+                    <p className="text-xs text-muted">{getTimeAgo(earning.createdAt)}</p>
                   </div>
                 </div>
                 <p className="text-sm font-bold text-accent-2">+${earning.amount.toFixed(2)}</p>
               </div>
             ))}
             {earnings.length > 10 && (
-              <p className="text-center text-xs text-zinc-500">
+              <p className="text-center text-xs text-muted">
                 and {earnings.length - 10} more...
               </p>
             )}
@@ -210,7 +210,7 @@ export default function ProfilePage() {
         </div>
       ) : posts.length === 0 && sectionPosts.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-card-border bg-card-bg py-12 text-center">
-          <p className="mb-2 text-zinc-300">You haven&apos;t posted anything yet.</p>
+          <p className="mb-2 text-subtle">You haven&apos;t posted anything yet.</p>
           <Link
             href="/post/new"
             className="btn-bounce mt-2 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
@@ -231,7 +231,7 @@ export default function ProfilePage() {
               {posts.length > 0 && (
                 <div className="flex items-center gap-2 pt-4">
                   <FiBriefcase size={16} className="text-accent-2" />
-                  <h3 className="text-sm font-semibold text-zinc-400">Section Posts</h3>
+                  <h3 className="text-sm font-semibold text-subtext">Section Posts</h3>
                 </div>
               )}
               {sectionPosts.map((sp) => (
@@ -246,13 +246,13 @@ export default function ProfilePage() {
                         Section
                       </span>
                     </div>
-                    <h3 className="mb-1 text-lg font-bold leading-snug text-white group-hover:text-accent">
+                    <h3 className="mb-1 text-lg font-bold leading-snug text-heading group-hover:text-accent">
                       {sp.title}
                     </h3>
-                    <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-zinc-400">
+                    <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-subtext">
                       {sp.content}
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-zinc-500">
+                    <div className="flex items-center gap-2 text-xs text-muted">
                       <FiUser size={12} />
                       <span>{sp.isAnonymous ? "Anonymous" : sp.authorName}</span>
                       <span className="text-accent-2">&middot;</span>

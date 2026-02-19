@@ -91,7 +91,7 @@ export default function CreateSectionPage() {
   if (!user) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <p className="text-lg text-zinc-400">You must be signed in to create a section.</p>
+        <p className="text-lg text-subtext">You must be signed in to create a section.</p>
         <Link href="/login" className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2 text-sm font-bold text-white shadow-lg shadow-accent/20">
           Sign In
         </Link>
@@ -101,7 +101,7 @@ export default function CreateSectionPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/sections" className="btn-bounce mb-6 flex items-center gap-2 text-sm text-zinc-400 hover:text-accent-3">
+      <Link href="/sections" className="btn-bounce mb-6 flex items-center gap-2 text-sm text-subtext hover:text-accent-3">
         <FiArrowLeft size={16} />
         Back to Sections
       </Link>
@@ -115,40 +115,40 @@ export default function CreateSectionPage() {
             <h1 className="text-2xl font-black">
               <span className="gradient-text">Create Company Section</span>
             </h1>
-            <p className="text-sm text-zinc-400">Set up a private space for your company</p>
+            <p className="text-sm text-subtext">Set up a private space for your company</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Company Name */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-300">Company Name</label>
+            <label className="mb-1.5 block text-sm font-medium text-subtle">Company Name</label>
             <input
               type="text"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder="e.g. Acme Corp"
-              className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+              className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
               maxLength={100}
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-300">Description</label>
+            <label className="mb-1.5 block text-sm font-medium text-subtle">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What is this section about?"
               rows={3}
-              className="w-full resize-none rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+              className="w-full resize-none rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
               maxLength={500}
             />
           </div>
 
           {/* Invite Staff */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-zinc-300">
+            <label className="mb-1.5 block text-sm font-medium text-subtle">
               Invite Staff Members (by email)
             </label>
             <div className="flex gap-2">
@@ -158,12 +158,12 @@ export default function CreateSectionPage() {
                 onChange={(e) => setStaffEmail(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addStaffEmail(); } }}
                 placeholder="colleague@company.com"
-                className="flex-1 rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-white placeholder-zinc-500 outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+                className="flex-1 rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
               />
               <button
                 type="button"
                 onClick={addStaffEmail}
-                className="btn-bounce rounded-xl bg-zinc-800 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
+                className="btn-bounce rounded-xl bg-surface px-4 py-3 text-sm font-medium text-heading transition-colors hover:bg-zinc-700"
               >
                 <FiPlus size={16} />
               </button>
@@ -176,14 +176,14 @@ export default function CreateSectionPage() {
                     className="flex items-center gap-1.5 rounded-full bg-accent-2/10 px-3 py-1 text-xs font-medium text-accent-2"
                   >
                     {email}
-                    <button type="button" onClick={() => removeStaffEmail(email)} className="hover:text-white">
+                    <button type="button" onClick={() => removeStaffEmail(email)} className="hover:text-heading">
                       <FiX size={12} />
                     </button>
                   </span>
                 ))}
               </div>
             )}
-            <p className="mt-2 text-xs text-zinc-500">
+            <p className="mt-2 text-xs text-muted">
               You are automatically added as staff. Invited staff can post when they sign up with these emails.
             </p>
           </div>

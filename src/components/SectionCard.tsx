@@ -26,18 +26,18 @@ export default function SectionCard({ section }: { section: CompanySection }) {
             <FiBriefcase className="text-accent-2" size={24} />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-lg font-bold text-white transition-colors group-hover:text-accent-2">
+            <h3 className="truncate text-lg font-bold text-heading transition-colors group-hover:text-accent-2">
               {section.companyName}
             </h3>
-            <p className="text-xs text-zinc-500">Created {getTimeAgo(section.createdAt)}</p>
+            <p className="text-xs text-muted">Created {getTimeAgo(section.createdAt)}</p>
           </div>
         </div>
 
-        <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-zinc-400">
+        <p className="mb-4 line-clamp-2 text-sm leading-relaxed text-subtext">
           {section.description}
         </p>
 
-        <div className="flex items-center gap-4 text-xs text-zinc-500">
+        <div className="flex items-center gap-4 text-xs text-muted">
           <span className="flex items-center gap-1 text-accent-3">
             <FiUsers size={12} />
             {section.staffIds.length} staff

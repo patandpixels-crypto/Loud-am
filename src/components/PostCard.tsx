@@ -149,7 +149,7 @@ export default function PostCard({ post, rank }: PostCardProps) {
         {/* Vote Column */}
         <div className="flex flex-col items-center gap-1">
           {rank && (
-            <span className={`mb-1 text-xs font-black ${rank <= 3 ? "text-accent-2" : "text-zinc-500"}`}>
+            <span className={`mb-1 text-xs font-black ${rank <= 3 ? "text-accent-2" : "text-muted"}`}>
               #{rank}
             </span>
           )}
@@ -159,14 +159,14 @@ export default function PostCard({ post, rank }: PostCardProps) {
             className={`btn-bounce rounded-xl p-1.5 ${
               userVote === "up"
                 ? "bg-positive/20 text-positive shadow-sm shadow-positive/20"
-                : "text-zinc-500 hover:bg-positive/10 hover:text-positive disabled:opacity-30"
+                : "text-muted hover:bg-positive/10 hover:text-positive disabled:opacity-30"
             }`}
           >
             <FiArrowUp size={20} />
           </button>
           <span
             className={`text-sm font-black ${
-              score > 0 ? "text-positive" : score < 0 ? "text-negative" : "text-zinc-400"
+              score > 0 ? "text-positive" : score < 0 ? "text-negative" : "text-subtext"
             }`}
           >
             {score}
@@ -177,7 +177,7 @@ export default function PostCard({ post, rank }: PostCardProps) {
             className={`btn-bounce rounded-xl p-1.5 ${
               userVote === "down"
                 ? "bg-negative/20 text-negative shadow-sm shadow-negative/20"
-                : "text-zinc-500 hover:bg-negative/10 hover:text-negative disabled:opacity-30"
+                : "text-muted hover:bg-negative/10 hover:text-negative disabled:opacity-30"
             }`}
           >
             <FiArrowDown size={20} />
@@ -202,7 +202,7 @@ export default function PostCard({ post, rank }: PostCardProps) {
           </div>
 
           <Link href={`/post/${post.id}`} className="block">
-            <h3 className="mb-1 text-lg font-bold leading-snug text-white transition-colors group-hover:text-accent">
+            <h3 className="mb-1 text-lg font-bold leading-snug text-heading transition-colors group-hover:text-accent">
               {post.title}
             </h3>
           </Link>
@@ -211,7 +211,7 @@ export default function PostCard({ post, rank }: PostCardProps) {
             About: {post.targetName}
           </p>
 
-          <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-zinc-400">
+          <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-subtext">
             {post.content}
           </p>
 
@@ -232,7 +232,7 @@ export default function PostCard({ post, rank }: PostCardProps) {
             </div>
           )}
 
-          <div className="flex items-center gap-2 text-xs text-zinc-500">
+          <div className="flex items-center gap-2 text-xs text-muted">
             <FiUser size={12} />
             <span>{post.isAnonymous ? "Anonymous" : post.authorName}</span>
             <span className="text-accent-2">&middot;</span>
