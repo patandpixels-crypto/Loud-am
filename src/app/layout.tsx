@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Bangers } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/AuthContext";
@@ -24,6 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script src="https://js.paystack.co/v2/inline.js" strategy="beforeInteractive" />
+      </head>
       <body className={`${bangers.variable} antialiased`}>
         <ThemeProvider>
           <AuthProvider>

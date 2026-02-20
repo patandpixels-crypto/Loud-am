@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
+import { openPaystack, verifyPayment } from "@/lib/paystack";
 import { CompanySection, SectionPost, SectionAccess } from "@/lib/types";
 import {
   FiArrowLeft,
@@ -51,7 +52,6 @@ export default function SectionDetailPage() {
   const [isStaff, setIsStaff] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
   const [paying, setPaying] = useState(false);
-  const [showPaywall, setShowPaywall] = useState(false);
   const [isCreator, setIsCreator] = useState(false);
 
   // Manage staff modal
@@ -141,19 +141,25 @@ export default function SectionDetailPage() {
     }
   }, [sectionId, user, authLoading]);
 
-  const handlePayment = async () => {
+  const grantAccess = async (reference: string) => {
     if (!user) return;
     setPaying(true);
 
     try {
-      // Simulated payment — in production, integrate Stripe here
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Verify payment server-side
+      const { verified } = await verifyPayment(reference);
+      if (!verified) {
+        console.error("Payment verification failed");
+        setPaying(false);
+        return;
+      }
 
       await addDoc(collection(db, "sectionAccess"), {
         sectionId,
         userId: user.uid,
         paidAt: Date.now(),
         amount: 3,
+        paystackRef: reference,
       });
 
       // Distribute 50% ($1.50) of the payment to section post authors
@@ -170,7 +176,6 @@ export default function SectionDetailPage() {
 
           for (const postDoc of sectionPostsSnap.docs) {
             const postData = postDoc.data();
-            // Don't pay yourself
             if (postData.authorId !== user.uid) {
               await addDoc(collection(db, "earnings"), {
                 userId: postData.authorId,
@@ -188,15 +193,26 @@ export default function SectionDetailPage() {
       }
 
       setHasAccess(true);
-      setShowPaywall(false);
-
-      // Refetch posts now that user has access
       await fetchPosts();
     } catch (err) {
       console.error("Payment error:", err);
     } finally {
       setPaying(false);
     }
+  };
+
+  const handlePayment = () => {
+    if (!user?.email) return;
+    openPaystack({
+      email: user.email,
+      amountInCents: 300 * 100, // 300 NGN in kobo (adjust currency/amount as needed)
+      currency: "NGN",
+      metadata: { sectionId, userId: user.uid },
+      onSuccess: (reference) => {
+        grantAccess(reference);
+      },
+      onClose: () => {},
+    });
   };
 
   const handleAddStaff = async () => {
@@ -333,71 +349,23 @@ export default function SectionDetailPage() {
           <p className="mb-6 text-sm text-subtext">
             Pay <strong className="text-accent-2">$3</strong> to unlock read access & post replies (200 words max).
           </p>
-          {showPaywall ? (
-            <div className="w-full max-w-sm rounded-xl border border-card-border bg-input-bg p-6">
-              <h3 className="mb-4 text-center text-lg font-black text-heading">Complete Payment</h3>
-              <div className="mb-4 rounded-xl bg-surface p-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-subtext">Access to {section.companyName}</span>
-                  <span className="font-bold text-accent-2">$3.00</span>
-                </div>
-              </div>
-              {/* Simulated payment form */}
-              <div className="mb-4 space-y-3">
-                <input
-                  type="text"
-                  placeholder="Card number"
-                  className="w-full rounded-xl border border-card-border bg-surface px-4 py-2.5 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent"
-                  maxLength={19}
-                />
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    placeholder="MM/YY"
-                    className="w-1/2 rounded-xl border border-card-border bg-surface px-4 py-2.5 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent"
-                    maxLength={5}
-                  />
-                  <input
-                    type="text"
-                    placeholder="CVC"
-                    className="w-1/2 rounded-xl border border-card-border bg-surface px-4 py-2.5 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent"
-                    maxLength={4}
-                  />
-                </div>
-              </div>
-              <button
-                onClick={handlePayment}
-                disabled={paying}
-                className="btn-bounce w-full rounded-xl bg-gradient-to-r from-accent to-accent-2 py-3 text-sm font-black text-white shadow-lg shadow-accent/20 disabled:opacity-50"
-              >
-                {paying ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    Processing...
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <FiDollarSign size={16} />
-                    Pay $3.00
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => setShowPaywall(false)}
-                className="mt-3 w-full text-center text-xs text-muted hover:text-subtle"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setShowPaywall(true)}
-              className="btn-bounce flex items-center gap-2 rounded-full bg-gradient-to-r from-accent to-accent-2 px-8 py-3 text-sm font-black text-white shadow-lg shadow-accent/20"
-            >
-              <FiDollarSign size={16} />
-              Unlock for $3
-            </button>
-          )}
+          <button
+            onClick={handlePayment}
+            disabled={paying}
+            className="btn-bounce flex items-center gap-2 rounded-full bg-gradient-to-r from-accent to-accent-2 px-8 py-3 text-sm font-black text-white shadow-lg shadow-accent/20 disabled:opacity-50"
+          >
+            {paying ? (
+              <span className="flex items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Verifying...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <FiDollarSign size={16} />
+                Pay with Paystack
+              </span>
+            )}
+          </button>
         </div>
       ) : posts.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-card-border py-16">
