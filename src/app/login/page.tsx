@@ -37,7 +37,7 @@ export default function LoginPage() {
       if (message.includes("auth/invalid-credential") || message.includes("auth/wrong-password")) {
         setError("Invalid email or password");
       } else if (message.includes("auth/email-already-in-use")) {
-        setError("An account with this email already exists");
+        setError("Could not create account. Please try signing in instead.");
       } else if (message.includes("auth/weak-password")) {
         setError("Password should be at least 6 characters");
       } else if (message.includes("auth/invalid-email")) {

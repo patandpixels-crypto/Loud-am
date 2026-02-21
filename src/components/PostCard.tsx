@@ -18,7 +18,10 @@ function getAnonId(): string {
   if (typeof window === "undefined") return "";
   let id = localStorage.getItem("loud_anon_id");
   if (!id) {
-    id = "anon_" + Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+    id = "anon_" + hex;
     localStorage.setItem("loud_anon_id", id);
   }
   return id;

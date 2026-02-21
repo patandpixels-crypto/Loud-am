@@ -41,7 +41,7 @@ export function openPaystack({ email, amountInCents, currency = "NGN", metadata,
     email,
     amount: amountInCents,
     currency,
-    ref: "LOUD_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8),
+    ref: "LOUD_" + Date.now() + "_" + crypto.getRandomValues(new Uint32Array(1))[0].toString(36),
     metadata,
     onClose,
     onSuccess: (response) => {
@@ -63,5 +63,33 @@ export async function verifyPayment(reference: string): Promise<{ verified: bool
     return data;
   } catch {
     return { verified: false };
+  }
+}
+
+/**
+ * Server-side grant access: verifies payment, creates sectionAccess, distributes earnings.
+ * Requires a Firebase ID token for authentication.
+ */
+export async function grantAccessServerSide(
+  reference: string,
+  sectionId: string,
+  idToken: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const res = await fetch("/api/grant-access", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({ reference, sectionId }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { success: false, error: data.error || "Grant access failed" };
+    }
+    return { success: true };
+  } catch {
+    return { success: false, error: "Network error" };
   }
 }

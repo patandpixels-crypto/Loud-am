@@ -10,11 +10,10 @@ import {
   query,
   where,
   getDocs,
-  addDoc,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db, auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
-import { openPaystack, verifyPayment } from "@/lib/paystack";
+import { openPaystack, grantAccessServerSide } from "@/lib/paystack";
 import { CompanySection, SectionPost, SectionAccess } from "@/lib/types";
 import {
   FiArrowLeft,
@@ -146,50 +145,20 @@ export default function SectionDetailPage() {
     setPaying(true);
 
     try {
-      // Verify payment server-side
-      const { verified } = await verifyPayment(reference);
-      if (!verified) {
-        console.error("Payment verification failed");
+      // Get Firebase ID token for server-side authentication
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) {
+        console.error("Could not get auth token");
         setPaying(false);
         return;
       }
 
-      await addDoc(collection(db, "sectionAccess"), {
-        sectionId,
-        userId: user.uid,
-        paidAt: Date.now(),
-        amount: 3,
-        paystackRef: reference,
-      });
-
-      // Distribute 50% ($1.50) of the payment to section post authors
-      try {
-        const sectionPostsQuery = query(
-          collection(db, "sectionPosts"),
-          where("sectionId", "==", sectionId)
-        );
-        const sectionPostsSnap = await getDocs(sectionPostsQuery);
-
-        if (!sectionPostsSnap.empty) {
-          const revenueShare = 1.5; // 50% of $3
-          const perPost = revenueShare / sectionPostsSnap.size;
-
-          for (const postDoc of sectionPostsSnap.docs) {
-            const postData = postDoc.data();
-            if (postData.authorId !== user.uid) {
-              await addDoc(collection(db, "earnings"), {
-                userId: postData.authorId,
-                sectionId,
-                sectionPostId: postDoc.id,
-                fromPaymentBy: user.uid,
-                amount: Math.round(perPost * 100) / 100,
-                createdAt: Date.now(),
-              });
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Error distributing earnings:", err);
+      // Call secure server-side endpoint that verifies payment, grants access, and distributes earnings
+      const result = await grantAccessServerSide(reference, sectionId, idToken);
+      if (!result.success) {
+        console.error("Grant access failed:", result.error);
+        setPaying(false);
+        return;
       }
 
       setHasAccess(true);

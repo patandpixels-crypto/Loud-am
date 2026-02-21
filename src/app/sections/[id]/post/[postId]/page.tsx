@@ -14,9 +14,9 @@ import {
   updateDoc,
   increment,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db, auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
-import { openPaystack, verifyPayment } from "@/lib/paystack";
+import { openPaystack, grantAccessServerSide } from "@/lib/paystack";
 import { CompanySection, SectionPost, SectionReply } from "@/lib/types";
 import { FiArrowLeft, FiUser, FiSend, FiLock, FiDollarSign } from "react-icons/fi";
 
@@ -118,49 +118,18 @@ export default function SectionPostPage() {
     if (!user) return;
     setPaying(true);
     try {
-      const { verified } = await verifyPayment(reference);
-      if (!verified) {
-        console.error("Payment verification failed");
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) {
+        console.error("Could not get auth token");
         setPaying(false);
         return;
       }
 
-      await addDoc(collection(db, "sectionAccess"), {
-        sectionId,
-        userId: user.uid,
-        paidAt: Date.now(),
-        amount: 3,
-        paystackRef: reference,
-      });
-
-      // Distribute 50% of the payment to section post authors
-      try {
-        const sectionPostsQuery = query(
-          collection(db, "sectionPosts"),
-          where("sectionId", "==", sectionId)
-        );
-        const sectionPostsSnap = await getDocs(sectionPostsQuery);
-
-        if (!sectionPostsSnap.empty) {
-          const revenueShare = 1.5;
-          const perPost = revenueShare / sectionPostsSnap.size;
-
-          for (const pd of sectionPostsSnap.docs) {
-            const pData = pd.data();
-            if (pData.authorId !== user.uid) {
-              await addDoc(collection(db, "earnings"), {
-                userId: pData.authorId,
-                sectionId,
-                sectionPostId: pd.id,
-                fromPaymentBy: user.uid,
-                amount: Math.round(perPost * 100) / 100,
-                createdAt: Date.now(),
-              });
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Error distributing earnings:", err);
+      const result = await grantAccessServerSide(reference, sectionId, idToken);
+      if (!result.success) {
+        console.error("Grant access failed:", result.error);
+        setPaying(false);
+        return;
       }
 
       setHasAccess(true);

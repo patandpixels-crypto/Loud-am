@@ -4,45 +4,51 @@ service cloud.firestore {
 
     // Users collection
     match /users/{userId} {
-      // Anyone can read user profiles (for display names on leaderboard)
-      allow read: if true;
+      // Only authenticated users can read profiles
+      allow read: if request.auth != null;
       // Users can only create/update their own profile
       allow create, update: if request.auth != null && request.auth.uid == userId;
     }
 
     // Posts collection
     match /posts/{postId} {
-      // Anyone can read posts (including anonymous ones - authorId is hidden client-side)
+      // Anyone can read posts (public feed)
       allow read: if true;
       // Authenticated users can create posts
       allow create: if request.auth != null
         && request.resource.data.authorId == request.auth.uid;
-      // Allow score/vote updates (open for anonymous voting)
+      // Only allow score updates via transactions — authorId, content, targetName must stay unchanged
       allow update: if request.resource.data.authorId == resource.data.authorId
-        && request.resource.data.content == resource.data.content;
+        && request.resource.data.content == resource.data.content
+        && request.resource.data.targetName == resource.data.targetName
+        && request.resource.data.title == resource.data.title;
     }
 
-    // Votes collection (open for anonymous voting)
+    // Votes collection — require authentication, owner-only delete
     match /votes/{voteId} {
       allow read: if true;
-      allow create: if true;
-      allow delete: if true;
+      allow create: if request.auth != null || request.resource.data.voterId is string;
+      allow delete: if (request.auth != null && resource.data.userId == request.auth.uid)
+                    || (resource.data.userId == "" && resource.data.voterId is string);
     }
 
-    // Company Sections
+    // Company Sections — only creator or current staff can update
     match /companySections/{sectionId} {
       allow read: if true;
       allow create: if request.auth != null
         && request.resource.data.creatorId == request.auth.uid;
-      allow update: if request.auth != null;
+      allow update: if request.auth != null
+        && (request.auth.uid == resource.data.creatorId
+            || resource.data.staffIds.hasAny([request.auth.uid]));
     }
 
-    // Section Posts
+    // Section Posts — only author can update their own post
     match /sectionPosts/{postId} {
       allow read: if request.auth != null;
       allow create: if request.auth != null
         && request.resource.data.authorId == request.auth.uid;
-      allow update: if request.auth != null;
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.authorId;
     }
 
     // Section Replies
@@ -52,18 +58,18 @@ service cloud.firestore {
         && request.resource.data.authorId == request.auth.uid;
     }
 
-    // Section Access (payments)
+    // Section Access (payments) — only created by server-side API now
     match /sectionAccess/{accessId} {
       allow read: if request.auth != null;
-      allow create: if request.auth != null
-        && request.resource.data.userId == request.auth.uid;
+      // Deny client-side creation — this is now handled server-side
+      allow create: if false;
     }
 
-    // Earnings (revenue share for section post authors)
+    // Earnings — only created by server-side API now
     match /earnings/{earningId} {
-      // Public read so pre-login users can see top earner leaderboard
-      allow read: if true;
-      allow create: if request.auth != null;
+      allow read: if request.auth != null;
+      // Deny client-side creation — this is now handled server-side
+      allow create: if false;
     }
   }
 }
