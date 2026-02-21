@@ -201,12 +201,13 @@ export default function SectionDetailPage() {
     }
   };
 
-  const handlePayment = () => {
+  const handlePayment = (currency: "NGN" | "USD") => {
     if (!user?.email) return;
+    const amount = currency === "NGN" ? 300 * 100 : 3 * 100; // 300 NGN in kobo or $3 in cents
     openPaystack({
       email: user.email,
-      amountInCents: 300 * 100, // 300 NGN in kobo (adjust currency/amount as needed)
-      currency: "NGN",
+      amountInCents: amount,
+      currency,
       metadata: { sectionId, userId: user.uid },
       onSuccess: (reference) => {
         grantAccess(reference);
@@ -347,25 +348,31 @@ export default function SectionDetailPage() {
             Only permitted staff can post here.
           </p>
           <p className="mb-6 text-sm text-subtext">
-            Pay <strong className="text-accent-2">$3</strong> to unlock read access & post replies (200 words max).
+            Unlock read access & post replies (200 words max).
           </p>
-          <button
-            onClick={handlePayment}
-            disabled={paying}
-            className="btn-bounce flex items-center gap-2 rounded-full bg-gradient-to-r from-accent to-accent-2 px-8 py-3 text-sm font-black text-white shadow-lg shadow-accent/20 disabled:opacity-50"
-          >
-            {paying ? (
-              <span className="flex items-center gap-2">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                Verifying...
-              </span>
-            ) : (
-              <span className="flex items-center gap-2">
+          {paying ? (
+            <div className="flex items-center gap-2 text-sm text-subtext">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+              Verifying payment...
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3 sm:flex-row">
+              <button
+                onClick={() => handlePayment("NGN")}
+                className="btn-bounce flex items-center gap-2 rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-3 text-sm font-black text-white shadow-lg shadow-accent/20"
+              >
                 <FiDollarSign size={16} />
-                Pay with Paystack
-              </span>
-            )}
-          </button>
+                Pay &#8358;300 (NGN)
+              </button>
+              <button
+                onClick={() => handlePayment("USD")}
+                className="btn-bounce flex items-center gap-2 rounded-full border-2 border-accent px-6 py-3 text-sm font-bold text-accent transition-colors hover:bg-accent hover:text-white"
+              >
+                <FiDollarSign size={16} />
+                Pay $3 (USD)
+              </button>
+            </div>
+          )}
         </div>
       ) : posts.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-card-border py-16">
