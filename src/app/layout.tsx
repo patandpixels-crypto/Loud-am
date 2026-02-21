@@ -27,6 +27,12 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <Script src="https://js.paystack.co/v2/inline.js" strategy="beforeInteractive" />
+        <Script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </head>
       <body className={`${bangers.variable} antialiased`}>
         <ThemeProvider>
