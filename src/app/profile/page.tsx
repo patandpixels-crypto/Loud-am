@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
-import { Post, SectionPost, Earning } from "@/lib/types";
+import { Post, SectionPost, Earning, PayoutRequest } from "@/lib/types";
 import PostCard from "@/components/PostCard";
 import Link from "next/link";
-import { FiUser, FiCalendar, FiPlus, FiBriefcase, FiDollarSign } from "react-icons/fi";
+import {
+  FiUser, FiCalendar, FiPlus, FiBriefcase, FiDollarSign,
+  FiArrowRight, FiX, FiCheck, FiClock, FiAlertCircle,
+} from "react-icons/fi";
 
 function getTimeAgo(timestamp: number): string {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -22,12 +25,34 @@ function getTimeAgo(timestamp: number): string {
   return `${months}mo ago`;
 }
 
+const NIGERIAN_BANKS = [
+  "Access Bank", "Citibank Nigeria", "Ecobank Nigeria", "Fidelity Bank",
+  "First Bank of Nigeria", "First City Monument Bank (FCMB)", "Globus Bank",
+  "Guaranty Trust Bank (GTB)", "Heritage Bank", "Jaiz Bank", "Keystone Bank",
+  "Kuda Bank", "Opay", "Palmpay", "Polaris Bank", "Providus Bank",
+  "Stanbic IBTC Bank", "Standard Chartered Bank", "Sterling Bank",
+  "SunTrust Bank", "Titan Trust Bank", "Union Bank of Nigeria",
+  "United Bank for Africa (UBA)", "Unity Bank", "VFD Microfinance Bank",
+  "Wema Bank", "Zenith Bank",
+];
+
 export default function ProfilePage() {
   const { user, userProfile, loading: authLoading } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [sectionPosts, setSectionPosts] = useState<SectionPost[]>([]);
   const [earnings, setEarnings] = useState<Earning[]>([]);
+  const [payouts, setPayouts] = useState<PayoutRequest[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Payout modal state
+  const [showPayoutModal, setShowPayoutModal] = useState(false);
+  const [payoutAmount, setPayoutAmount] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [accountName, setAccountName] = useState("");
+  const [payoutSubmitting, setPayoutSubmitting] = useState(false);
+  const [payoutError, setPayoutError] = useState("");
+  const [payoutSuccess, setPayoutSuccess] = useState(false);
 
   useEffect(() => {
     if (authLoading || !user) {
@@ -37,38 +62,36 @@ export default function ProfilePage() {
 
     const fetchUserData = async () => {
       try {
-        // Fetch homepage posts
-        const postsQuery = query(
-          collection(db, "posts"),
-          where("authorId", "==", user.uid)
-        );
+        const postsQuery = query(collection(db, "posts"), where("authorId", "==", user.uid));
         const postsSnap = await getDocs(postsQuery);
         const fetchedPosts = postsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Post[];
         fetchedPosts.sort((a, b) => b.createdAt - a.createdAt);
         setPosts(fetchedPosts);
 
-        // Fetch section posts
-        const sectionQuery = query(
-          collection(db, "sectionPosts"),
-          where("authorId", "==", user.uid)
-        );
+        const sectionQuery = query(collection(db, "sectionPosts"), where("authorId", "==", user.uid));
         const sectionSnap = await getDocs(sectionQuery);
         const fetchedSectionPosts = sectionSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as SectionPost[];
         fetchedSectionPosts.sort((a, b) => b.createdAt - a.createdAt);
         setSectionPosts(fetchedSectionPosts);
 
-        // Fetch earnings
         try {
-          const earningsQuery = query(
-            collection(db, "earnings"),
-            where("userId", "==", user.uid)
-          );
+          const earningsQuery = query(collection(db, "earnings"), where("userId", "==", user.uid));
           const earningsSnap = await getDocs(earningsQuery);
           const fetchedEarnings = earningsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Earning[];
           fetchedEarnings.sort((a, b) => b.createdAt - a.createdAt);
           setEarnings(fetchedEarnings);
         } catch (err) {
           console.error("Error fetching earnings:", err);
+        }
+
+        try {
+          const payoutsQuery = query(collection(db, "payoutRequests"), where("userId", "==", user.uid));
+          const payoutsSnap = await getDocs(payoutsQuery);
+          const fetchedPayouts = payoutsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as PayoutRequest[];
+          fetchedPayouts.sort((a, b) => b.createdAt - a.createdAt);
+          setPayouts(fetchedPayouts);
+        } catch (err) {
+          console.error("Error fetching payouts:", err);
         }
       } catch (err) {
         console.error("Error fetching user posts:", err);
@@ -91,10 +114,7 @@ export default function ProfilePage() {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
         <p className="text-subtext">Sign in to view your profile.</p>
-        <Link
-          href="/login"
-          className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2 font-bold text-white shadow-lg shadow-accent/20"
-        >
+        <Link href="/login" className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2 font-bold text-white shadow-lg shadow-accent/20">
           Sign In
         </Link>
       </div>
@@ -103,6 +123,48 @@ export default function ProfilePage() {
 
   const totalPosts = posts.length + sectionPosts.length;
   const totalEarnings = earnings.reduce((sum, e) => sum + e.amount, 0);
+  const totalPaidOut = payouts.filter((p) => p.status === "approved").reduce((sum, p) => sum + p.amount, 0);
+  const pendingPayout = payouts.filter((p) => p.status === "pending").reduce((sum, p) => sum + p.amount, 0);
+  const availableBalance = totalEarnings - totalPaidOut - pendingPayout;
+
+  const handlePayoutSubmit = async () => {
+    setPayoutError("");
+    const amount = parseFloat(payoutAmount);
+
+    if (!amount || amount <= 0) { setPayoutError("Enter a valid amount."); return; }
+    if (amount > availableBalance) { setPayoutError(`You can only withdraw up to $${availableBalance.toFixed(2)}.`); return; }
+    if (amount < 1) { setPayoutError("Minimum withdrawal is $1.00."); return; }
+    if (!bankName) { setPayoutError("Select your bank."); return; }
+    if (!accountNumber.trim() || accountNumber.trim().length < 10) { setPayoutError("Enter a valid 10-digit account number."); return; }
+    if (!accountName.trim()) { setPayoutError("Enter the account holder name."); return; }
+
+    setPayoutSubmitting(true);
+    try {
+      const newPayout: Omit<PayoutRequest, "id"> = {
+        userId: user.uid,
+        userEmail: user.email || "",
+        userName: userProfile?.codeName || user.displayName || "User",
+        amount,
+        bankName,
+        accountNumber: accountNumber.trim(),
+        accountName: accountName.trim(),
+        status: "pending",
+        createdAt: Date.now(),
+      };
+      const docRef = await addDoc(collection(db, "payoutRequests"), newPayout);
+      setPayouts((prev) => [{ id: docRef.id, ...newPayout }, ...prev]);
+      setPayoutSuccess(true);
+      setPayoutAmount("");
+      setBankName("");
+      setAccountNumber("");
+      setAccountName("");
+      setTimeout(() => { setShowPayoutModal(false); setPayoutSuccess(false); }, 2500);
+    } catch {
+      setPayoutError("Failed to submit. Try again.");
+    } finally {
+      setPayoutSubmitting(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6">
@@ -126,7 +188,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Earnings Card */}
+      {/* Earnings + Payout Card */}
       <div className="card-glow mb-6 rounded-2xl border border-accent-2/30 bg-accent-2/5 p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -134,18 +196,66 @@ export default function ProfilePage() {
               <FiDollarSign size={20} className="text-accent-2" />
             </div>
             <div>
-              <p className="text-sm text-subtext">Total Earnings</p>
-              <p className="text-2xl font-black text-accent-2">
-                ${totalEarnings.toFixed(2)}
-              </p>
+              <p className="text-sm text-subtext">Available Balance</p>
+              <p className="text-2xl font-black text-accent-2">${availableBalance.toFixed(2)}</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xs text-muted">From {earnings.length} payments</p>
-            <p className="text-xs text-muted">50% revenue share on section access</p>
+            <p className="text-xs text-muted">Total earned: ${totalEarnings.toFixed(2)}</p>
+            {totalPaidOut > 0 && <p className="text-xs text-positive">Withdrawn: ${totalPaidOut.toFixed(2)}</p>}
+            {pendingPayout > 0 && <p className="text-xs text-accent-2">Pending: ${pendingPayout.toFixed(2)}</p>}
           </div>
         </div>
+        <button
+          onClick={() => setShowPayoutModal(true)}
+          disabled={availableBalance < 1}
+          className="btn-bounce mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent-2 py-3 text-sm font-bold text-white shadow-lg shadow-accent/20 disabled:opacity-40"
+        >
+          <FiDollarSign size={16} />
+          Withdraw Funds
+          <FiArrowRight size={14} />
+        </button>
+        {availableBalance < 1 && totalEarnings > 0 && (
+          <p className="mt-2 text-center text-xs text-muted">Minimum withdrawal: $1.00</p>
+        )}
       </div>
+
+      {/* Payout History */}
+      {payouts.length > 0 && (
+        <div className="mb-6">
+          <h2 className="mb-3 text-lg font-bold">Withdrawal History</h2>
+          <div className="space-y-2">
+            {payouts.map((payout) => (
+              <div key={payout.id} className="card-glow flex items-center justify-between rounded-xl border border-card-border bg-card-bg px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                    payout.status === "approved" ? "bg-positive/10" : payout.status === "rejected" ? "bg-negative/10" : "bg-accent-2/10"
+                  }`}>
+                    {payout.status === "approved" ? <FiCheck size={14} className="text-positive" /> :
+                     payout.status === "rejected" ? <FiX size={14} className="text-negative" /> :
+                     <FiClock size={14} className="text-accent-2" />}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-heading">{payout.bankName} &middot; ****{payout.accountNumber.slice(-4)}</p>
+                    <p className="text-xs text-muted">
+                      {getTimeAgo(payout.createdAt)}
+                      {payout.status === "rejected" && payout.adminNote && <span className="ml-1 text-negative"> &middot; {payout.adminNote}</span>}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className={`text-sm font-bold ${payout.status === "approved" ? "text-positive" : payout.status === "rejected" ? "text-negative" : "text-accent-2"}`}>
+                    ${payout.amount.toFixed(2)}
+                  </p>
+                  <p className={`text-xs font-bold ${payout.status === "approved" ? "text-positive" : payout.status === "rejected" ? "text-negative" : "text-accent-2"}`}>
+                    {payout.status}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="mb-6 grid grid-cols-4 gap-3">
@@ -154,15 +264,11 @@ export default function ProfilePage() {
           <p className="text-xs text-subtext">Total Posts</p>
         </div>
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4 text-center">
-          <p className="text-2xl font-black text-positive">
-            {posts.filter((p) => p.sentiment === "positive").length}
-          </p>
+          <p className="text-2xl font-black text-positive">{posts.filter((p) => p.sentiment === "positive").length}</p>
           <p className="text-xs text-subtext">Positive</p>
         </div>
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4 text-center">
-          <p className="text-2xl font-black text-negative">
-            {posts.filter((p) => p.sentiment === "negative").length}
-          </p>
+          <p className="text-2xl font-black text-negative">{posts.filter((p) => p.sentiment === "negative").length}</p>
           <p className="text-xs text-subtext">Negative</p>
         </div>
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4 text-center">
@@ -177,10 +283,7 @@ export default function ProfilePage() {
           <h2 className="mb-3 text-lg font-bold">Earnings History</h2>
           <div className="space-y-2">
             {earnings.slice(0, 10).map((earning) => (
-              <div
-                key={earning.id}
-                className="card-glow flex items-center justify-between rounded-xl border border-card-border bg-card-bg px-4 py-3"
-              >
+              <div key={earning.id} className="card-glow flex items-center justify-between rounded-xl border border-card-border bg-card-bg px-4 py-3">
                 <div className="flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-2/10">
                     <FiDollarSign size={14} className="text-accent-2" />
@@ -193,11 +296,7 @@ export default function ProfilePage() {
                 <p className="text-sm font-bold text-accent-2">+${earning.amount.toFixed(2)}</p>
               </div>
             ))}
-            {earnings.length > 10 && (
-              <p className="text-center text-xs text-muted">
-                and {earnings.length - 10} more...
-              </p>
-            )}
+            {earnings.length > 10 && <p className="text-center text-xs text-muted">and {earnings.length - 10} more...</p>}
           </div>
         </div>
       )}
@@ -211,10 +310,7 @@ export default function ProfilePage() {
       ) : posts.length === 0 && sectionPosts.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-card-border bg-card-bg py-12 text-center">
           <p className="mb-2 text-subtle">You haven&apos;t posted anything yet.</p>
-          <Link
-            href="/post/new"
-            className="btn-bounce mt-2 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
-          >
+          <Link href="/post/new" className="btn-bounce mt-2 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 font-bold text-white shadow-lg shadow-accent/20">
             <FiPlus size={16} />
             Create Your First Post
           </Link>
@@ -222,10 +318,8 @@ export default function ProfilePage() {
       ) : (
         <div className="space-y-3">
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard key={post.id} post={post} onDelete={(id) => setPosts((prev) => prev.filter((p) => p.id !== id))} />
           ))}
-
-          {/* Section Posts */}
           {sectionPosts.length > 0 && (
             <>
               {posts.length > 0 && (
@@ -235,23 +329,13 @@ export default function ProfilePage() {
                 </div>
               )}
               {sectionPosts.map((sp) => (
-                <Link
-                  key={sp.id}
-                  href={`/sections/${sp.sectionId}/post/${sp.id}`}
-                  className="block"
-                >
+                <Link key={sp.id} href={`/sections/${sp.sectionId}/post/${sp.id}`} className="block">
                   <div className="card-glow group rounded-2xl border border-card-border bg-card-bg p-5">
                     <div className="mb-1 flex items-center gap-2">
-                      <span className="rounded-full bg-accent-2/10 px-2 py-0.5 text-xs font-bold text-accent-2">
-                        Section
-                      </span>
+                      <span className="rounded-full bg-accent-2/10 px-2 py-0.5 text-xs font-bold text-accent-2">Section</span>
                     </div>
-                    <h3 className="mb-1 text-lg font-bold leading-snug text-heading group-hover:text-accent">
-                      {sp.title}
-                    </h3>
-                    <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-subtext">
-                      {sp.content}
-                    </p>
+                    <h3 className="mb-1 text-lg font-bold leading-snug text-heading group-hover:text-accent">{sp.title}</h3>
+                    <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-subtext">{sp.content}</p>
                     <div className="flex items-center gap-2 text-xs text-muted">
                       <FiUser size={12} />
                       <span>{sp.isAnonymous ? "Anonymous" : sp.authorName}</span>
@@ -265,6 +349,72 @@ export default function ProfilePage() {
               ))}
             </>
           )}
+        </div>
+      )}
+
+      {/* Payout Modal */}
+      {showPayoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4" onClick={() => !payoutSubmitting && setShowPayoutModal(false)}>
+          <div className="w-full max-w-md rounded-2xl border border-card-border bg-card-bg p-6" onClick={(e) => e.stopPropagation()}>
+            {payoutSuccess ? (
+              <div className="py-4 text-center">
+                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-positive/20">
+                  <FiCheck size={24} className="text-positive" />
+                </div>
+                <p className="text-lg font-bold">Withdrawal requested!</p>
+                <p className="mt-1 text-sm text-subtext">We&apos;ll process it within 24-48 hours.</p>
+              </div>
+            ) : (
+              <>
+                <div className="mb-5 flex items-center justify-between">
+                  <h3 className="text-lg font-bold">Withdraw Funds</h3>
+                  <button onClick={() => setShowPayoutModal(false)} className="text-muted hover:text-heading"><FiX size={20} /></button>
+                </div>
+                <div className="mb-5 rounded-xl border border-accent-2/20 bg-accent-2/5 px-4 py-3 text-center">
+                  <p className="text-xs text-subtext">Available</p>
+                  <p className="text-xl font-black text-accent-2">${availableBalance.toFixed(2)}</p>
+                </div>
+                {payoutError && (
+                  <div className="mb-4 flex items-center gap-2 rounded-xl bg-negative/10 px-4 py-2.5 text-sm text-negative">
+                    <FiAlertCircle size={14} />{payoutError}
+                  </div>
+                )}
+                <div className="space-y-3">
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-subtle">Amount (USD)</label>
+                    <input type="number" value={payoutAmount} onChange={(e) => setPayoutAmount(e.target.value)}
+                      className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+                      placeholder="0.00" min="1" max={availableBalance} step="0.01" />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-subtle">Bank</label>
+                    <select value={bankName} onChange={(e) => setBankName(e.target.value)}
+                      className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10">
+                      <option value="">Select bank...</option>
+                      {NIGERIAN_BANKS.map((bank) => <option key={bank} value={bank}>{bank}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-subtle">Account Number</label>
+                    <input type="text" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                      className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+                      placeholder="0123456789" maxLength={10} />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-subtle">Account Name</label>
+                    <input type="text" value={accountName} onChange={(e) => setAccountName(e.target.value)}
+                      className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+                      placeholder="John Doe" />
+                  </div>
+                  <button onClick={handlePayoutSubmit} disabled={payoutSubmitting}
+                    className="btn-bounce w-full rounded-xl bg-gradient-to-r from-accent to-accent-2 py-3 text-sm font-bold text-white shadow-lg shadow-accent/20 disabled:opacity-50">
+                    {payoutSubmitting ? "Submitting..." : "Request Withdrawal"}
+                  </button>
+                  <p className="text-center text-xs text-muted">Withdrawals are processed manually within 24-48 hours.</p>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>

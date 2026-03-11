@@ -98,6 +98,21 @@ export interface Report {
   createdAt: number;
 }
 
+export interface PayoutRequest {
+  id: string;
+  userId: string;
+  userEmail: string;
+  userName: string;
+  amount: number;
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+  status: "pending" | "approved" | "rejected";
+  adminNote?: string;
+  createdAt: number;
+  processedAt?: number;
+}
+
 export interface Notification {
   id: string;
   userId: string;

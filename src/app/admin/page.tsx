@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { collection, query, orderBy, getDocs, doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
-import { Post, UserProfile, Report } from "@/lib/types";
+import { Post, UserProfile, Report, PayoutRequest } from "@/lib/types";
 import {
   FiShield, FiUser, FiMail, FiEyeOff, FiEye,
   FiFlag, FiTrash2, FiEyeOff as FiHide, FiCheck, FiX, FiAlertTriangle,
+  FiDollarSign,
 } from "react-icons/fi";
 import Link from "next/link";
 
@@ -20,8 +21,10 @@ export default function AdminPage() {
   const { user, userProfile, loading: authLoading } = useAuth();
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
+  const [payoutRequests, setPayoutRequests] = useState<PayoutRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"posts" | "reports">("posts");
+  const [activeTab, setActiveTab] = useState<"posts" | "reports" | "payouts">("posts");
+  const [rejectNote, setRejectNote] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
@@ -59,6 +62,12 @@ export default function AdminPage() {
         const reportsSnapshot = await getDocs(reportsQuery);
         const reportsData = reportsSnapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Report));
         setReports(reportsData);
+
+        // Fetch payout requests
+        const payoutsQuery = query(collection(db, "payoutRequests"), orderBy("createdAt", "desc"));
+        const payoutsSnapshot = await getDocs(payoutsQuery);
+        const payoutsData = payoutsSnapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PayoutRequest));
+        setPayoutRequests(payoutsData);
       } catch (err) {
         console.error("Error fetching admin data:", err);
       } finally {
@@ -111,6 +120,32 @@ export default function AdminPage() {
     }
   };
 
+  const handleApprovePayout = async (payoutId: string) => {
+    setActionLoading(payoutId);
+    try {
+      await updateDoc(doc(db, "payoutRequests", payoutId), { status: "approved", processedAt: Date.now() });
+      setPayoutRequests((prev) => prev.map((p) => p.id === payoutId ? { ...p, status: "approved", processedAt: Date.now() } : p));
+    } catch (err) {
+      console.error("Error approving payout:", err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRejectPayout = async (payoutId: string) => {
+    const note = rejectNote.trim() || "Request rejected by admin";
+    setActionLoading(payoutId);
+    try {
+      await updateDoc(doc(db, "payoutRequests", payoutId), { status: "rejected", adminNote: note, processedAt: Date.now() });
+      setPayoutRequests((prev) => prev.map((p) => p.id === payoutId ? { ...p, status: "rejected", adminNote: note, processedAt: Date.now() } : p));
+      setRejectNote("");
+    } catch (err) {
+      console.error("Error rejecting payout:", err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleResolveReport = async (reportId: string, status: "reviewed" | "dismissed") => {
     setActionLoading(reportId);
     try {
@@ -148,6 +183,7 @@ export default function AdminPage() {
   }
 
   const pendingReports = reports.filter((r) => r.status === "pending");
+  const pendingPayouts = payoutRequests.filter((p) => p.status === "pending");
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
@@ -159,28 +195,26 @@ export default function AdminPage() {
       </div>
 
       {/* Stats */}
-      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
           <p className="text-sm text-subtext">Total Posts</p>
           <p className="text-3xl font-black">{posts.length}</p>
         </div>
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
           <p className="text-sm text-subtext">Anonymous</p>
-          <p className="text-3xl font-black text-accent-2">
-            {posts.filter((p) => p.isAnonymous).length}
-          </p>
+          <p className="text-3xl font-black text-accent-2">{posts.filter((p) => p.isAnonymous).length}</p>
         </div>
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
           <p className="text-sm text-subtext">Hidden</p>
-          <p className="text-3xl font-black text-accent">
-            {posts.filter((p) => p.hidden).length}
-          </p>
+          <p className="text-3xl font-black text-accent">{posts.filter((p) => p.hidden).length}</p>
         </div>
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
-          <p className="text-sm text-subtext">Pending Reports</p>
-          <p className="text-3xl font-black text-negative">
-            {pendingReports.length}
-          </p>
+          <p className="text-sm text-subtext">Reports</p>
+          <p className="text-3xl font-black text-negative">{pendingReports.length}</p>
+        </div>
+        <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
+          <p className="text-sm text-subtext">Payouts</p>
+          <p className="text-3xl font-black text-accent-2">{pendingPayouts.length}</p>
         </div>
       </div>
 
@@ -189,9 +223,7 @@ export default function AdminPage() {
         <button
           onClick={() => setActiveTab("posts")}
           className={`flex-1 px-4 py-2.5 text-sm font-bold transition-all ${
-            activeTab === "posts"
-              ? "bg-gradient-to-r from-accent to-accent-2 text-white"
-              : "text-subtext hover:text-heading"
+            activeTab === "posts" ? "bg-gradient-to-r from-accent to-accent-2 text-white" : "text-subtext hover:text-heading"
           }`}
         >
           Posts
@@ -199,15 +231,21 @@ export default function AdminPage() {
         <button
           onClick={() => setActiveTab("reports")}
           className={`flex-1 px-4 py-2.5 text-sm font-bold transition-all ${
-            activeTab === "reports"
-              ? "bg-gradient-to-r from-accent to-accent-2 text-white"
-              : "text-subtext hover:text-heading"
+            activeTab === "reports" ? "bg-gradient-to-r from-accent to-accent-2 text-white" : "text-subtext hover:text-heading"
           }`}
         >
           Reports {pendingReports.length > 0 && (
-            <span className="ml-1 rounded-full bg-negative px-1.5 py-0.5 text-[10px] text-white">
-              {pendingReports.length}
-            </span>
+            <span className="ml-1 rounded-full bg-negative px-1.5 py-0.5 text-[10px] text-white">{pendingReports.length}</span>
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab("payouts")}
+          className={`flex-1 px-4 py-2.5 text-sm font-bold transition-all ${
+            activeTab === "payouts" ? "bg-gradient-to-r from-accent to-accent-2 text-white" : "text-subtext hover:text-heading"
+          }`}
+        >
+          Payouts {pendingPayouts.length > 0 && (
+            <span className="ml-1 rounded-full bg-accent-2 px-1.5 py-0.5 text-[10px] text-white">{pendingPayouts.length}</span>
           )}
         </button>
       </div>
@@ -398,6 +436,77 @@ export default function AdminPage() {
                         title="Dismiss report"
                       >
                         <FiX size={14} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+      {/* Payouts Tab */}
+      {activeTab === "payouts" && (
+        <div className="space-y-3">
+          {payoutRequests.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-card-border py-16 text-center">
+              <FiDollarSign size={32} className="mx-auto mb-3 text-muted" />
+              <p className="font-bold text-subtext">No payout requests yet</p>
+            </div>
+          ) : (
+            payoutRequests.map((payout) => (
+              <div
+                key={payout.id}
+                className={`card-glow rounded-xl border bg-card-bg p-4 ${
+                  payout.status === "pending" ? "border-accent-2/30" : "border-card-border opacity-60"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                        payout.status === "pending" ? "bg-accent-2/10 text-accent-2" :
+                        payout.status === "approved" ? "bg-positive/10 text-positive" :
+                        "bg-negative/10 text-negative"
+                      }`}>
+                        {payout.status}
+                      </span>
+                      <span className="text-lg font-black text-accent-2">${payout.amount.toFixed(2)}</span>
+                    </div>
+                    <p className="text-sm font-medium text-heading">{payout.userName}</p>
+                    <p className="flex items-center gap-1 text-xs text-muted">
+                      <FiMail size={10} /> {payout.userEmail}
+                    </p>
+                    <div className="mt-2 rounded-lg bg-surface/50 px-3 py-2 text-xs text-subtext">
+                      <p><span className="text-muted">Bank:</span> {payout.bankName}</p>
+                      <p><span className="text-muted">Account:</span> {payout.accountNumber}</p>
+                      <p><span className="text-muted">Name:</span> {payout.accountName}</p>
+                    </div>
+                    <p className="mt-1 text-xs text-muted">{new Date(payout.createdAt).toLocaleString()}</p>
+                    {payout.adminNote && <p className="mt-1 text-xs text-negative">Note: {payout.adminNote}</p>}
+                  </div>
+                  {payout.status === "pending" && (
+                    <div className="flex flex-col gap-1.5">
+                      <button
+                        onClick={() => handleApprovePayout(payout.id)}
+                        disabled={actionLoading === payout.id}
+                        className="btn-bounce rounded-lg border border-positive/30 px-3 py-1.5 text-xs font-bold text-positive hover:bg-positive/10 disabled:opacity-50"
+                      >
+                        <FiCheck size={12} className="mr-1 inline" /> Approve
+                      </button>
+                      <input
+                        type="text"
+                        value={rejectNote}
+                        onChange={(e) => setRejectNote(e.target.value)}
+                        placeholder="Reason..."
+                        className="rounded-lg border border-card-border bg-input-bg px-2 py-1 text-xs text-heading placeholder-muted outline-none"
+                      />
+                      <button
+                        onClick={() => handleRejectPayout(payout.id)}
+                        disabled={actionLoading === payout.id}
+                        className="btn-bounce rounded-lg border border-negative/30 px-3 py-1.5 text-xs font-bold text-negative hover:bg-negative/10 disabled:opacity-50"
+                      >
+                        <FiX size={12} className="mr-1 inline" /> Reject
                       </button>
                     </div>
                   )}

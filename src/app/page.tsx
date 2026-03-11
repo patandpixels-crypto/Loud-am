@@ -1,13 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Post, Earning } from "@/lib/types";
+import { Post, Earning, CompanySection } from "@/lib/types";
 import PostCard from "@/components/PostCard";
+import SectionCard from "@/components/SectionCard";
 import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
-import { FiTrendingUp, FiPlus, FiFilter, FiSearch, FiAward } from "react-icons/fi";
+import {
+  FiTrendingUp, FiPlus, FiFilter, FiSearch, FiAward,
+  FiBriefcase, FiDollarSign, FiUsers, FiLock, FiArrowRight,
+} from "react-icons/fi";
 
 type FilterType = "all" | "positive" | "negative";
 type SortType = "score" | "recent";
@@ -15,6 +19,7 @@ type SortType = "score" | "recent";
 export default function HomePage() {
   const { user } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [sections, setSections] = useState<CompanySection[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>("all");
   const [sort, setSort] = useState<SortType>("score");
@@ -35,13 +40,11 @@ export default function HomePage() {
 
         if (monthEarnings.length === 0) return;
 
-        // Aggregate by userId
         const totals: Record<string, number> = {};
         for (const e of monthEarnings) {
           totals[e.userId] = (totals[e.userId] || 0) + e.amount;
         }
 
-        // Find the top earner
         let topUserId = "";
         let topAmount = 0;
         for (const [uid, amount] of Object.entries(totals)) {
@@ -53,7 +56,6 @@ export default function HomePage() {
 
         if (!topUserId) return;
 
-        // Get their codename
         const userDoc = await getDoc(doc(db, "users", topUserId));
         const codeName = userDoc.exists()
           ? (userDoc.data().codeName || userDoc.data().displayName)
@@ -68,9 +70,16 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
+        // Fetch sections
+        const sectionsQuery = query(collection(db, "companySections"), orderBy("createdAt", "desc"));
+        const sectionsSnap = await getDocs(sectionsQuery);
+        const sectionsData = sectionsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as CompanySection[];
+        setSections(sectionsData);
+
+        // Fetch posts
         const postsRef = collection(db, "posts");
         const snapshot = await getDocs(postsRef);
         let fetchedPosts = snapshot.docs.map((doc) => ({
@@ -78,15 +87,12 @@ export default function HomePage() {
           ...doc.data(),
         })) as Post[];
 
-        // Filter out hidden posts
         fetchedPosts = fetchedPosts.filter((p) => !p.hidden);
 
-        // Filter client-side
         if (filter !== "all") {
           fetchedPosts = fetchedPosts.filter((p) => p.sentiment === filter);
         }
 
-        // Sort client-side
         if (sort === "score") {
           fetchedPosts.sort((a, b) => b.score - a.score);
         } else {
@@ -95,49 +101,145 @@ export default function HomePage() {
 
         setPosts(fetchedPosts);
       } catch (err) {
-        console.error("Error fetching posts:", err);
+        console.error("Error fetching data:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchPosts();
+    fetchData();
   }, [filter, sort]);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6">
+    <div className="mx-auto max-w-4xl px-4 py-6">
       {/* Hero */}
-      <div className="mb-8 text-center">
+      <div className="mb-10 text-center">
         <h1 className="logo-text animate-float text-5xl sm:text-6xl">
           <span className="gradient-text">LOUD</span>
           <span className="text-foreground">-AM!</span>
         </h1>
-        <p className="mt-3 text-subtext">
-          Speak your truth about people and brands. <span className="font-semibold text-accent-3">Be heard.</span>
+        <p className="mt-3 text-lg text-subtext">
+          Insider company talk. <span className="font-bold text-accent-2">Get paid to share.</span>
         </p>
         {!user && (
           <Link
             href="/login"
-            className="btn-bounce mt-4 inline-block rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
+            className="btn-bounce mt-5 inline-block rounded-full bg-gradient-to-r from-accent to-accent-2 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-accent/20"
           >
             Join the Conversation
           </Link>
         )}
+      </div>
 
-        {/* Top Earner of the Month */}
-        {topEarner && (
-          <div className="mx-auto mt-5 flex max-w-sm items-center gap-3 rounded-xl border border-accent-2/20 bg-accent-2/5 px-4 py-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-2/20">
-              <FiAward size={18} className="text-accent-2" />
-            </div>
-            <div className="text-left">
-              <p className="text-xs font-medium text-subtext">Top Earner This Month</p>
-              <p className="text-sm font-bold text-heading">
-                {topEarner.name}{" "}
-                <span className="text-accent-2">${topEarner.amount.toFixed(2)}</span>
-              </p>
-            </div>
+      {/* Value Proposition Cards */}
+      <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-card-border bg-card-bg p-4 text-center">
+          <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-accent-2/20">
+            <FiLock size={18} className="text-accent-2" />
+          </div>
+          <p className="text-sm font-bold text-heading">Staff-Only Posting</p>
+          <p className="mt-1 text-xs text-muted">Only verified staff can post insider content</p>
+        </div>
+        <div className="rounded-xl border border-card-border bg-card-bg p-4 text-center">
+          <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-positive/20">
+            <FiDollarSign size={18} className="text-positive" />
+          </div>
+          <p className="text-sm font-bold text-heading">Earn 50% Revenue</p>
+          <p className="mt-1 text-xs text-muted">Every $3 reader pays, half goes to you</p>
+        </div>
+        <div className="rounded-xl border border-card-border bg-card-bg p-4 text-center">
+          <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-accent-3/20">
+            <FiUsers size={18} className="text-accent-3" />
+          </div>
+          <p className="text-sm font-bold text-heading">Anonymous Identity</p>
+          <p className="mt-1 text-xs text-muted">Post under a codename, stay protected</p>
+        </div>
+      </div>
+
+      {/* Top Earner Badge */}
+      {topEarner && (
+        <div className="mx-auto mb-8 flex max-w-md items-center gap-3 rounded-xl border border-accent-2/20 bg-accent-2/5 px-4 py-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-2/20">
+            <FiAward size={18} className="text-accent-2" />
+          </div>
+          <div className="text-left">
+            <p className="text-xs font-medium text-subtext">Top Earner This Month</p>
+            <p className="text-sm font-bold text-heading">
+              {topEarner.name}{" "}
+              <span className="text-accent-2">${topEarner.amount.toFixed(2)}</span>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* === SECTIONS (Primary Product) === */}
+      <div className="mb-10">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <FiBriefcase size={20} className="text-accent-2" />
+            <h2 className="text-xl font-black">Company Sections</h2>
+          </div>
+          <div className="flex items-center gap-2">
+            {user && (
+              <Link
+                href="/sections/create"
+                className="btn-bounce flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-accent/20"
+              >
+                <FiPlus size={14} />
+                Create
+              </Link>
+            )}
+            <Link
+              href="/sections"
+              className="btn-bounce flex items-center gap-1 rounded-full border border-card-border px-3 py-2 text-xs font-bold text-subtext hover:bg-surface hover:text-heading"
+            >
+              View All
+              <FiArrowRight size={12} />
+            </Link>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center py-10">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-2/30 border-t-accent" />
+          </div>
+        ) : sections.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-card-border bg-card-bg py-12 text-center">
+            <FiBriefcase size={32} className="mx-auto mb-3 text-muted" />
+            <p className="mb-1 font-bold text-subtext">No company sections yet</p>
+            <p className="mb-4 text-sm text-muted">
+              {user ? "Be the first to create one and start earning!" : "Sign in to create a company section."}
+            </p>
+            {user && (
+              <Link
+                href="/sections/create"
+                className="btn-bounce inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
+              >
+                <FiPlus size={16} />
+                Create Section
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {sections.slice(0, 4).map((section) => (
+              <SectionCard key={section.id} section={section} />
+            ))}
           </div>
         )}
+        {sections.length > 4 && (
+          <div className="mt-3 text-center">
+            <Link href="/sections" className="text-sm font-bold text-accent-3 hover:text-accent-3/80">
+              See all {sections.length} sections &rarr;
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* === Divider === */}
+      <div className="mb-8 flex items-center gap-4">
+        <div className="h-px flex-1 bg-card-border" />
+        <span className="text-xs font-bold text-muted">PUBLIC REVIEWS</span>
+        <div className="h-px flex-1 bg-card-border" />
       </div>
 
       {/* Search Bar */}
@@ -162,7 +264,6 @@ export default function HomePage() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Sort Toggle */}
           <div className="flex overflow-hidden rounded-xl border border-card-border">
             <button
               onClick={() => setSort("score")}
@@ -186,7 +287,6 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* Filter */}
           <div className="flex items-center gap-1 overflow-hidden rounded-xl border border-card-border">
             <FiFilter size={14} className="ml-2 text-muted" />
             <button
