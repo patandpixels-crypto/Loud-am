@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import Link from "next/link";
+import { FiMail, FiCheck } from "react-icons/fi";
 
 export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [justSignedUp, setJustSignedUp] = useState(false);
   const { signIn, signUp } = useAuth();
   const router = useRouter();
 
@@ -28,6 +30,8 @@ export default function LoginPage() {
           return;
         }
         await signUp(email, password, displayName);
+        setJustSignedUp(true);
+        return;
       } else {
         await signIn(email, password);
       }
@@ -49,6 +53,35 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  if (justSignedUp) {
+    return (
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4">
+        <div className="w-full max-w-md text-center">
+          <div className="card-glow rounded-2xl border border-card-border bg-card-bg p-8">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-positive/20">
+              <FiMail size={28} className="text-positive" />
+            </div>
+            <h2 className="mb-2 text-xl font-bold">Check your email</h2>
+            <p className="mb-4 text-sm text-subtext">
+              We sent a verification link to <span className="font-bold text-accent-3">{email}</span>.
+              Click the link to verify your account and unlock posting.
+            </p>
+            <div className="flex items-center justify-center gap-2 rounded-xl bg-accent-2/10 px-4 py-3 text-sm text-accent-2">
+              <FiCheck size={16} />
+              Account created successfully
+            </div>
+            <button
+              onClick={() => router.push("/")}
+              className="btn-bounce mt-6 w-full rounded-xl bg-gradient-to-r from-accent to-accent-2 py-3 font-bold text-white shadow-lg shadow-accent/20"
+            >
+              Go to Homepage
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-[calc(100vh-64px)] items-center justify-center px-4">

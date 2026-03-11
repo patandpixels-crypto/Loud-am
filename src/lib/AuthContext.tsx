@@ -8,6 +8,7 @@ import {
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   updateProfile,
+  sendEmailVerification,
 } from "firebase/auth";
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
@@ -18,9 +19,12 @@ interface AuthContextType {
   user: User | null;
   userProfile: UserProfile | null;
   loading: boolean;
+  emailVerified: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, displayName: string) => Promise<void>;
   signOut: () => Promise<void>;
+  resendVerification: () => Promise<void>;
+  refreshVerification: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,15 +33,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [emailVerified, setEmailVerified] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      setEmailVerified(user?.emailVerified ?? false);
       if (user) {
         const profileDoc = await getDoc(doc(db, "users", user.uid));
         if (profileDoc.exists()) {
           const profile = profileDoc.data() as UserProfile;
-          // Backfill codeName for existing users who don't have one
           if (!profile.codeName) {
             const codeName = generateCodeName();
             try {
@@ -74,6 +79,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     await setDoc(doc(db, "users", cred.user.uid), profile);
     setUserProfile(profile);
+
+    // Send verification email after signup
+    try {
+      await sendEmailVerification(cred.user);
+    } catch {
+      // Non-fatal — user can resend later
+    }
   };
 
   const signOut = async () => {
@@ -81,8 +93,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUserProfile(null);
   };
 
+  const resendVerification = async () => {
+    if (user && !user.emailVerified) {
+      await sendEmailVerification(user);
+    }
+  };
+
+  const refreshVerification = async (): Promise<boolean> => {
+    if (user) {
+      await user.reload();
+      const verified = user.emailVerified;
+      setEmailVerified(verified);
+      return verified;
+    }
+    return false;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        userProfile,
+        loading,
+        emailVerified,
+        signIn,
+        signUp,
+        signOut,
+        resendVerification,
+        refreshVerification,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { FiX, FiPlus, FiEye, FiEyeOff } from "react-icons/fi";
+import { FiX, FiPlus, FiEye, FiEyeOff, FiAlertCircle, FiMail } from "react-icons/fi";
+import { checkRateLimit, recordAction, formatRetryTime } from "@/lib/rateLimit";
 import Link from "next/link";
 
 export default function NewPostPage() {
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, emailVerified, resendVerification } = useAuth();
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -21,6 +22,7 @@ export default function NewPostPage() {
   const [targetLinks, setTargetLinks] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [resending, setResending] = useState(false);
 
   if (!user) {
     return (
@@ -32,6 +34,53 @@ export default function NewPostPage() {
         >
           Sign In
         </Link>
+      </div>
+    );
+  }
+
+  if (!emailVerified) {
+    const handleResend = async () => {
+      setResending(true);
+      try {
+        await resendVerification();
+        setError("");
+      } catch {
+        setError("Failed to resend. Try again later.");
+      } finally {
+        setResending(false);
+      }
+    };
+
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4">
+        <div className="card-glow w-full max-w-md rounded-2xl border border-card-border bg-card-bg p-8 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent-2/20">
+            <FiMail size={28} className="text-accent-2" />
+          </div>
+          <h2 className="mb-2 text-xl font-bold">Verify your email first</h2>
+          <p className="mb-4 text-sm text-subtext">
+            Check your inbox for a verification link. You need to verify your email before posting.
+          </p>
+          {error && (
+            <div className="mb-3 rounded-xl bg-negative/10 px-4 py-2 text-sm text-negative">{error}</div>
+          )}
+          <button
+            onClick={handleResend}
+            disabled={resending}
+            className="btn-bounce w-full rounded-xl border border-accent-2/30 px-4 py-3 text-sm font-bold text-accent-2 hover:bg-accent-2/10 disabled:opacity-50"
+          >
+            <span className="flex items-center justify-center gap-2">
+              <FiMail size={16} />
+              {resending ? "Sending..." : "Resend Verification Email"}
+            </span>
+          </button>
+          <Link
+            href="/"
+            className="mt-3 block text-sm text-subtext hover:text-heading"
+          >
+            Back to home
+          </Link>
+        </div>
       </div>
     );
   }
@@ -51,6 +100,14 @@ export default function NewPostPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // Rate limit check
+    const limit = checkRateLimit("post_create");
+    if (!limit.allowed) {
+      setError(`You're posting too fast. Try again in ${formatRetryTime(limit.retryAfterMs)}.`);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -69,6 +126,7 @@ export default function NewPostPage() {
         score: 0,
         createdAt: Date.now(),
       });
+      recordAction("post_create");
       router.push("/");
     } catch {
       setError("Failed to create post. Please try again.");
@@ -85,7 +143,8 @@ export default function NewPostPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
-          <div className="rounded-xl bg-negative/10 px-4 py-3 text-sm font-medium text-negative">
+          <div className="flex items-center gap-2 rounded-xl bg-negative/10 px-4 py-3 text-sm font-medium text-negative">
+            <FiAlertCircle size={16} />
             {error}
           </div>
         )}

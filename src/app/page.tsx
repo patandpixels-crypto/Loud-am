@@ -78,6 +78,9 @@ export default function HomePage() {
           ...doc.data(),
         })) as Post[];
 
+        // Filter out hidden posts
+        fetchedPosts = fetchedPosts.filter((p) => !p.hidden);
+
         // Filter client-side
         if (filter !== "all") {
           fetchedPosts = fetchedPosts.filter((p) => p.sentiment === filter);
@@ -261,6 +264,7 @@ export default function HomePage() {
                 key={post.id}
                 post={post}
                 rank={!searchQuery.trim() && sort === "score" ? index + 1 : undefined}
+                onDelete={(id) => setPosts((prev) => prev.filter((p) => p.id !== id))}
               />
             ))}
           </div>

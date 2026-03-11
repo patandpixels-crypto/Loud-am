@@ -22,6 +22,8 @@ export interface Post {
   downvotes: number;
   score: number;
   createdAt: number;
+  hidden?: boolean;
+  editedAt?: number;
 }
 
 export interface Vote {
@@ -82,5 +84,27 @@ export interface Earning {
   sectionPostId: string;
   fromPaymentBy: string; // userId of the person who paid
   amount: number;
+  createdAt: number;
+}
+
+export interface Report {
+  id: string;
+  postId: string;
+  postTitle: string;
+  reporterId: string;
+  reason: "spam" | "harassment" | "misinformation" | "hate_speech" | "other";
+  details?: string;
+  status: "pending" | "reviewed" | "dismissed";
+  createdAt: number;
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: "vote" | "reply" | "earning" | "report_resolved";
+  title: string;
+  message: string;
+  link?: string;
+  read: boolean;
   createdAt: number;
 }
