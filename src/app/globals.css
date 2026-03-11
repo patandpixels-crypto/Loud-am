@@ -1,46 +1,46 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a12;
-  --foreground: #f0f0f5;
-  --accent: #ff6b6b;
-  --accent-hover: #ff8787;
-  --accent-2: #feca57;
-  --accent-3: #48dbfb;
-  --positive: #00d2d3;
-  --negative: #ff6b6b;
-  --card-bg: #13131f;
-  --card-border: #1e1e30;
-  --input-bg: #1a1a2e;
-  --glow-accent: rgba(255, 107, 107, 0.15);
-  --glow-positive: rgba(0, 210, 211, 0.15);
-  --heading: #ffffff;
-  --subtext: #a1a1aa;
-  --muted: #71717a;
-  --subtle: #d4d4d8;
-  --surface: #27272a;
+  --background: #0B1120;
+  --foreground: #F0F4F8;
+  --accent: #2563EB;
+  --accent-hover: #3B82F6;
+  --accent-2: #A3E635;
+  --accent-3: #38BDF8;
+  --positive: #22C55E;
+  --negative: #EF4444;
+  --card-bg: #111827;
+  --card-border: #1E293B;
+  --input-bg: #0F172A;
+  --glow-accent: rgba(37, 99, 235, 0.12);
+  --glow-positive: rgba(34, 197, 94, 0.12);
+  --heading: #F8FAFC;
+  --subtext: #94A3B8;
+  --muted: #64748B;
+  --subtle: #CBD5E1;
+  --surface: #1E293B;
   --overlay: rgba(0, 0, 0, 0.6);
 }
 
 [data-theme="light"] {
-  --background: #f8f8fc;
-  --foreground: #1a1a2e;
-  --accent: #e05555;
-  --accent-hover: #c94444;
-  --accent-2: #e0a820;
-  --accent-3: #1a9fc4;
-  --positive: #059e9f;
-  --negative: #dc3545;
-  --card-bg: #ffffff;
-  --card-border: #e2e2ee;
-  --input-bg: #f0f0f8;
-  --glow-accent: rgba(224, 85, 85, 0.1);
-  --glow-positive: rgba(5, 158, 159, 0.1);
-  --heading: #1a1a2e;
-  --subtext: #52525b;
-  --muted: #71717a;
-  --subtle: #3f3f46;
-  --surface: #f0f0f8;
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --accent: #2563EB;
+  --accent-hover: #1D4ED8;
+  --accent-2: #65A30D;
+  --accent-3: #0284C7;
+  --positive: #16A34A;
+  --negative: #DC2626;
+  --card-bg: #FFFFFF;
+  --card-border: #E2E8F0;
+  --input-bg: #F1F5F9;
+  --glow-accent: rgba(37, 99, 235, 0.08);
+  --glow-positive: rgba(22, 163, 74, 0.08);
+  --heading: #0F172A;
+  --subtext: #475569;
+  --muted: #64748B;
+  --subtle: #334155;
+  --surface: #F1F5F9;
   --overlay: rgba(0, 0, 0, 0.3);
 }
 
@@ -62,42 +62,41 @@
   --color-subtle: var(--subtle);
   --color-surface: var(--surface);
   --color-overlay: var(--overlay);
-  --font-sans: "Inter", "Segoe UI", Arial, sans-serif;
-  --font-mono: "Fira Code", "Courier New", monospace;
+  --font-sans: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Plus Jakarta Sans", "Inter", "Segoe UI", sans-serif;
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* Fun selection color */
 ::selection {
   background: var(--accent);
   color: white;
 }
 
-/* Playful scrollbar */
+/* Clean scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  background: var(--muted);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--accent-hover), var(--accent-2));
+  background: var(--accent);
 }
 
 /* Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+  50% { transform: translateY(-3px); }
 }
 
 @keyframes wiggle {
@@ -134,38 +133,46 @@ body {
   animation: pop 0.3s ease-in-out;
 }
 
-/* Playful logo font */
+/* Logo font */
 .logo-text {
-  font-family: var(--font-playful), cursive;
-  letter-spacing: 0.05em;
+  font-family: var(--font-display), "Plus Jakarta Sans", sans-serif;
+  letter-spacing: -0.02em;
+  font-weight: 800;
 }
 
-/* Gradient text */
+/* Gradient text — blue to lemon green */
 .gradient-text {
-  background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb, #ff6b6b);
+  background: linear-gradient(135deg, #2563EB, #38BDF8, #A3E635, #2563EB);
   background-size: 300% 300%;
-  animation: gradient-shift 4s ease infinite;
+  animation: gradient-shift 5s ease infinite;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Card glow effect on hover */
+/* Card hover — subtle lift + blue glow */
 .card-glow {
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 .card-glow:hover {
-  box-shadow: 0 0 20px var(--glow-accent), 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px var(--glow-accent), 0 2px 8px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
+  border-color: var(--accent) !important;
 }
 
-/* Button bounce */
+/* Button interaction */
 .btn-bounce {
-  transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 .btn-bounce:hover {
-  transform: translateY(-2px) scale(1.02);
+  transform: translateY(-1px);
 }
 .btn-bounce:active {
   transform: translateY(0) scale(0.98);
+}
+
+/* Glass effect */
+.glass {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
 }

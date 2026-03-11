@@ -1,21 +1,27 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Bangers } from "next/font/google";
+import { Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/AuthContext";
 import { ThemeProvider } from "@/lib/ThemeContext";
 import Navbar from "@/components/Navbar";
 
-const bangers = Bangers({
-  weight: "400",
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-playful",
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "LOUD-AM! | Speak Your Truth",
+  title: "LOUD-AM! | Insider Company Talk",
   description:
-    "Post honest reviews about people and brands you've worked with, dated, or done business with. Upvote the truth.",
+    "Share insider company reviews anonymously. Staff-only sections. Get paid when people read your posts.",
 };
 
 export default function RootLayout({
@@ -34,7 +40,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
       </head>
-      <body className={`${bangers.variable} antialiased`}>
+      <body className={`${jakarta.variable} ${spaceGrotesk.variable} antialiased`}>
         <ThemeProvider>
           <AuthProvider>
             <Navbar />
@@ -44,7 +50,7 @@ export default function RootLayout({
                 LOUD-AM!
               </p>
               <p className="mt-1 text-xs text-muted">
-                &copy; {new Date().getFullYear()} &mdash; Speak your truth, be heard.
+                &copy; {new Date().getFullYear()} &mdash; Insider company talk. Get paid to share.
               </p>
             </footer>
           </AuthProvider>
