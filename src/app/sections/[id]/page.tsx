@@ -25,6 +25,8 @@ import {
   FiDollarSign,
   FiUserPlus,
   FiX,
+  FiClock,
+  FiAlertTriangle,
 } from "react-icons/fi";
 
 function getTimeAgo(timestamp: number): string {
@@ -197,6 +199,14 @@ export default function SectionDetailPage() {
       setStaffError("Already a staff member");
       return;
     }
+    // Enforce same company domain
+    if (section.companyDomain) {
+      const emailDomain = email.split("@")[1];
+      if (emailDomain !== section.companyDomain) {
+        setStaffError(`Only @${section.companyDomain} emails can be added`);
+        return;
+      }
+    }
 
     setAddingStaff(true);
     setStaffError("");
@@ -297,6 +307,30 @@ export default function SectionDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Pending / Rejected status banner */}
+      {section.status === "pending" && (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-accent-2/30 bg-accent-2/5 px-4 py-3">
+          <FiClock className="mt-0.5 shrink-0 text-accent-2" size={18} />
+          <div>
+            <p className="text-sm font-bold text-heading">Pending Admin Approval</p>
+            <p className="text-xs text-subtext">
+              This section is awaiting review by an admin. It is only visible to you until approved.
+            </p>
+          </div>
+        </div>
+      )}
+      {section.status === "rejected" && (
+        <div className="mb-6 flex items-start gap-3 rounded-xl border border-negative/30 bg-negative/5 px-4 py-3">
+          <FiAlertTriangle className="mt-0.5 shrink-0 text-negative" size={18} />
+          <div>
+            <p className="text-sm font-bold text-heading">Section Rejected</p>
+            <p className="text-xs text-subtext">
+              This section was not approved.{section.adminNote && <> Reason: {section.adminNote}</>}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Posts */}
       {!user ? (

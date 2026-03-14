@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { collection, query, orderBy, getDocs, doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
-import { Post, UserProfile, Report, PayoutRequest } from "@/lib/types";
+import { Post, UserProfile, Report, PayoutRequest, CompanySection } from "@/lib/types";
 import {
   FiShield, FiUser, FiMail, FiEyeOff, FiEye,
   FiFlag, FiTrash2, FiEyeOff as FiHide, FiCheck, FiX, FiAlertTriangle,
   FiDollarSign,
+  FiBriefcase,
 } from "react-icons/fi";
 import Link from "next/link";
 
@@ -22,9 +23,11 @@ export default function AdminPage() {
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [payoutRequests, setPayoutRequests] = useState<PayoutRequest[]>([]);
+  const [pendingSections, setPendingSections] = useState<CompanySection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"posts" | "reports" | "payouts">("posts");
+  const [activeTab, setActiveTab] = useState<"posts" | "reports" | "payouts" | "sections">("posts");
   const [rejectNote, setRejectNote] = useState("");
+  const [sectionRejectNote, setSectionRejectNote] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
@@ -68,6 +71,13 @@ export default function AdminPage() {
         const payoutsSnapshot = await getDocs(payoutsQuery);
         const payoutsData = payoutsSnapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PayoutRequest));
         setPayoutRequests(payoutsData);
+
+        // Fetch pending company sections
+        const sectionsQuery = query(collection(db, "companySections"), orderBy("createdAt", "desc"));
+        const sectionsSnapshot = await getDocs(sectionsQuery);
+        const sectionsData = sectionsSnapshot.docs
+          .map((d) => ({ id: d.id, ...d.data() } as CompanySection));
+        setPendingSections(sectionsData);
       } catch (err) {
         console.error("Error fetching admin data:", err);
       } finally {
@@ -146,6 +156,32 @@ export default function AdminPage() {
     }
   };
 
+  const handleApproveSection = async (sectionId: string) => {
+    setActionLoading(sectionId);
+    try {
+      await updateDoc(doc(db, "companySections", sectionId), { status: "approved", reviewedAt: Date.now() });
+      setPendingSections((prev) => prev.map((s) => s.id === sectionId ? { ...s, status: "approved", reviewedAt: Date.now() } : s));
+    } catch (err) {
+      console.error("Error approving section:", err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRejectSection = async (sectionId: string) => {
+    const note = sectionRejectNote.trim() || "Section rejected by admin";
+    setActionLoading(sectionId);
+    try {
+      await updateDoc(doc(db, "companySections", sectionId), { status: "rejected", adminNote: note, reviewedAt: Date.now() });
+      setPendingSections((prev) => prev.map((s) => s.id === sectionId ? { ...s, status: "rejected", adminNote: note, reviewedAt: Date.now() } : s));
+      setSectionRejectNote("");
+    } catch (err) {
+      console.error("Error rejecting section:", err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleResolveReport = async (reportId: string, status: "reviewed" | "dismissed") => {
     setActionLoading(reportId);
     try {
@@ -184,6 +220,7 @@ export default function AdminPage() {
 
   const pendingReports = reports.filter((r) => r.status === "pending");
   const pendingPayouts = payoutRequests.filter((p) => p.status === "pending");
+  const pendingSectionsList = pendingSections.filter((s) => s.status === "pending");
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
@@ -195,7 +232,7 @@ export default function AdminPage() {
       </div>
 
       {/* Stats */}
-      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-6">
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
           <p className="text-sm text-subtext">Total Posts</p>
           <p className="text-3xl font-black">{posts.length}</p>
@@ -215,6 +252,10 @@ export default function AdminPage() {
         <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
           <p className="text-sm text-subtext">Payouts</p>
           <p className="text-3xl font-black text-accent-2">{pendingPayouts.length}</p>
+        </div>
+        <div className="card-glow rounded-xl border border-card-border bg-card-bg p-4">
+          <p className="text-sm text-subtext">Sections</p>
+          <p className="text-3xl font-black text-accent-3">{pendingSectionsList.length}</p>
         </div>
       </div>
 
@@ -246,6 +287,16 @@ export default function AdminPage() {
         >
           Payouts {pendingPayouts.length > 0 && (
             <span className="ml-1 rounded-full bg-accent-2 px-1.5 py-0.5 text-[10px] text-white">{pendingPayouts.length}</span>
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab("sections")}
+          className={`flex-1 px-4 py-2.5 text-sm font-bold transition-all ${
+            activeTab === "sections" ? "bg-gradient-to-r from-accent to-accent-2 text-white" : "text-subtext hover:text-heading"
+          }`}
+        >
+          Sections {pendingSectionsList.length > 0 && (
+            <span className="ml-1 rounded-full bg-accent-3 px-1.5 py-0.5 text-[10px] text-white">{pendingSectionsList.length}</span>
           )}
         </button>
       </div>
@@ -504,6 +555,77 @@ export default function AdminPage() {
                       <button
                         onClick={() => handleRejectPayout(payout.id)}
                         disabled={actionLoading === payout.id}
+                        className="btn-bounce rounded-lg border border-negative/30 px-3 py-1.5 text-xs font-bold text-negative hover:bg-negative/10 disabled:opacity-50"
+                      >
+                        <FiX size={12} className="mr-1 inline" /> Reject
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+      {/* Sections Tab */}
+      {activeTab === "sections" && (
+        <div className="space-y-3">
+          {pendingSections.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-card-border py-16 text-center">
+              <FiBriefcase size={32} className="mx-auto mb-3 text-muted" />
+              <p className="font-bold text-subtext">No section requests</p>
+            </div>
+          ) : (
+            pendingSections.map((section) => (
+              <div
+                key={section.id}
+                className={`card-glow rounded-xl border bg-card-bg p-4 ${
+                  section.status === "pending" ? "border-accent-2/30" : "border-card-border opacity-60"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                        section.status === "pending"
+                          ? "bg-accent-2/10 text-accent-2"
+                          : section.status === "approved"
+                          ? "bg-positive/10 text-positive"
+                          : "bg-negative/10 text-negative"
+                      }`}>
+                        {section.status || "legacy"}
+                      </span>
+                      <span className="text-lg font-black text-heading">{section.companyName}</span>
+                    </div>
+                    <p className="mb-2 text-sm text-subtext">{section.description}</p>
+                    <div className="rounded-lg bg-surface/50 px-3 py-2 text-xs text-subtext">
+                      <p><span className="text-muted">Creator:</span> {section.creatorName}</p>
+                      <p><span className="text-muted">Email:</span> {section.creatorEmail || "N/A"}</p>
+                      <p><span className="text-muted">Domain:</span> @{section.companyDomain || "N/A"}</p>
+                      <p><span className="text-muted">Staff:</span> {section.staffEmails.join(", ")}</p>
+                    </div>
+                    <p className="mt-1 text-xs text-muted">{new Date(section.createdAt).toLocaleString()}</p>
+                    {section.adminNote && <p className="mt-1 text-xs text-negative">Note: {section.adminNote}</p>}
+                  </div>
+                  {section.status === "pending" && (
+                    <div className="flex flex-col gap-1.5">
+                      <button
+                        onClick={() => handleApproveSection(section.id)}
+                        disabled={actionLoading === section.id}
+                        className="btn-bounce rounded-lg border border-positive/30 px-3 py-1.5 text-xs font-bold text-positive hover:bg-positive/10 disabled:opacity-50"
+                      >
+                        <FiCheck size={12} className="mr-1 inline" /> Approve
+                      </button>
+                      <input
+                        type="text"
+                        value={sectionRejectNote}
+                        onChange={(e) => setSectionRejectNote(e.target.value)}
+                        placeholder="Reason..."
+                        className="rounded-lg border border-card-border bg-input-bg px-2 py-1 text-xs text-heading placeholder-muted outline-none"
+                      />
+                      <button
+                        onClick={() => handleRejectSection(section.id)}
+                        disabled={actionLoading === section.id}
                         className="btn-bounce rounded-lg border border-negative/30 px-3 py-1.5 text-xs font-bold text-negative hover:bg-negative/10 disabled:opacity-50"
                       >
                         <FiX size={12} className="mr-1 inline" /> Reject

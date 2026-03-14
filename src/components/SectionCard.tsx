@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { CompanySection } from "@/lib/types";
-import { FiBriefcase, FiUsers, FiFileText } from "react-icons/fi";
+import { FiBriefcase, FiUsers, FiFileText, FiClock, FiXCircle } from "react-icons/fi";
 
 function getTimeAgo(timestamp: number): string {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -38,6 +38,18 @@ export default function SectionCard({ section }: { section: CompanySection }) {
         </p>
 
         <div className="flex items-center gap-4 text-xs text-muted">
+          {section.status === "pending" && (
+            <span className="flex items-center gap-1 rounded-full bg-accent-2/10 px-2 py-0.5 text-xs font-bold text-accent-2">
+              <FiClock size={10} />
+              Pending Approval
+            </span>
+          )}
+          {section.status === "rejected" && (
+            <span className="flex items-center gap-1 rounded-full bg-negative/10 px-2 py-0.5 text-xs font-bold text-negative">
+              <FiXCircle size={10} />
+              Rejected
+            </span>
+          )}
           <span className="flex items-center gap-1 text-accent-3">
             <FiUsers size={12} />
             {section.staffIds.length} staff

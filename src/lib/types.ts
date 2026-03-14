@@ -40,9 +40,14 @@ export interface CompanySection {
   description: string;
   creatorId: string;
   creatorName: string;
+  creatorEmail: string;
+  companyDomain: string; // e.g. "acme.com" — extracted from creator's email
   staffIds: string[]; // UIDs of permitted staff
   staffEmails: string[]; // emails for display
   postCount: number;
+  status: "pending" | "approved" | "rejected";
+  adminNote?: string;
+  reviewedAt?: number;
   createdAt: number;
 }
 

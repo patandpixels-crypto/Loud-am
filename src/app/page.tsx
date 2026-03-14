@@ -76,8 +76,10 @@ export default function HomePage() {
         // Fetch sections
         const sectionsQuery = query(collection(db, "companySections"), orderBy("createdAt", "desc"));
         const sectionsSnap = await getDocs(sectionsQuery);
-        const sectionsData = sectionsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as CompanySection[];
-        setSections(sectionsData);
+        const sectionsData = sectionsSnap.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() })) as CompanySection[];
+        // Only show approved sections on homepage
+        setSections(sectionsData.filter((s) => s.status === "approved" || !s.status));
 
         // Fetch posts
         const postsRef = collection(db, "posts");

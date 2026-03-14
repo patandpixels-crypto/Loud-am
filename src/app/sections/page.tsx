@@ -34,7 +34,13 @@ export default function SectionsPage() {
     fetchSections();
   }, []);
 
-  const filtered = sections.filter((s) =>
+  // Only show approved sections publicly; creators can see their own pending/rejected ones
+  const visible = sections.filter((s) => {
+    if (s.status === "approved" || !s.status) return true;
+    return user?.uid === s.creatorId;
+  });
+
+  const filtered = visible.filter((s) =>
     s.companyName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

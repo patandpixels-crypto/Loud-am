@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
-import { FiArrowLeft, FiBriefcase, FiPlus, FiX } from "react-icons/fi";
+import { getEmailDomain, isGenericDomain, emailMatchesDomain } from "@/lib/emailDomain";
+import { FiArrowLeft, FiBriefcase, FiPlus, FiX, FiAlertTriangle, FiClock } from "react-icons/fi";
 import Link from "next/link";
 
 export default function CreateSectionPage() {
@@ -18,6 +19,9 @@ export default function CreateSectionPage() {
   const [staffEmails, setStaffEmails] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  const userDomain = user?.email ? getEmailDomain(user.email) : null;
+  const isBlockedDomain = userDomain ? isGenericDomain(userDomain) : false;
 
   const addStaffEmail = () => {
     const email = staffEmail.trim().toLowerCase();
@@ -34,6 +38,10 @@ export default function CreateSectionPage() {
       setError("You are automatically added as staff");
       return;
     }
+    if (userDomain && !emailMatchesDomain(email, userDomain)) {
+      setError(`Staff emails must use the @${userDomain} domain`);
+      return;
+    }
     setStaffEmails([...staffEmails, email]);
     setStaffEmail("");
     setError("");
@@ -45,7 +53,12 @@ export default function CreateSectionPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !userProfile) return;
+    if (!user || !userProfile || !userDomain) return;
+
+    if (isBlockedDomain) {
+      setError("You must use a company email to create a section.");
+      return;
+    }
 
     if (!companyName.trim()) {
       setError("Company name is required");
@@ -65,9 +78,12 @@ export default function CreateSectionPage() {
         description: description.trim(),
         creatorId: user.uid,
         creatorName: userProfile.codeName || userProfile.displayName,
+        creatorEmail: user.email?.toLowerCase(),
+        companyDomain: userDomain,
         staffIds: [user.uid],
         staffEmails: [user.email?.toLowerCase(), ...staffEmails],
         postCount: 0,
+        status: "pending",
         createdAt: Date.now(),
       });
 
@@ -119,6 +135,34 @@ export default function CreateSectionPage() {
           </div>
         </div>
 
+        {/* Blocked domain warning */}
+        {isBlockedDomain && (
+          <div className="mb-6 flex items-start gap-3 rounded-xl border border-accent/30 bg-accent/5 px-4 py-3">
+            <FiAlertTriangle className="mt-0.5 shrink-0 text-accent" size={18} />
+            <div>
+              <p className="text-sm font-bold text-heading">Company email required</p>
+              <p className="mt-0.5 text-xs text-subtext">
+                You&apos;re signed in with <strong className="text-subtle">{user.email}</strong> which is a personal email.
+                To create a company section, sign in with your work email (e.g. you@company.com).
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Approval notice */}
+        {!isBlockedDomain && (
+          <div className="mb-6 flex items-start gap-3 rounded-xl border border-accent-2/30 bg-accent-2/5 px-4 py-3">
+            <FiClock className="mt-0.5 shrink-0 text-accent-2" size={18} />
+            <div>
+              <p className="text-sm font-bold text-heading">Admin approval required</p>
+              <p className="mt-0.5 text-xs text-subtext">
+                Your section will be reviewed by an admin before it becomes publicly visible.
+                {userDomain && <> Your company domain: <strong className="text-accent-2">@{userDomain}</strong></>}
+              </p>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Company Name */}
           <div>
@@ -128,7 +172,8 @@ export default function CreateSectionPage() {
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder="e.g. Acme Corp"
-              className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+              disabled={isBlockedDomain}
+              className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10 disabled:opacity-50"
               maxLength={100}
             />
           </div>
@@ -141,7 +186,8 @@ export default function CreateSectionPage() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What is this section about?"
               rows={3}
-              className="w-full resize-none rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+              disabled={isBlockedDomain}
+              className="w-full resize-none rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10 disabled:opacity-50"
               maxLength={500}
             />
           </div>
@@ -157,13 +203,15 @@ export default function CreateSectionPage() {
                 value={staffEmail}
                 onChange={(e) => setStaffEmail(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addStaffEmail(); } }}
-                placeholder="colleague@company.com"
-                className="flex-1 rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+                placeholder={userDomain ? `colleague@${userDomain}` : "colleague@company.com"}
+                disabled={isBlockedDomain}
+                className="flex-1 rounded-xl border border-card-border bg-input-bg px-4 py-3 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10 disabled:opacity-50"
               />
               <button
                 type="button"
                 onClick={addStaffEmail}
-                className="btn-bounce rounded-xl bg-surface px-4 py-3 text-sm font-medium text-heading transition-colors hover:bg-zinc-700"
+                disabled={isBlockedDomain}
+                className="btn-bounce rounded-xl bg-surface px-4 py-3 text-sm font-medium text-heading transition-colors hover:bg-zinc-700 disabled:opacity-50"
               >
                 <FiPlus size={16} />
               </button>
@@ -184,7 +232,8 @@ export default function CreateSectionPage() {
               </div>
             )}
             <p className="mt-2 text-xs text-muted">
-              You are automatically added as staff. Invited staff can post when they sign up with these emails.
+              You are automatically added as staff.
+              {userDomain && !isBlockedDomain && <> Only <strong>@{userDomain}</strong> emails can be added.</>}
             </p>
           </div>
 
@@ -194,10 +243,10 @@ export default function CreateSectionPage() {
 
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || isBlockedDomain}
             className="btn-bounce w-full rounded-xl bg-gradient-to-r from-accent to-accent-2 py-3 text-sm font-black text-white shadow-lg shadow-accent/20 disabled:opacity-50"
           >
-            {submitting ? "Creating..." : "Create Section"}
+            {submitting ? "Creating..." : "Submit for Approval"}
           </button>
         </form>
       </div>
