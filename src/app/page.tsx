@@ -24,7 +24,6 @@ export default function HomePage() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [sort, setSort] = useState<SortType>("score");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sectionSearchQuery, setSectionSearchQuery] = useState("");
   const [topEarner, setTopEarner] = useState<{ name: string; amount: number } | null>(null);
 
   // Fetch top earner of the month
@@ -174,6 +173,18 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* Unified Search Bar */}
+      <div className="relative mb-8">
+        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={16} />
+        <input
+          type="text"
+          placeholder="Search companies, names, brands, or links..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+        />
+      </div>
+
       {/* === SECTIONS (Primary Product) === */}
       <div className="mb-10">
         <div className="mb-4 flex items-center justify-between">
@@ -201,20 +212,8 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Section Search Bar */}
-        <div className="relative mb-4">
-          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={16} />
-          <input
-            type="text"
-            placeholder="Search for a company..."
-            value={sectionSearchQuery}
-            onChange={(e) => setSectionSearchQuery(e.target.value)}
-            className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent-2 focus:shadow-lg focus:shadow-accent-2/10"
-          />
-        </div>
-
         {(() => {
-          const sq = sectionSearchQuery.trim().toLowerCase();
+          const sq = searchQuery.trim().toLowerCase();
           const filteredSections = sq
             ? sections.filter((s) => s.companyName.toLowerCase().includes(sq))
             : sections;
@@ -230,7 +229,7 @@ export default function HomePage() {
                 <>
                   <p className="mb-1 font-bold text-subtext">No results found</p>
                   <p className="mb-4 text-sm text-muted">
-                    No company matching &ldquo;{sectionSearchQuery.trim()}&rdquo;
+                    No company matching &ldquo;{searchQuery.trim()}&rdquo;
                   </p>
                 </>
               ) : (
@@ -275,18 +274,6 @@ export default function HomePage() {
         <div className="h-px flex-1 bg-card-border" />
         <span className="text-xs font-bold text-muted">PUBLIC REVIEWS</span>
         <div className="h-px flex-1 bg-card-border" />
-      </div>
-
-      {/* Search Bar */}
-      <div className="relative mb-6">
-        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={16} />
-        <input
-          type="text"
-          placeholder="Search by name, brand, or social media link..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
-        />
       </div>
 
       {/* Leaderboard Header */}
