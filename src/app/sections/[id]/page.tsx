@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   doc,
   getDoc,
+  deleteDoc,
   collection,
   query,
   where,
@@ -27,6 +28,7 @@ import {
   FiX,
   FiClock,
   FiAlertTriangle,
+  FiTrash2,
 } from "react-icons/fi";
 
 function getTimeAgo(timestamp: number): string {
@@ -60,6 +62,7 @@ export default function SectionDetailPage() {
   const [newStaffEmail, setNewStaffEmail] = useState("");
   const [addingStaff, setAddingStaff] = useState(false);
   const [staffError, setStaffError] = useState("");
+  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
 
   const fetchPosts = async () => {
     try {
@@ -229,6 +232,33 @@ export default function SectionDetailPage() {
     }
   };
 
+  const isAdmin = !!userProfile?.isAdmin;
+
+  const handleDeletePost = async (e: React.MouseEvent, postId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm("Are you sure you want to delete this post? This cannot be undone.")) return;
+
+    setDeletingPostId(postId);
+    try {
+      // Delete all replies for this post
+      const repliesQuery = query(
+        collection(db, "sectionReplies"),
+        where("postId", "==", postId)
+      );
+      const repliesSnap = await getDocs(repliesQuery);
+      await Promise.all(repliesSnap.docs.map((d) => deleteDoc(d.ref)));
+
+      // Delete the post
+      await deleteDoc(doc(db, "sectionPosts", postId));
+      setPosts((prev) => prev.filter((p) => p.id !== postId));
+    } catch (err) {
+      console.error("Error deleting post:", err);
+    } finally {
+      setDeletingPostId(null);
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -393,24 +423,40 @@ export default function SectionDetailPage() {
       ) : (
         <div className="space-y-4">
           {posts.map((post) => (
-            <Link key={post.id} href={`/sections/${sectionId}/post/${post.id}`} className="block">
-              <div className="card-glow group rounded-2xl border border-card-border bg-card-bg p-5">
-                <h3 className="mb-2 text-lg font-bold text-heading group-hover:text-accent">
-                  {post.title}
-                </h3>
-                <p className="mb-3 line-clamp-3 text-sm leading-relaxed text-subtext">
-                  {post.content}
-                </p>
-                <div className="flex items-center gap-3 text-xs text-muted">
-                  <span className="flex items-center gap-1">
-                    <FiUser size={12} />
-                    {post.isAnonymous ? "Anonymous" : post.authorName}
-                  </span>
-                  <span className="text-accent-2">{getTimeAgo(post.createdAt)}</span>
-                  <span>{post.replyCount} {post.replyCount === 1 ? "reply" : "replies"}</span>
+            <div key={post.id} className="relative">
+              <Link href={`/sections/${sectionId}/post/${post.id}`} className="block">
+                <div className="card-glow group rounded-2xl border border-card-border bg-card-bg p-5">
+                  <h3 className="mb-2 text-lg font-bold text-heading group-hover:text-accent">
+                    {post.title}
+                  </h3>
+                  <p className="mb-3 line-clamp-3 text-sm leading-relaxed text-subtext">
+                    {post.content}
+                  </p>
+                  <div className="flex items-center gap-3 text-xs text-muted">
+                    <span className="flex items-center gap-1">
+                      <FiUser size={12} />
+                      {post.isAnonymous ? "Anonymous" : post.authorName}
+                    </span>
+                    <span className="text-accent-2">{getTimeAgo(post.createdAt)}</span>
+                    <span>{post.replyCount} {post.replyCount === 1 ? "reply" : "replies"}</span>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+              {isAdmin && (
+                <button
+                  onClick={(e) => handleDeletePost(e, post.id)}
+                  disabled={deletingPostId === post.id}
+                  className="absolute right-3 top-3 rounded-lg p-2 text-muted transition-colors hover:bg-negative/10 hover:text-negative disabled:opacity-50"
+                  title="Delete post (admin)"
+                >
+                  {deletingPostId === post.id ? (
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-negative border-t-transparent" />
+                  ) : (
+                    <FiTrash2 size={16} />
+                  )}
+                </button>
+              )}
+            </div>
           ))}
         </div>
       )}

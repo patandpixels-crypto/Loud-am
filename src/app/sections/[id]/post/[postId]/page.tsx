@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   doc,
   getDoc,
+  deleteDoc,
   collection,
   query,
   where,
@@ -18,7 +19,7 @@ import { db, auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
 import { openPaystack, grantAccessServerSide } from "@/lib/paystack";
 import { CompanySection, SectionPost, SectionReply } from "@/lib/types";
-import { FiArrowLeft, FiUser, FiSend, FiLock, FiDollarSign } from "react-icons/fi";
+import { FiArrowLeft, FiUser, FiSend, FiLock, FiDollarSign, FiTrash2 } from "react-icons/fi";
 
 function getTimeAgo(timestamp: number): string {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -39,6 +40,7 @@ function countWords(text: string): number {
 
 export default function SectionPostPage() {
   const params = useParams();
+  const router = useRouter();
   const sectionId = params.id as string;
   const postId = params.postId as string;
   const { user, userProfile, loading: authLoading } = useAuth();
@@ -55,6 +57,7 @@ export default function SectionPostPage() {
   const [replyError, setReplyError] = useState("");
 
   const [paying, setPaying] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -200,6 +203,30 @@ export default function SectionPostPage() {
     }
   };
 
+  const isAdmin = !!userProfile?.isAdmin;
+
+  const handleDeletePost = async () => {
+    if (!confirm("Are you sure you want to delete this post and all its replies? This cannot be undone.")) return;
+
+    setDeleting(true);
+    try {
+      // Delete all replies for this post
+      const repliesQuery = query(
+        collection(db, "sectionReplies"),
+        where("postId", "==", postId)
+      );
+      const repliesSnap = await getDocs(repliesQuery);
+      await Promise.all(repliesSnap.docs.map((d) => deleteDoc(d.ref)));
+
+      // Delete the post
+      await deleteDoc(doc(db, "sectionPosts", postId));
+      router.push(`/sections/${sectionId}`);
+    } catch (err) {
+      console.error("Error deleting post:", err);
+      setDeleting(false);
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -290,7 +317,23 @@ export default function SectionPostPage() {
 
       {/* Post */}
       <article className="mb-8 rounded-2xl border border-card-border bg-card-bg p-6 sm:p-8">
-        <h1 className="mb-3 text-2xl font-black leading-tight text-heading">{post.title}</h1>
+        <div className="mb-3 flex items-start justify-between gap-4">
+          <h1 className="text-2xl font-black leading-tight text-heading">{post.title}</h1>
+          {isAdmin && (
+            <button
+              onClick={handleDeletePost}
+              disabled={deleting}
+              className="shrink-0 rounded-lg p-2 text-muted transition-colors hover:bg-negative/10 hover:text-negative disabled:opacity-50"
+              title="Delete post (admin)"
+            >
+              {deleting ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-negative border-t-transparent" />
+              ) : (
+                <FiTrash2 size={18} />
+              )}
+            </button>
+          )}
+        </div>
         <div className="mb-4 flex items-center gap-3 text-sm text-muted">
           <span className="flex items-center gap-1">
             <FiUser size={14} />
