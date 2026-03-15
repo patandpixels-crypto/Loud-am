@@ -24,6 +24,7 @@ export default function HomePage() {
   const [filter, setFilter] = useState<FilterType>("all");
   const [sort, setSort] = useState<SortType>("score");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sectionSearchQuery, setSectionSearchQuery] = useState("");
   const [topEarner, setTopEarner] = useState<{ name: string; amount: number } | null>(null);
 
   // Fetch top earner of the month
@@ -200,41 +201,73 @@ export default function HomePage() {
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex justify-center py-10">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-2/30 border-t-accent" />
-          </div>
-        ) : sections.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-card-border bg-card-bg py-12 text-center">
-            <FiBriefcase size={32} className="mx-auto mb-3 text-muted" />
-            <p className="mb-1 font-bold text-subtext">No company sections yet</p>
-            <p className="mb-4 text-sm text-muted">
-              {user ? "Be the first to create one and start earning!" : "Sign in to create a company section."}
-            </p>
-            {user && (
-              <Link
-                href="/sections/create"
-                className="btn-bounce inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
-              >
-                <FiPlus size={16} />
-                Create Section
-              </Link>
-            )}
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {sections.slice(0, 4).map((section) => (
-              <SectionCard key={section.id} section={section} />
-            ))}
-          </div>
-        )}
-        {sections.length > 4 && (
-          <div className="mt-3 text-center">
-            <Link href="/sections" className="text-sm font-bold text-accent-3 hover:text-accent-3/80">
-              See all {sections.length} sections &rarr;
-            </Link>
-          </div>
-        )}
+        {/* Section Search Bar */}
+        <div className="relative mb-4">
+          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={16} />
+          <input
+            type="text"
+            placeholder="Search for a company..."
+            value={sectionSearchQuery}
+            onChange={(e) => setSectionSearchQuery(e.target.value)}
+            className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent-2 focus:shadow-lg focus:shadow-accent-2/10"
+          />
+        </div>
+
+        {(() => {
+          const sq = sectionSearchQuery.trim().toLowerCase();
+          const filteredSections = sq
+            ? sections.filter((s) => s.companyName.toLowerCase().includes(sq))
+            : sections;
+
+          return loading ? (
+            <div className="flex justify-center py-10">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-2/30 border-t-accent" />
+            </div>
+          ) : filteredSections.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-card-border bg-card-bg py-12 text-center">
+              <FiBriefcase size={32} className="mx-auto mb-3 text-muted" />
+              {sq ? (
+                <>
+                  <p className="mb-1 font-bold text-subtext">No results found</p>
+                  <p className="mb-4 text-sm text-muted">
+                    No company matching &ldquo;{sectionSearchQuery.trim()}&rdquo;
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="mb-1 font-bold text-subtext">No company sections yet</p>
+                  <p className="mb-4 text-sm text-muted">
+                    {user ? "Be the first to create one and start earning!" : "Sign in to create a company section."}
+                  </p>
+                  {user && (
+                    <Link
+                      href="/sections/create"
+                      className="btn-bounce inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
+                    >
+                      <FiPlus size={16} />
+                      Create Section
+                    </Link>
+                  )}
+                </>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {(sq ? filteredSections : filteredSections.slice(0, 4)).map((section) => (
+                  <SectionCard key={section.id} section={section} />
+                ))}
+              </div>
+              {!sq && sections.length > 4 && (
+                <div className="mt-3 text-center">
+                  <Link href="/sections" className="text-sm font-bold text-accent-3 hover:text-accent-3/80">
+                    See all {sections.length} sections &rarr;
+                  </Link>
+                </div>
+              )}
+            </>
+          );
+        })()}
       </div>
 
       {/* === Divider === */}
