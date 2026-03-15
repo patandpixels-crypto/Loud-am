@@ -319,12 +319,12 @@ export default function SectionPostPage() {
       <article className="mb-8 rounded-2xl border border-card-border bg-card-bg p-6 sm:p-8">
         <div className="mb-3 flex items-start justify-between gap-4">
           <h1 className="text-2xl font-black leading-tight text-heading">{post.title}</h1>
-          {isAdmin && (
+          {(isAdmin || post.authorId === user?.uid) && (
             <button
               onClick={handleDeletePost}
               disabled={deleting}
               className="shrink-0 rounded-lg p-2 text-muted transition-colors hover:bg-negative/10 hover:text-negative disabled:opacity-50"
-              title="Delete post (admin)"
+              title="Delete post"
             >
               {deleting ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-negative border-t-transparent" />

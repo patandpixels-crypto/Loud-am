@@ -442,12 +442,12 @@ export default function SectionDetailPage() {
                   </div>
                 </div>
               </Link>
-              {isAdmin && (
+              {(isAdmin || post.authorId === user?.uid) && (
                 <button
                   onClick={(e) => handleDeletePost(e, post.id)}
                   disabled={deletingPostId === post.id}
                   className="absolute right-3 top-3 rounded-lg p-2 text-muted transition-colors hover:bg-negative/10 hover:text-negative disabled:opacity-50"
-                  title="Delete post (admin)"
+                  title="Delete post"
                 >
                   {deletingPostId === post.id ? (
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-negative border-t-transparent" />
