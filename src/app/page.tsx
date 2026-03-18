@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, doc, getDoc, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Post, Earning, CompanySection } from "@/lib/types";
 import PostCard from "@/components/PostCard";
@@ -77,16 +77,24 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+
+      // Fetch sections separately so a failure here doesn't block posts
       try {
-        // Fetch sections
-        const sectionsQuery = query(collection(db, "companySections"), orderBy("createdAt", "desc"));
-        const sectionsSnap = await getDocs(sectionsQuery);
+        const sectionsSnap = await getDocs(collection(db, "companySections"));
         const sectionsData = sectionsSnap.docs
           .map((doc) => ({ id: doc.id, ...doc.data() })) as CompanySection[];
-        // Only show approved sections on homepage
-        setSections(sectionsData.filter((s) => s.status === "approved" || !s.status));
+        // Only show approved sections on homepage, sort newest first client-side
+        setSections(
+          sectionsData
+            .filter((s) => s.status === "approved" || !s.status)
+            .sort((a, b) => b.createdAt - a.createdAt)
+        );
+      } catch (err) {
+        console.error("Error fetching sections:", err);
+      }
 
-        // Fetch posts
+      // Fetch posts
+      try {
         const postsRef = collection(db, "posts");
         const snapshot = await getDocs(postsRef);
         let fetchedPosts = snapshot.docs.map((doc) => ({
@@ -101,17 +109,17 @@ export default function HomePage() {
         }
 
         if (sort === "score") {
-          fetchedPosts.sort((a, b) => b.score - a.score);
+          fetchedPosts.sort((a, b) => (b.score || 0) - (a.score || 0));
         } else {
           fetchedPosts.sort((a, b) => b.createdAt - a.createdAt);
         }
 
         setPosts(fetchedPosts);
       } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching posts:", err);
       }
+
+      setLoading(false);
     };
     fetchData();
   }, [filter, sort]);
