@@ -160,6 +160,45 @@ export async function POST(request: NextRequest) {
       // Access was already granted — earnings distribution failure is non-fatal
     }
 
+    // 9. Referral bonus — award referrer $0.50 on the referred user's first payment
+    try {
+      const payerDoc = await adminDb.collection("users").doc(uid).get();
+      const payerData = payerDoc.data();
+      if (payerData?.referredBy) {
+        // Check if this is the user's first payment (only one sectionAccess record = this one)
+        const payerAccessSnap = await adminDb
+          .collection("sectionAccess")
+          .where("userId", "==", uid)
+          .limit(2)
+          .get();
+
+        if (payerAccessSnap.size === 1) {
+          // First payment — find the referrer by their referral code
+          const referrerSnap = await adminDb
+            .collection("users")
+            .where("referralCode", "==", payerData.referredBy)
+            .limit(1)
+            .get();
+
+          if (!referrerSnap.empty) {
+            const referrerId = referrerSnap.docs[0].id;
+            await adminDb.collection("earnings").add({
+              userId: referrerId,
+              sectionId,
+              sectionPostId: "",
+              fromPaymentBy: uid,
+              amount: 0.5,
+              type: "referral_bonus",
+              createdAt: Date.now(),
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error processing referral bonus:", err);
+      // Non-fatal
+    }
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Grant access error:", err);

@@ -4,6 +4,8 @@ export interface UserProfile {
   displayName: string;
   codeName: string;
   isAdmin: boolean;
+  referralCode: string;
+  referredBy?: string; // referralCode of the user who referred them
   createdAt: number;
 }
 
@@ -89,6 +91,7 @@ export interface Earning {
   sectionPostId: string;
   fromPaymentBy: string; // userId of the person who paid
   amount: number;
+  type?: "section_revenue" | "referral_bonus";
   createdAt: number;
 }
 

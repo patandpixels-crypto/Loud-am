@@ -10,6 +10,7 @@ import Link from "next/link";
 import {
   FiUser, FiCalendar, FiPlus, FiBriefcase, FiDollarSign,
   FiArrowRight, FiX, FiCheck, FiClock, FiAlertCircle,
+  FiShare2, FiCopy, FiGift,
 } from "react-icons/fi";
 
 function getTimeAgo(timestamp: number): string {
@@ -43,6 +44,9 @@ export default function ProfilePage() {
   const [earnings, setEarnings] = useState<Earning[]>([]);
   const [payouts, setPayouts] = useState<PayoutRequest[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [referralCount, setReferralCount] = useState(0);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   // Payout modal state
   const [showPayoutModal, setShowPayoutModal] = useState(false);
@@ -82,6 +86,17 @@ export default function ProfilePage() {
           setEarnings(fetchedEarnings);
         } catch (err) {
           console.error("Error fetching earnings:", err);
+        }
+
+        // Fetch referral count
+        try {
+          if (userProfile?.referralCode) {
+            const referralQuery = query(collection(db, "users"), where("referredBy", "==", userProfile.referralCode));
+            const referralSnap = await getDocs(referralQuery);
+            setReferralCount(referralSnap.size);
+          }
+        } catch (err) {
+          console.error("Error fetching referrals:", err);
         }
 
         try {
@@ -219,6 +234,55 @@ export default function ProfilePage() {
           <p className="mt-2 text-center text-xs text-muted">Minimum withdrawal: $1.00</p>
         )}
       </div>
+
+      {/* Referral Card */}
+      {userProfile?.referralCode && (
+        <div className="card-glow mb-6 rounded-2xl border border-accent-3/30 bg-accent-3/5 p-5">
+          <div className="mb-3 flex items-center gap-2">
+            <FiShare2 size={18} className="text-accent-3" />
+            <h3 className="text-lg font-bold text-heading">Invite Friends, Earn Rewards</h3>
+          </div>
+          <p className="mb-4 text-sm text-subtext">
+            Share your link. When someone signs up and makes their first purchase, you earn a <span className="font-bold text-accent-2">$0.50 bonus</span>.
+          </p>
+
+          <div className="mb-4 flex items-stretch gap-2">
+            <div className="flex flex-1 items-center rounded-xl border border-card-border bg-input-bg px-4 py-2.5">
+              <code className="truncate text-sm text-heading">
+                {typeof window !== "undefined" ? `${window.location.origin}/login?ref=${userProfile.referralCode}` : `/login?ref=${userProfile.referralCode}`}
+              </code>
+            </div>
+            <button
+              onClick={() => {
+                const url = `${window.location.origin}/login?ref=${userProfile.referralCode}`;
+                navigator.clipboard.writeText(url);
+                setCopiedLink(true);
+                setTimeout(() => setCopiedLink(false), 2000);
+              }}
+              className="btn-bounce flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-4 text-sm font-bold text-white shadow-lg shadow-accent/20"
+            >
+              {copiedLink ? <FiCheck size={16} /> : <FiCopy size={16} />}
+              {copiedLink ? "Copied!" : "Copy"}
+            </button>
+          </div>
+
+          <div className="flex items-center gap-4 rounded-xl border border-card-border bg-card-bg px-4 py-3">
+            <div className="flex items-center gap-2">
+              <FiGift size={14} className="text-accent-3" />
+              <span className="text-sm text-subtext">Referrals:</span>
+              <span className="text-sm font-bold text-heading">{referralCount}</span>
+            </div>
+            <div className="h-4 w-px bg-card-border" />
+            <div className="flex items-center gap-2">
+              <FiDollarSign size={14} className="text-accent-2" />
+              <span className="text-sm text-subtext">Referral earnings:</span>
+              <span className="text-sm font-bold text-accent-2">
+                ${earnings.filter((e) => e.type === "referral_bonus").reduce((sum, e) => sum + e.amount, 0).toFixed(2)}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Payout History */}
       {payouts.length > 0 && (

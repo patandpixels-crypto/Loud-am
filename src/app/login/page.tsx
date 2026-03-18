@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import Link from "next/link";
-import { FiMail, FiCheck } from "react-icons/fi";
+import { FiMail, FiCheck, FiGift } from "react-icons/fi";
 
 export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -14,8 +14,18 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [justSignedUp, setJustSignedUp] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
   const { signIn, signUp } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref) {
+      setReferralCode(ref);
+      setIsSignUp(true);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +39,7 @@ export default function LoginPage() {
           setLoading(false);
           return;
         }
-        await signUp(email, password, displayName);
+        await signUp(email, password, displayName, referralCode || undefined);
         setJustSignedUp(true);
         return;
       } else {
@@ -100,6 +110,13 @@ export default function LoginPage() {
           <h2 className="mb-6 text-xl font-bold">
             {isSignUp ? "Create Account" : "Welcome Back"}
           </h2>
+
+          {isSignUp && referralCode && (
+            <div className="mb-4 flex items-center gap-2 rounded-xl bg-positive/10 px-4 py-3 text-sm text-positive">
+              <FiGift size={16} />
+              <span>You were referred! You&apos;ll both earn a bonus on your first purchase.</span>
+            </div>
+          )}
 
           {error && (
             <div className="mb-4 rounded-xl bg-negative/10 px-4 py-3 text-sm font-medium text-negative">

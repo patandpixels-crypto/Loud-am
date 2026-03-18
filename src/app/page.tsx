@@ -25,6 +25,7 @@ export default function HomePage() {
   const [sort, setSort] = useState<SortType>("score");
   const [searchQuery, setSearchQuery] = useState("");
   const [topEarner, setTopEarner] = useState<{ name: string; amount: number } | null>(null);
+  const [totalPlatformEarnings, setTotalPlatformEarnings] = useState(0);
 
   // Fetch top earner of the month
   useEffect(() => {
@@ -34,9 +35,13 @@ export default function HomePage() {
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
 
         const earningsSnap = await getDocs(collection(db, "earnings"));
-        const monthEarnings = earningsSnap.docs
-          .map((d) => d.data() as Earning)
-          .filter((e) => e.createdAt >= monthStart);
+        const allEarnings = earningsSnap.docs.map((d) => d.data() as Earning);
+
+        // Total platform earnings (all time)
+        const total = allEarnings.reduce((sum, e) => sum + e.amount, 0);
+        setTotalPlatformEarnings(total);
+
+        const monthEarnings = allEarnings.filter((e) => e.createdAt >= monthStart);
 
         if (monthEarnings.length === 0) return;
 
@@ -156,6 +161,17 @@ export default function HomePage() {
           <p className="mt-1 text-xs text-muted">Post under a codename, stay protected</p>
         </div>
       </div>
+
+      {/* Platform Earnings Counter */}
+      {totalPlatformEarnings > 0 && (
+        <div className="mx-auto mb-6 max-w-md rounded-xl border border-positive/20 bg-positive/5 px-5 py-4 text-center">
+          <p className="text-xs font-medium text-subtext">Earned by insiders on LOUD-AM</p>
+          <p className="mt-1 text-3xl font-black text-positive">
+            ${totalPlatformEarnings.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </p>
+          <p className="mt-1 text-xs text-muted">and counting...</p>
+        </div>
+      )}
 
       {/* Top Earner Badge */}
       {topEarner && (

@@ -14,6 +14,7 @@ import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import { UserProfile } from "./types";
 import { generateCodeName } from "./codename";
+import { generateReferralCode } from "./referral";
 
 interface AuthContextType {
   user: User | null;
@@ -21,7 +22,7 @@ interface AuthContextType {
   loading: boolean;
   emailVerified: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, displayName: string) => Promise<void>;
+  signUp: (email: string, password: string, displayName: string, referredBy?: string) => Promise<void>;
   signOut: () => Promise<void>;
   resendVerification: () => Promise<void>;
   refreshVerification: () => Promise<boolean>;
@@ -52,6 +53,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               profile.codeName = `User${user.uid.substring(0, 6)}`;
             }
           }
+          if (!profile.referralCode) {
+            const referralCode = generateReferralCode();
+            try {
+              await updateDoc(doc(db, "users", user.uid), { referralCode });
+              profile.referralCode = referralCode;
+            } catch {
+              // Non-fatal
+            }
+          }
           setUserProfile(profile);
         }
       } else {
@@ -66,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signInWithEmailAndPassword(auth, email, password);
   };
 
-  const signUp = async (email: string, password: string, displayName: string) => {
+  const signUp = async (email: string, password: string, displayName: string, referredBy?: string) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, { displayName });
     const profile: UserProfile = {
@@ -75,6 +85,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       displayName,
       codeName: generateCodeName(),
       isAdmin: false,
+      referralCode: generateReferralCode(),
+      ...(referredBy ? { referredBy } : {}),
       createdAt: Date.now(),
     };
     await setDoc(doc(db, "users", cred.user.uid), profile);
