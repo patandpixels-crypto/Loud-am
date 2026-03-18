@@ -41,28 +41,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(user);
       setEmailVerified(user?.emailVerified ?? false);
       if (user) {
-        const profileDoc = await getDoc(doc(db, "users", user.uid));
-        if (profileDoc.exists()) {
-          const profile = profileDoc.data() as UserProfile;
-          if (!profile.codeName) {
-            const codeName = generateCodeName();
-            try {
-              await updateDoc(doc(db, "users", user.uid), { codeName });
-              profile.codeName = codeName;
-            } catch {
-              profile.codeName = `User${user.uid.substring(0, 6)}`;
+        try {
+          const profileDoc = await getDoc(doc(db, "users", user.uid));
+          if (profileDoc.exists()) {
+            const profile = profileDoc.data() as UserProfile;
+            if (!profile.codeName) {
+              const codeName = generateCodeName();
+              try {
+                await updateDoc(doc(db, "users", user.uid), { codeName });
+                profile.codeName = codeName;
+              } catch {
+                profile.codeName = `User${user.uid.substring(0, 6)}`;
+              }
             }
-          }
-          if (!profile.referralCode) {
-            const referralCode = generateReferralCode();
-            try {
-              await updateDoc(doc(db, "users", user.uid), { referralCode });
-              profile.referralCode = referralCode;
-            } catch {
-              // Non-fatal
+            if (!profile.referralCode) {
+              const referralCode = generateReferralCode();
+              try {
+                await updateDoc(doc(db, "users", user.uid), { referralCode });
+                profile.referralCode = referralCode;
+              } catch {
+                // Non-fatal
+              }
             }
+            setUserProfile(profile);
+          } else {
+            // Profile doc missing — create one from auth data
+            const profile: UserProfile = {
+              uid: user.uid,
+              email: user.email || "",
+              displayName: user.displayName || "",
+              codeName: generateCodeName(),
+              isAdmin: false,
+              referralCode: generateReferralCode(),
+              createdAt: Date.now(),
+            };
+            try {
+              await setDoc(doc(db, "users", user.uid), profile);
+            } catch {
+              // Non-fatal — profile still usable in memory
+            }
+            setUserProfile(profile);
           }
-          setUserProfile(profile);
+        } catch (err) {
+          console.error("Error loading user profile:", err);
+          // Fallback profile so the UI isn't broken
+          setUserProfile({
+            uid: user.uid,
+            email: user.email || "",
+            displayName: user.displayName || "",
+            codeName: user.displayName || `User${user.uid.substring(0, 6)}`,
+            isAdmin: false,
+            referralCode: "",
+            createdAt: Date.now(),
+          });
         }
       } else {
         setUserProfile(null);

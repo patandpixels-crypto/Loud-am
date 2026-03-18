@@ -79,5 +79,31 @@ service cloud.firestore {
       // Deny client-side creation — this is now handled server-side
       allow create: if false;
     }
+
+    // Notifications — users can read/update their own
+    match /notifications/{notifId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if false; // server-side only
+    }
+
+    // Reports — authenticated users can create, admins can read/update
+    match /reports/{reportId} {
+      allow create: if request.auth != null
+        && request.resource.data.reporterId == request.auth.uid;
+      allow read, update: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    // Payout Requests — users can create/read their own, admins can read/update all
+    match /payoutRequests/{requestId} {
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null
+        && (resource.data.userId == request.auth.uid
+            || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+      allow update: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
   }
 }
