@@ -541,7 +541,7 @@ export default function AdminPage() {
                     </p>
                     <div className="mt-2 rounded-lg bg-surface/50 px-3 py-2 text-xs text-subtext">
                       <p><span className="text-muted">Bank:</span> {payout.bankName}</p>
-                      <p><span className="text-muted">Account:</span> {payout.accountNumber}</p>
+                      <p><span className="text-muted">Account:</span> ****{payout.accountNumber?.slice(-4) || "N/A"}</p>
                       <p><span className="text-muted">Name:</span> {payout.accountName}</p>
                     </div>
                     <p className="mt-1 text-xs text-muted">{new Date(payout.createdAt).toLocaleString()}</p>

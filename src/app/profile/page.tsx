@@ -121,7 +121,6 @@ export default function ProfilePage() {
       }
 
       setLoading(false);
-      }
     };
     fetchUserData();
   }, [authLoading, user]);

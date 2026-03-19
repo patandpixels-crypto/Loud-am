@@ -115,15 +115,12 @@ export default function SectionDetailPage() {
             }
           }
         } else if (user) {
-          // Check if user has paid
+          // Check if user has paid via sectionAccessLookup (atomic lookup by doc ID)
           try {
-            const accessQuery = query(
-              collection(db, "sectionAccess"),
-              where("userId", "==", user.uid)
+            const lookupDoc = await getDoc(
+              doc(db, "sectionAccessLookup", `${user.uid}_${sectionId}`)
             );
-            const accessSnap = await getDocs(accessQuery);
-            const hasPaid = accessSnap.docs.some((d) => d.data().sectionId === sectionId);
-            if (hasPaid) {
+            if (lookupDoc.exists()) {
               setHasAccess(true);
             }
           } catch (err) {
