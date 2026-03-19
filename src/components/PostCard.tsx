@@ -61,7 +61,7 @@ const REPORT_REASONS = [
 export default function PostCard({ post, rank, onDelete }: PostCardProps) {
   const { user } = useAuth();
   const router = useRouter();
-  const [score, setScore] = useState(post.score);
+  const [score, setScore] = useState(post.score || 0);
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
   const [voting, setVoting] = useState(false);
   const [showMenu, setShowMenu] = useState(false);

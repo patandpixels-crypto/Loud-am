@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, query, orderBy, getDocs, doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
 import { Post, UserProfile, Report, PayoutRequest, CompanySection } from "@/lib/types";
@@ -38,11 +38,9 @@ export default function AdminPage() {
     }
 
     const fetchData = async () => {
+      // Fetch posts
       try {
-        // Fetch posts
-        const postsQuery = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-        const postsSnapshot = await getDocs(postsQuery);
-
+        const postsSnapshot = await getDocs(collection(db, "posts"));
         const postsWithAuthors: PostWithAuthor[] = await Promise.all(
           postsSnapshot.docs.map(async (postDoc) => {
             const postData = { id: postDoc.id, ...postDoc.data() } as PostWithAuthor;
@@ -58,31 +56,44 @@ export default function AdminPage() {
             return postData;
           })
         );
+        postsWithAuthors.sort((a, b) => b.createdAt - a.createdAt);
         setPosts(postsWithAuthors);
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+      }
 
-        // Fetch reports
-        const reportsQuery = query(collection(db, "reports"), orderBy("createdAt", "desc"));
-        const reportsSnapshot = await getDocs(reportsQuery);
+      // Fetch reports
+      try {
+        const reportsSnapshot = await getDocs(collection(db, "reports"));
         const reportsData = reportsSnapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Report));
+        reportsData.sort((a, b) => b.createdAt - a.createdAt);
         setReports(reportsData);
+      } catch (err) {
+        console.error("Error fetching reports:", err);
+      }
 
-        // Fetch payout requests
-        const payoutsQuery = query(collection(db, "payoutRequests"), orderBy("createdAt", "desc"));
-        const payoutsSnapshot = await getDocs(payoutsQuery);
+      // Fetch payout requests
+      try {
+        const payoutsSnapshot = await getDocs(collection(db, "payoutRequests"));
         const payoutsData = payoutsSnapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PayoutRequest));
+        payoutsData.sort((a, b) => b.createdAt - a.createdAt);
         setPayoutRequests(payoutsData);
+      } catch (err) {
+        console.error("Error fetching payouts:", err);
+      }
 
-        // Fetch pending company sections
-        const sectionsQuery = query(collection(db, "companySections"), orderBy("createdAt", "desc"));
-        const sectionsSnapshot = await getDocs(sectionsQuery);
+      // Fetch company sections
+      try {
+        const sectionsSnapshot = await getDocs(collection(db, "companySections"));
         const sectionsData = sectionsSnapshot.docs
           .map((d) => ({ id: d.id, ...d.data() } as CompanySection));
+        sectionsData.sort((a, b) => b.createdAt - a.createdAt);
         setPendingSections(sectionsData);
       } catch (err) {
-        console.error("Error fetching admin data:", err);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching sections:", err);
       }
+
+      setLoading(false);
     };
     fetchData();
   }, [authLoading, userProfile]);
@@ -368,10 +379,10 @@ export default function AdminPage() {
                     <td className="px-4 py-3">
                       <span
                         className={`font-black ${
-                          post.score > 0 ? "text-positive" : post.score < 0 ? "text-negative" : "text-subtext"
+                          (post.score || 0) > 0 ? "text-positive" : (post.score || 0) < 0 ? "text-negative" : "text-subtext"
                         }`}
                       >
-                        {post.score > 0 ? "+" : ""}{post.score}
+                        {(post.score || 0) > 0 ? "+" : ""}{(post.score || 0)}
                       </span>
                     </td>
                     <td className="px-4 py-3">

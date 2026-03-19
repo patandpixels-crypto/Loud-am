@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
 import { CompanySection } from "@/lib/types";
@@ -18,12 +18,12 @@ export default function SectionsPage() {
   useEffect(() => {
     const fetchSections = async () => {
       try {
-        const q = query(collection(db, "companySections"), orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(q);
+        const snapshot = await getDocs(collection(db, "companySections"));
         const data = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         })) as CompanySection[];
+        data.sort((a, b) => b.createdAt - a.createdAt);
         setSections(data);
       } catch (err) {
         console.error("Error fetching sections:", err);

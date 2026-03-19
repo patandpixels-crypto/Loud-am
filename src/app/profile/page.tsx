@@ -65,53 +65,62 @@ export default function ProfilePage() {
     }
 
     const fetchUserData = async () => {
+      // Fetch posts
       try {
         const postsQuery = query(collection(db, "posts"), where("authorId", "==", user.uid));
         const postsSnap = await getDocs(postsQuery);
         const fetchedPosts = postsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Post[];
         fetchedPosts.sort((a, b) => b.createdAt - a.createdAt);
         setPosts(fetchedPosts);
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+      }
 
+      // Fetch section posts
+      try {
         const sectionQuery = query(collection(db, "sectionPosts"), where("authorId", "==", user.uid));
         const sectionSnap = await getDocs(sectionQuery);
         const fetchedSectionPosts = sectionSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as SectionPost[];
         fetchedSectionPosts.sort((a, b) => b.createdAt - a.createdAt);
         setSectionPosts(fetchedSectionPosts);
+      } catch (err) {
+        console.error("Error fetching section posts:", err);
+      }
 
-        try {
-          const earningsQuery = query(collection(db, "earnings"), where("userId", "==", user.uid));
-          const earningsSnap = await getDocs(earningsQuery);
-          const fetchedEarnings = earningsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Earning[];
-          fetchedEarnings.sort((a, b) => b.createdAt - a.createdAt);
-          setEarnings(fetchedEarnings);
-        } catch (err) {
-          console.error("Error fetching earnings:", err);
-        }
+      // Fetch earnings
+      try {
+        const earningsQuery = query(collection(db, "earnings"), where("userId", "==", user.uid));
+        const earningsSnap = await getDocs(earningsQuery);
+        const fetchedEarnings = earningsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Earning[];
+        fetchedEarnings.sort((a, b) => b.createdAt - a.createdAt);
+        setEarnings(fetchedEarnings);
+      } catch (err) {
+        console.error("Error fetching earnings:", err);
+      }
 
-        // Fetch referral count
-        try {
-          if (userProfile?.referralCode) {
-            const referralQuery = query(collection(db, "users"), where("referredBy", "==", userProfile.referralCode));
-            const referralSnap = await getDocs(referralQuery);
-            setReferralCount(referralSnap.size);
-          }
-        } catch (err) {
-          console.error("Error fetching referrals:", err);
-        }
-
-        try {
-          const payoutsQuery = query(collection(db, "payoutRequests"), where("userId", "==", user.uid));
-          const payoutsSnap = await getDocs(payoutsQuery);
-          const fetchedPayouts = payoutsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as PayoutRequest[];
-          fetchedPayouts.sort((a, b) => b.createdAt - a.createdAt);
-          setPayouts(fetchedPayouts);
-        } catch (err) {
-          console.error("Error fetching payouts:", err);
+      // Fetch referral count
+      try {
+        if (userProfile?.referralCode) {
+          const referralQuery = query(collection(db, "users"), where("referredBy", "==", userProfile.referralCode));
+          const referralSnap = await getDocs(referralQuery);
+          setReferralCount(referralSnap.size);
         }
       } catch (err) {
-        console.error("Error fetching user posts:", err);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching referrals:", err);
+      }
+
+      // Fetch payouts
+      try {
+        const payoutsQuery = query(collection(db, "payoutRequests"), where("userId", "==", user.uid));
+        const payoutsSnap = await getDocs(payoutsQuery);
+        const fetchedPayouts = payoutsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as PayoutRequest[];
+        fetchedPayouts.sort((a, b) => b.createdAt - a.createdAt);
+        setPayouts(fetchedPayouts);
+      } catch (err) {
+        console.error("Error fetching payouts:", err);
+      }
+
+      setLoading(false);
       }
     };
     fetchUserData();

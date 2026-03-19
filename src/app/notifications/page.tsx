@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, query, where, orderBy, getDocs, updateDoc, doc, writeBatch } from "firebase/firestore";
+import { collection, query, where, getDocs, updateDoc, doc, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
 import { Notification } from "@/lib/types";
@@ -54,11 +54,12 @@ export default function NotificationsPage() {
       try {
         const q = query(
           collection(db, "notifications"),
-          where("userId", "==", user.uid),
-          orderBy("createdAt", "desc")
+          where("userId", "==", user.uid)
         );
         const snap = await getDocs(q);
-        setNotifications(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Notification)));
+        const notifs = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Notification));
+        notifs.sort((a, b) => b.createdAt - a.createdAt);
+        setNotifications(notifs);
       } catch {
         // silent
       } finally {
