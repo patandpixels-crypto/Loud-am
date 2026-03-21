@@ -9,7 +9,7 @@ import { useTheme } from "@/lib/ThemeContext";
 import {
   FiPlus, FiLogOut, FiShield, FiUser, FiBriefcase,
   FiDollarSign, FiSun, FiMoon, FiBell, FiAlertCircle, FiMail,
-  FiMenu, FiX, FiHome, FiMessageSquare,
+  FiMenu, FiX, FiMessageSquare, FiTrendingUp,
 } from "react-icons/fi";
 
 export default function Navbar() {
@@ -99,7 +99,7 @@ export default function Navbar() {
       <nav className="sticky top-0 z-50 border-b border-card-border bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           {/* Logo */}
-          <Link href="/" className="group flex items-center gap-2" onClick={closeMobile}>
+          <Link href={user ? "/feed" : "/"} className="group flex items-center gap-2" onClick={closeMobile}>
             <span className="logo-text text-2xl transition-transform duration-300 group-hover:scale-105">
               <span className="gradient-text">LOUD</span>
               <span className="text-foreground">-AM!</span>
@@ -119,6 +119,13 @@ export default function Navbar() {
 
             {user ? (
               <>
+                <Link
+                  href="/feed"
+                  className="btn-bounce flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-sm text-subtext transition-colors hover:bg-surface hover:text-accent"
+                >
+                  <FiTrendingUp size={16} />
+                  Feed
+                </Link>
                 {totalEarnings !== null && totalEarnings > 0 && (
                   <Link
                     href="/profile"
@@ -251,9 +258,9 @@ export default function Navbar() {
                   </div>
                 </div>
 
-                <Link href="/" onClick={closeMobile} className="flex items-center gap-3 rounded-xl px-4 py-3 text-subtext transition-colors hover:bg-surface hover:text-heading">
-                  <FiHome size={18} />
-                  <span className="font-medium">Home</span>
+                <Link href="/feed" onClick={closeMobile} className="flex items-center gap-3 rounded-xl px-4 py-3 text-subtext transition-colors hover:bg-surface hover:text-heading">
+                  <FiTrendingUp size={18} />
+                  <span className="font-medium">Feed</span>
                 </Link>
                 <Link href="/profile" onClick={closeMobile} className="flex items-center gap-3 rounded-xl px-4 py-3 text-subtext transition-colors hover:bg-surface hover:text-heading">
                   <FiUser size={18} />

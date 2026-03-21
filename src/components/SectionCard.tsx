@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { CompanySection } from "@/lib/types";
-import { FiBriefcase, FiUsers, FiFileText, FiClock, FiXCircle, FiArrowRight } from "react-icons/fi";
+import { FiUsers, FiFileText, FiClock, FiXCircle, FiArrowRight } from "react-icons/fi";
 
 function getTimeAgo(timestamp: number): string {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
