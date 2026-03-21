@@ -121,12 +121,12 @@ function LoginContent() {
         <div className="relative z-10 max-w-md px-12">
           {/* Logo */}
           <h1 className="logo-text mb-6 text-5xl">
-            <span className="gradient-text">LOUD</span>
-            <span className="text-foreground">-AM!</span>
+            <span className="gradient-text">BR</span>
+            <span className="text-foreground">EAL</span>
           </h1>
 
           <p className="mb-10 text-lg leading-relaxed text-subtext">
-            The anonymous platform where <span className="font-bold text-heading">insiders get paid</span> for honest company reviews.
+            The anonymous platform where <span className="font-bold text-heading">insiders get paid</span> for honest company reviews. Be real. Get paid.
           </p>
 
           {/* Feature list */}
@@ -187,7 +187,7 @@ function LoginContent() {
               <span className="text-foreground">-AM!</span>
             </h1>
             <p className="mt-1 text-sm text-subtext">
-              Insider company talk. Get paid to share.
+              Be real. Get paid.
             </p>
           </div>
 

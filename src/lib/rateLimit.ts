@@ -5,7 +5,7 @@ const RATE_LIMITS: Record<string, { maxActions: number; windowMs: number }> = {
 };
 
 function getKey(action: string): string {
-  return `loud_rate_${action}`;
+  return `breal_rate_${action}`;
 }
 
 export function checkRateLimit(action: string): { allowed: boolean; retryAfterMs: number } {

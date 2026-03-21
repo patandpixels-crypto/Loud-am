@@ -15,13 +15,13 @@ No test framework is configured.
 
 ## Architecture Overview
 
-LOUD-AM is an anonymous review platform built on **Next.js 16 (App Router)** with **Firebase** (auth + Firestore) and **Paystack** (payments). Users post reviews about people/brands, vote on content, and earn money through company sections.
+BREAL is an anonymous review platform built on **Next.js 16 (App Router)** with **Firebase** (auth + Firestore) and **Paystack** (payments). Users post reviews about people/brands, vote on content, and earn money through company sections.
 
 ### Tech Stack
 - Next.js 16.1.6 with Turbopack, React 19, TypeScript 5
 - Tailwind CSS 4 (PostCSS plugin, not config file)
 - Firebase Auth (email/password) + Firestore
-- Paystack for payments (NGN ₦300 / USD $3)
+- Paystack for payments (NGN ₦1,500 / USD $3)
 
 ### Path Alias
 `@/*` maps to `./src/*`
@@ -45,17 +45,17 @@ ThemeProvider → AuthProvider → Navbar + {children}
 - **votes** — Per-user vote tracking (supports anonymous via localStorage `anon_id`)
 - **companySections** — Staff-only sections with approval workflow (pending → approved/rejected)
 - **sectionPosts** / **sectionReplies** — Content within sections
-- **sectionAccess** — Payment records ($3 access fee, server-created only)
+- **sectionAccess** — Payment records (₦1,500 NGN / $3 USD access fee, server-created only)
 - **earnings** — Revenue sharing records (50% to authors, server-created only)
 - **notifications** — Vote/reply/earning alerts
 - **reports** / **payoutRequests** — Moderation and payout workflows
 
 ### API Routes (Server-side)
 - `POST /api/paystack/verify` — Verifies Paystack payment reference
-- `POST /api/grant-access` — Grants section access after payment verification, distributes 50% earnings to post authors, awards $0.50 referral bonus. Uses Firebase Admin SDK. Idempotent.
+- `POST /api/grant-access` — Grants section access after payment verification, distributes 50% earnings to post authors, awards 10% referral bonus. Uses Firebase Admin SDK. Idempotent.
 
 ### Monetization Flow
-User pays $3 via Paystack → `/api/grant-access` verifies → creates `sectionAccess` → distributes 50% to section post authors as `earnings` → optional $0.50 referral bonus on first payment.
+User pays ₦1,500/$3 via Paystack → `/api/grant-access` verifies → creates `sectionAccess` → distributes 50% to section post authors as `earnings` → optional 10% referral bonus on first payment.
 
 ### Security Rules
 `firestore.rules` must be deployed to Firebase separately (`firebase deploy --only firestore:rules` or paste in Firebase Console). Posts are publicly readable; most other collections require authentication. `sectionAccess` and `earnings` are server-write only (`allow create: if false`).

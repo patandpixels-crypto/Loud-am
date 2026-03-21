@@ -41,7 +41,7 @@ export function openPaystack({ email, amountInCents, currency = "NGN", metadata,
     email,
     amount: amountInCents,
     currency,
-    ref: "LOUD_" + Date.now() + "_" + crypto.getRandomValues(new Uint32Array(1))[0].toString(36),
+    ref: "BREAL_" + Date.now() + "_" + crypto.getRandomValues(new Uint32Array(1))[0].toString(36),
     metadata,
     onClose,
     onSuccess: (response) => {

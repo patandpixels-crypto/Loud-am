@@ -1,4 +1,4 @@
-// Centralized pricing configuration for LOUD-AM
+// Centralized pricing configuration for BREAL
 // All prices, revenue splits, and referral bonuses in one place.
 
 export const PRICING = {

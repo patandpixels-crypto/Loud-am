@@ -1,16 +1,16 @@
-# LOUD-AM!
+# BREAL
 
-Speak your truth about people and brands. A community-driven platform where users can post honest reviews about people or brands they've dated, worked with, or done business with.
+Be real. Get paid. An anonymous insider review platform where users post honest reviews about people, brands, and companies — and earn money doing it.
 
 ## Features
 
 - **Post Reviews** — Share positive or negative experiences about people or brands
-- **Anonymous Posting** — Choose to post anonymously or with your display name
+- **Anonymous Posting** — Every user gets a unique codename for privacy
+- **Company Sections** — Staff-only insider sections with paid access
+- **Earn 50% Revenue** — Content creators earn half of every reader payment
 - **Upvote / Downvote** — Community-driven voting system
-- **Leaderboard** — Top-voted posts appear on the front page
-- **Social Links** — Add links or social media handles of the person/brand you're reviewing
-- **Admin Dashboard** — Admin can see the real identity behind anonymous posts
-- **Filter & Sort** — Filter by sentiment (positive/negative) and sort by score or recency
+- **Referral Bonuses** — Earn 10% of every referred user's first purchase
+- **Admin Dashboard** — Admin can see real identities and moderate content
 
 ## Tech Stack
 
@@ -18,6 +18,7 @@ Speak your truth about people and brands. A community-driven platform where user
 - **TypeScript**
 - **Tailwind CSS 4**
 - **Firebase** (Auth + Firestore)
+- **Paystack** (Payments — NGN & USD)
 
 ## Getting Started
 
@@ -61,18 +62,22 @@ Deploy the security rules from `firestore.rules` and indexes from `firestore.ind
 src/
 ├── app/
 │   ├── layout.tsx          # Root layout with AuthProvider & Navbar
-│   ├── page.tsx            # Homepage / Leaderboard
+│   ├── page.tsx            # Landing page
+│   ├── feed/page.tsx       # Dashboard / Review feed
 │   ├── login/page.tsx      # Login & Registration
 │   ├── post/
 │   │   ├── new/page.tsx    # Create new post
 │   │   └── [id]/page.tsx   # Individual post view
+│   ├── sections/           # Company sections (paid access)
 │   ├── admin/page.tsx      # Admin dashboard
-│   └── profile/page.tsx    # User profile & their posts
+│   └── profile/page.tsx    # User profile & earnings
 ├── components/
-│   ├── Navbar.tsx           # Navigation bar
-│   └── PostCard.tsx         # Post card with voting
+│   ├── Navbar.tsx           # Navigation bar with mobile menu
+│   ├── PostCard.tsx         # Post card with animated voting
+│   └── SectionCard.tsx      # Company section card
 └── lib/
     ├── firebase.ts          # Firebase initialization
     ├── AuthContext.tsx       # Auth provider & hooks
+    ├── pricing.ts           # Centralized pricing config
     └── types.ts             # TypeScript interfaces
 ```

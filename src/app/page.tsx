@@ -100,8 +100,8 @@ export default function LandingPage() {
 
           {/* Logo */}
           <h1 className="animate-slide-up stagger-1 logo-text text-6xl leading-tight sm:text-8xl md:text-9xl">
-            <span className="gradient-text">LOUD</span>
-            <span className="text-foreground">-AM!</span>
+            <span className="gradient-text">BR</span>
+            <span className="text-foreground">EAL</span>
           </h1>
 
           {/* Subtitle */}
@@ -199,7 +199,7 @@ export default function LandingPage() {
       <section className="px-4 py-20">
         <div className="mx-auto max-w-5xl">
           <div className="mb-14 text-center">
-            <h2 className="text-3xl font-black text-heading sm:text-4xl">Why LOUD-AM?</h2>
+            <h2 className="text-3xl font-black text-heading sm:text-4xl">Why BREAL?</h2>
             <p className="mt-3 text-subtext">The platform that pays you for the truth</p>
           </div>
 

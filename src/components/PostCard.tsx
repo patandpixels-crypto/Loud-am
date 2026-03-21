@@ -23,32 +23,32 @@ interface PostCardProps {
 
 function getAnonId(): string {
   if (typeof window === "undefined") return "";
-  let id = localStorage.getItem("loud_anon_id");
+  let id = localStorage.getItem("breal_anon_id");
   if (!id) {
     const bytes = new Uint8Array(16);
     crypto.getRandomValues(bytes);
     const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
     id = "anon_" + hex;
-    localStorage.setItem("loud_anon_id", id);
+    localStorage.setItem("breal_anon_id", id);
   }
   return id;
 }
 
 function getLocalVote(postId: string): "up" | "down" | null {
   if (typeof window === "undefined") return null;
-  const votes = JSON.parse(localStorage.getItem("loud_votes") || "{}");
+  const votes = JSON.parse(localStorage.getItem("breal_votes") || "{}");
   return votes[postId] || null;
 }
 
 function setLocalVote(postId: string, voteType: "up" | "down" | null) {
   if (typeof window === "undefined") return;
-  const votes = JSON.parse(localStorage.getItem("loud_votes") || "{}");
+  const votes = JSON.parse(localStorage.getItem("breal_votes") || "{}");
   if (voteType) {
     votes[postId] = voteType;
   } else {
     delete votes[postId];
   }
-  localStorage.setItem("loud_votes", JSON.stringify(votes));
+  localStorage.setItem("breal_votes", JSON.stringify(votes));
 }
 
 const REPORT_REASONS = [

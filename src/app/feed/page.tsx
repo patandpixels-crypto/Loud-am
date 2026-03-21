@@ -133,7 +133,7 @@ export default function FeedPage() {
               <>Explore <span className="gradient-text">Reviews</span></>
             )}
           </h1>
-          <p className="mt-1 text-sm text-subtext">Insider company talk. Get paid to share.</p>
+          <p className="mt-1 text-sm text-subtext">Be real. Get paid.</p>
         </div>
 
         <div className="flex items-center gap-3">
