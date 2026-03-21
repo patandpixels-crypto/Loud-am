@@ -162,7 +162,7 @@ export default function NewPostPage() {
                 value={targetName}
                 onChange={(e) => setTargetName(e.target.value)}
                 className="w-full rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
-                placeholder="Person or brand name"
+                placeholder="Person, brand, or organisation name"
                 required
               />
             </div>
@@ -299,7 +299,7 @@ export default function NewPostPage() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="min-h-[150px] w-full resize-y rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
-                placeholder="Tell your story. Be specific about what happened..."
+                placeholder="Share the details. What happened, when, and how it affected you..."
                 required
               />
             </div>

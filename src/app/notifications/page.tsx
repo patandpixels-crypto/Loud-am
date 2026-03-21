@@ -141,7 +141,7 @@ export default function NotificationsPage() {
           <FiBell size={32} className="mx-auto mb-3 text-muted" />
           <p className="font-bold text-subtext">No notifications yet</p>
           <p className="mt-1 text-sm text-muted">
-            You&apos;ll get notified when people interact with your posts.
+            You&apos;ll be notified when someone votes on or replies to your posts.
           </p>
         </div>
       ) : (

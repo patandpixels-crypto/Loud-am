@@ -56,12 +56,12 @@ export default function CreateSectionPage() {
     if (!user || !userProfile || !userDomain) return;
 
     if (isBlockedDomain) {
-      setError("You must use a company email to create a section.");
+      setError("You must use an organisation email to create a section.");
       return;
     }
 
     if (!companyName.trim()) {
-      setError("Company name is required");
+      setError("Organisation name is required");
       return;
     }
     if (!description.trim()) {
@@ -107,7 +107,7 @@ export default function CreateSectionPage() {
   if (!user) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <p className="text-lg text-subtext">You must be signed in to create a section.</p>
+        <p className="text-lg text-subtext">Sign in to create an organisation section.</p>
         <Link href="/login" className="btn-bounce rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-2 text-sm font-bold text-white shadow-lg shadow-accent/20">
           Sign In
         </Link>
@@ -129,9 +129,9 @@ export default function CreateSectionPage() {
           </div>
           <div>
             <h1 className="text-2xl font-black">
-              <span className="gradient-text">Create Company Section</span>
+              <span className="gradient-text">Create Organisation Section</span>
             </h1>
-            <p className="text-sm text-subtext">Set up a private space for your company</p>
+            <p className="text-sm text-subtext">Create a dedicated review space for your organisation</p>
           </div>
         </div>
 
@@ -140,10 +140,10 @@ export default function CreateSectionPage() {
           <div className="mb-6 flex items-start gap-3 rounded-xl border border-accent/30 bg-accent/5 px-4 py-3">
             <FiAlertTriangle className="mt-0.5 shrink-0 text-accent" size={18} />
             <div>
-              <p className="text-sm font-bold text-heading">Company email required</p>
+              <p className="text-sm font-bold text-heading">Organisation email required</p>
               <p className="mt-0.5 text-xs text-subtext">
                 You&apos;re signed in with <strong className="text-subtle">{user.email}</strong> which is a personal email.
-                To create a company section, sign in with your work email (e.g. you@company.com).
+                To create an organisation section, sign in with your work email (e.g. you@company.com).
               </p>
             </div>
           </div>
@@ -157,16 +157,16 @@ export default function CreateSectionPage() {
               <p className="text-sm font-bold text-heading">Admin approval required</p>
               <p className="mt-0.5 text-xs text-subtext">
                 Your section will be reviewed by an admin before it becomes publicly visible.
-                {userDomain && <> Your company domain: <strong className="text-accent-2">@{userDomain}</strong></>}
+                {userDomain && <> Your organisation domain: <strong className="text-accent-2">@{userDomain}</strong></>}
               </p>
             </div>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Company Name */}
+          {/* Organisation Name */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-subtle">Company Name</label>
+            <label className="mb-1.5 block text-sm font-medium text-subtle">Organisation Name</label>
             <input
               type="text"
               value={companyName}

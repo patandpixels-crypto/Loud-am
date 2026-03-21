@@ -82,7 +82,7 @@ export default function AdminPage() {
         console.error("Error fetching payouts:", err);
       }
 
-      // Fetch company sections
+      // Fetch organisation sections
       try {
         const sectionsSnapshot = await getDocs(collection(db, "companySections"));
         const sectionsData = sectionsSnapshot.docs

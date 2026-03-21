@@ -248,10 +248,10 @@ export default function ProfilePage() {
         <div className="card-glow mb-6 rounded-2xl border border-accent-3/30 bg-accent-3/5 p-5">
           <div className="mb-3 flex items-center gap-2">
             <FiShare2 size={18} className="text-accent-3" />
-            <h3 className="text-lg font-bold text-heading">Invite Friends, Earn Rewards</h3>
+            <h3 className="text-lg font-bold text-heading">Invite Friends, Earn Cash</h3>
           </div>
           <p className="mb-4 text-sm text-subtext">
-            Share your link. When someone signs up and makes their first purchase, you earn <span className="font-bold text-accent-2">10% of their payment</span> as a referral bonus.
+            Invite friends using your link. When they sign up and make their first payment, you earn <span className="font-bold text-accent-2">10% of their payment</span> as a referral bonus.
           </p>
 
           <div className="mb-4 flex items-stretch gap-2">
@@ -434,7 +434,7 @@ export default function ProfilePage() {
                   <FiCheck size={24} className="text-positive" />
                 </div>
                 <p className="text-lg font-bold">Withdrawal requested!</p>
-                <p className="mt-1 text-sm text-subtext">We&apos;ll process it within 24-48 hours.</p>
+                <p className="mt-1 text-sm text-subtext">We&apos;ll process it within 1-2 business days.</p>
               </div>
             ) : (
               <>
@@ -482,7 +482,7 @@ export default function ProfilePage() {
                     className="btn-bounce w-full rounded-xl bg-gradient-to-r from-accent to-accent-2 py-3 text-sm font-bold text-white shadow-lg shadow-accent/20 disabled:opacity-50">
                     {payoutSubmitting ? "Submitting..." : "Request Withdrawal"}
                   </button>
-                  <p className="text-center text-xs text-muted">Withdrawals are processed manually within 24-48 hours.</p>
+                  <p className="text-center text-xs text-muted">Withdrawals are typically processed within 1-2 business days.</p>
                 </div>
               </>
             )}

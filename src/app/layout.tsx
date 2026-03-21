@@ -21,7 +21,7 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "BREAL | Be Real. Get Paid.",
   description:
-    "Share insider company reviews anonymously. Staff-only sections. Get paid when people read your posts.",
+    "Post anonymous organisation reviews. Staff-only sections. Earn money when readers unlock your content.",
 };
 
 export default function RootLayout({

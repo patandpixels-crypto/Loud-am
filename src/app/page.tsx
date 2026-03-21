@@ -95,7 +95,7 @@ export default function LandingPage() {
           {/* Badge */}
           <div className="animate-slide-up mb-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-1.5">
             <FiZap size={14} className="text-accent" />
-            <span className="text-xs font-bold text-accent">Anonymous. Paid. Powerful.</span>
+            <span className="text-xs font-bold text-accent">Anonymous. Honest. Rewarded.</span>
           </div>
 
           {/* Logo */}
@@ -106,8 +106,8 @@ export default function LandingPage() {
 
           {/* Subtitle */}
           <p className="animate-slide-up stagger-2 mx-auto mt-6 max-w-xl text-lg text-subtext sm:text-xl">
-            Share <span className="font-bold text-heading">insider company reviews</span> anonymously.
-            Get <span className="font-bold text-accent-2">paid</span> when people read your posts.
+            Post <span className="font-bold text-heading">anonymous organisation reviews</span>.
+            Earn <span className="font-bold text-accent-2">money</span> when readers unlock your content.
           </p>
 
           {/* CTA Buttons */}
@@ -137,7 +137,7 @@ export default function LandingPage() {
             <div className="h-8 w-px bg-card-border" />
             <div className="text-center">
               <p className="stat-number text-2xl font-black text-heading sm:text-3xl">{sectionCount}</p>
-              <p className="mt-1 text-xs text-muted">Companies</p>
+              <p className="mt-1 text-xs text-muted">Organisations</p>
             </div>
             <div className="h-8 w-px bg-card-border" />
             <div className="text-center">
@@ -155,7 +155,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-5xl">
           <div className="mb-14 text-center">
             <h2 className="text-3xl font-black text-heading sm:text-4xl">How It Works</h2>
-            <p className="mt-3 text-subtext">Three steps to start earning from insider knowledge</p>
+            <p className="mt-3 text-subtext">Three steps to start earning from what you know</p>
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -166,7 +166,7 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-lg font-bold text-heading">Create a Section</h3>
               <p className="text-sm text-subtext">
-                Start a company section for any company you work at. Invite verified staff to contribute.
+                Start an organisation section for any organisation you work at. Invite verified staff to contribute.
               </p>
             </div>
 
@@ -175,9 +175,9 @@ export default function LandingPage() {
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-2/15">
                 <span className="text-2xl font-black text-accent-2">2</span>
               </div>
-              <h3 className="mb-2 text-lg font-bold text-heading">Post Insider Reviews</h3>
+              <h3 className="mb-2 text-lg font-bold text-heading">Share Your Experience</h3>
               <p className="text-sm text-subtext">
-                Share honest reviews about companies, brands, or people — all under your anonymous codename.
+                Write honest reviews about organisations, brands, or people — always under your anonymous codename.
               </p>
             </div>
 
@@ -188,7 +188,7 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-lg font-bold text-heading">Get Paid</h3>
               <p className="text-sm text-subtext">
-                When readers pay to access a section, <span className="font-bold text-positive">50% goes directly to you</span> — the content creators.
+                When readers pay to unlock a section, <span className="font-bold text-positive">50% goes directly to you</span> — the content creators.
               </p>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-5xl">
           <div className="mb-14 text-center">
             <h2 className="text-3xl font-black text-heading sm:text-4xl">Why BREAL?</h2>
-            <p className="mt-3 text-subtext">The platform that pays you for the truth</p>
+            <p className="mt-3 text-subtext">The platform where honesty pays</p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -222,7 +222,7 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-lg font-bold text-heading">Staff-Only Posting</h3>
               <p className="text-sm leading-relaxed text-subtext">
-                Only verified staff can post inside company sections, ensuring authentic insider content.
+                Only verified employees can post in organisation sections — keeping content authentic and firsthand.
               </p>
             </div>
 
@@ -233,7 +233,7 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-lg font-bold text-heading">50% Revenue Share</h3>
               <p className="text-sm leading-relaxed text-subtext">
-                Half of every reader payment goes directly to the section&apos;s content creators. Real money for real insights.
+                Half of every reader payment goes directly to the section&apos;s content creators. Real money for real reviews.
               </p>
             </div>
 
@@ -244,7 +244,7 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-lg font-bold text-heading">Community Voting</h3>
               <p className="text-sm leading-relaxed text-subtext">
-                Upvote and downvote reviews. The best insider content rises to the top naturally.
+                Upvote and downvote reviews. The most helpful content rises to the top.
               </p>
             </div>
 
@@ -255,7 +255,7 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-lg font-bold text-heading">Public Reviews</h3>
               <p className="text-sm leading-relaxed text-subtext">
-                Post positive or negative reviews about any person, brand, or company. Let the world know.
+                Share your real experience with any person, brand, or organisation. No filter, no bias.
               </p>
             </div>
 
@@ -266,7 +266,7 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-lg font-bold text-heading">Referral Bonus</h3>
               <p className="text-sm leading-relaxed text-subtext">
-                Earn 10% of every referred user&apos;s first purchase. Share your link and grow.
+                Invite friends and earn 10% of their first payment. Your network, your earnings.
               </p>
             </div>
           </div>
@@ -284,7 +284,7 @@ export default function LandingPage() {
               <p className="text-xs font-bold uppercase tracking-wider text-muted">Top Earner This Month</p>
               <p className="mt-2 text-2xl font-black text-heading">{topEarner.name}</p>
               <p className="stat-number mt-1 text-3xl font-black text-accent-2">${topEarner.amount.toFixed(2)}</p>
-              <p className="mt-3 text-sm text-subtext">This could be you. Start posting today.</p>
+              <p className="mt-3 text-sm text-subtext">This could be you. Share what you know and start earning.</p>
             </div>
           </div>
         </section>
@@ -296,15 +296,15 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="flex items-center gap-3 rounded-xl border border-card-border bg-card-bg p-4">
               <FiCheckCircle size={20} className="shrink-0 text-positive" />
-              <p className="text-sm text-subtext">Server-side payment verification</p>
+              <p className="text-sm text-subtext">Secure payments via Paystack</p>
             </div>
             <div className="flex items-center gap-3 rounded-xl border border-card-border bg-card-bg p-4">
               <FiCheckCircle size={20} className="shrink-0 text-positive" />
-              <p className="text-sm text-subtext">Anonymous codename for every user</p>
+              <p className="text-sm text-subtext">Anonymous identity for every user</p>
             </div>
             <div className="flex items-center gap-3 rounded-xl border border-card-border bg-card-bg p-4">
               <FiCheckCircle size={20} className="shrink-0 text-positive" />
-              <p className="text-sm text-subtext">Admin moderation & content reports</p>
+              <p className="text-sm text-subtext">Human-moderated content</p>
             </div>
           </div>
         </div>
@@ -315,10 +315,10 @@ export default function LandingPage() {
         <div className="hero-glow hero-glow-1" style={{ opacity: 0.08 }} />
         <div className="relative z-10 mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-black text-heading sm:text-5xl">
-            Ready to <span className="gradient-text">speak up?</span>
+            Ready to <span className="gradient-text">get real?</span>
           </h2>
           <p className="mt-4 text-lg text-subtext">
-            Join the platform where insiders get paid for honesty.
+            Join thousands sharing honest reviews and earning real money.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
@@ -329,7 +329,7 @@ export default function LandingPage() {
               <FiArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
-          <p className="mt-4 text-xs text-muted">No credit card required. Start posting in 30 seconds.</p>
+          <p className="mt-4 text-xs text-muted">Free to join. Start posting in under a minute.</p>
         </div>
       </section>
     </div>

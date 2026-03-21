@@ -440,7 +440,7 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
             </div>
             <h3 className="mb-2 text-center text-lg font-bold">Delete this post?</h3>
             <p className="mb-5 text-center text-sm text-subtext">
-              This action cannot be undone. Your post and all its votes will be permanently removed.
+              This will permanently delete your post and all associated votes. This cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
@@ -471,7 +471,7 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
                   <FiFlag size={20} className="text-positive" />
                 </div>
                 <p className="font-bold">Report submitted</p>
-                <p className="mt-1 text-sm text-subtext">We&apos;ll review this post.</p>
+                <p className="mt-1 text-sm text-subtext">Thanks for reporting. Our team will review this shortly.</p>
               </div>
             ) : (
               <>

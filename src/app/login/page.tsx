@@ -126,7 +126,7 @@ function LoginContent() {
           </h1>
 
           <p className="mb-10 text-lg leading-relaxed text-subtext">
-            The anonymous platform where <span className="font-bold text-heading">insiders get paid</span> for honest company reviews. Be real. Get paid.
+            The anonymous platform where <span className="font-bold text-heading">real people earn real money</span> for honest reviews. Be real. Get paid.
           </p>
 
           {/* Feature list */}
@@ -137,7 +137,7 @@ function LoginContent() {
               </div>
               <div>
                 <p className="font-bold text-heading">Anonymous Codenames</p>
-                <p className="text-sm text-subtext">Your identity stays hidden. Always.</p>
+                <p className="text-sm text-subtext">Your real identity is never revealed.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -146,7 +146,7 @@ function LoginContent() {
               </div>
               <div>
                 <p className="font-bold text-heading">50% Revenue Share</p>
-                <p className="text-sm text-subtext">Earn real money when people read your posts.</p>
+                <p className="text-sm text-subtext">Earn real money when readers pay to access your content.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -155,7 +155,7 @@ function LoginContent() {
               </div>
               <div>
                 <p className="font-bold text-heading">Staff-Only Sections</p>
-                <p className="text-sm text-subtext">Only verified insiders can post.</p>
+                <p className="text-sm text-subtext">Only verified employees can post.</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -164,7 +164,7 @@ function LoginContent() {
               </div>
               <div>
                 <p className="font-bold text-heading">Referral Bonuses</p>
-                <p className="text-sm text-subtext">Earn 10% of every friend&apos;s first purchase.</p>
+                <p className="text-sm text-subtext">Invite friends and earn 10% of their first payment.</p>
               </div>
             </div>
           </div>
@@ -183,8 +183,8 @@ function LoginContent() {
           {/* Mobile logo */}
           <div className="mb-8 lg:hidden">
             <h1 className="logo-text text-3xl">
-              <span className="gradient-text">LOUD</span>
-              <span className="text-foreground">-AM!</span>
+              <span className="gradient-text">BR</span>
+              <span className="text-foreground">EAL</span>
             </h1>
             <p className="mt-1 text-sm text-subtext">
               Be real. Get paid.
@@ -196,14 +196,14 @@ function LoginContent() {
             {isSignUp ? "Create your account" : "Welcome back"}
           </h2>
           <p className="mb-8 text-sm text-subtext">
-            {isSignUp ? "Start posting and earning in 30 seconds" : "Sign in to continue to your feed"}
+            {isSignUp ? "Start posting and earning in under a minute" : "Sign in to continue to your feed"}
           </p>
 
           {/* Referral banner */}
           {isSignUp && referralCode && (
             <div className="mb-6 flex items-center gap-2 rounded-xl bg-positive/10 px-4 py-3 text-sm text-positive">
               <FiGift size={16} />
-              <span>You were referred! You&apos;ll both earn a bonus on your first purchase.</span>
+              <span>You were referred! You&apos;ll both earn a bonus on your first payment.</span>
             </div>
           )}
 

@@ -133,7 +133,7 @@ export default function FeedPage() {
               <>Explore <span className="gradient-text">Reviews</span></>
             )}
           </h1>
-          <p className="mt-1 text-sm text-subtext">Be real. Get paid.</p>
+          <p className="mt-1 text-sm text-subtext">See what&apos;s new.</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -144,7 +144,7 @@ export default function FeedPage() {
               <p className="stat-number text-sm font-black text-positive">
                 ${totalPlatformEarnings.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
-              <p className="text-[10px] text-muted">earned by insiders</p>
+              <p className="text-[10px] text-muted">earned by creators</p>
             </div>
           </div>
 
@@ -154,7 +154,7 @@ export default function FeedPage() {
               <FiAward size={16} className="text-accent-2" />
               <div>
                 <p className="text-sm font-bold text-heading">{topEarner.name}</p>
-                <p className="text-[10px] text-muted">top earner &middot; <span className="text-accent-2">${topEarner.amount.toFixed(2)}</span></p>
+                <p className="text-[10px] text-muted">top creator &middot; <span className="text-accent-2">${topEarner.amount.toFixed(2)}</span></p>
               </div>
             </div>
           )}
@@ -166,7 +166,7 @@ export default function FeedPage() {
         <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={16} />
         <input
           type="text"
-          placeholder="Search companies, names, brands, or links..."
+          placeholder="Search organisations, names, brands, or links..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full rounded-xl border border-card-border bg-input-bg py-3.5 pl-11 pr-4 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
@@ -180,7 +180,7 @@ export default function FeedPage() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-2/15">
               <FiBriefcase size={16} className="text-accent-2" />
             </div>
-            <h2 className="text-xl font-black text-heading">Company Sections</h2>
+            <h2 className="text-xl font-black text-heading">Organisation Sections</h2>
           </div>
           <div className="flex items-center gap-2">
             {user && (
@@ -221,14 +221,14 @@ export default function FeedPage() {
                 <>
                   <p className="mb-1 font-bold text-subtext">No results found</p>
                   <p className="mb-4 text-sm text-muted">
-                    No company matching &ldquo;{searchQuery.trim()}&rdquo;
+                    No organisation matching &ldquo;{searchQuery.trim()}&rdquo;
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="mb-1 font-bold text-subtext">No company sections yet</p>
+                  <p className="mb-1 font-bold text-subtext">No organisation sections yet</p>
                   <p className="mb-4 text-sm text-muted">
-                    {user ? "Be the first to create one and start earning!" : "Sign in to create a company section."}
+                    {user ? "Be the first to create one and start earning!" : "Sign in to create an organisation section."}
                   </p>
                   {user && (
                     <Link
@@ -357,7 +357,7 @@ export default function FeedPage() {
               <p className="mb-5 text-sm text-muted">
                 {searchQuery.trim()
                   ? `Nothing about "${searchQuery}" yet. Be the first!`
-                  : "Be the first to speak up!"}
+                  : "Be the first to share your experience!"}
               </p>
               {!searchQuery.trim() && user && (
                 <Link

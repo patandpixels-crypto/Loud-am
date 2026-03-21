@@ -17,7 +17,7 @@ function getTimeAgo(timestamp: number): string {
   return `${months}mo ago`;
 }
 
-// Generate a consistent color from company name
+// Generate a consistent color from organisation name
 function getCompanyColor(name: string): string {
   const colors = [
     "from-blue-500/20 to-cyan-500/20",

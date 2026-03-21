@@ -199,7 +199,7 @@ export default function SectionDetailPage() {
       setStaffError("Already a staff member");
       return;
     }
-    // Enforce same company domain
+    // Enforce same organisation domain
     if (section.companyDomain) {
       const emailDomain = email.split("@")[1];
       if (emailDomain !== section.companyDomain) {
@@ -375,10 +375,10 @@ export default function SectionDetailPage() {
           <h2 className="mb-2 text-xl font-black text-heading">Staff-Only Content</h2>
           <p className="mb-1 max-w-md text-center text-sm text-subtext">
             This section is managed by <strong className="text-heading">{section.companyName}</strong> staff.
-            Only permitted staff can post here.
+            Only verified employees can post here.
           </p>
           <p className="mb-6 text-sm text-subtext">
-            Unlock read access & post replies (200 words max).
+            Unlock full access to read all posts and join the conversation.
           </p>
           {paying ? (
             <div className="flex items-center gap-2 text-sm text-subtext">

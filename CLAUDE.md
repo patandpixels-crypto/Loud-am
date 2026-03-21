@@ -15,7 +15,7 @@ No test framework is configured.
 
 ## Architecture Overview
 
-BREAL is an anonymous review platform built on **Next.js 16 (App Router)** with **Firebase** (auth + Firestore) and **Paystack** (payments). Users post reviews about people/brands, vote on content, and earn money through company sections.
+BREAL is an anonymous review platform built on **Next.js 16 (App Router)** with **Firebase** (auth + Firestore) and **Paystack** (payments). Users post reviews about people/brands/organisations, vote on content, and earn money through organisation sections.
 
 ### Tech Stack
 - Next.js 16.1.6 with Turbopack, React 19, TypeScript 5
@@ -43,7 +43,7 @@ ThemeProvider → AuthProvider → Navbar + {children}
 - **users** — Profile with codeName, isAdmin, referralCode
 - **posts** — Public reviews with voting (score = upvotes - downvotes)
 - **votes** — Per-user vote tracking (supports anonymous via localStorage `anon_id`)
-- **companySections** — Staff-only sections with approval workflow (pending → approved/rejected)
+- **companySections** — Organisation sections with staff-only posting and approval workflow (pending → approved/rejected)
 - **sectionPosts** / **sectionReplies** — Content within sections
 - **sectionAccess** — Payment records (₦1,500 NGN / $3 USD access fee, server-created only)
 - **earnings** — Revenue sharing records (50% to authors, server-created only)
