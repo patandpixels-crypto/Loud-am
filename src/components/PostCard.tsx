@@ -10,6 +10,7 @@ import { Post } from "@/lib/types";
 import {
   FiArrowUp, FiArrowDown, FiUser, FiExternalLink,
   FiFlag, FiEdit2, FiTrash2, FiMoreHorizontal, FiX,
+  FiMessageCircle, FiShare2,
 } from "react-icons/fi";
 import { collection, query, where, getDocs, addDoc, deleteDoc } from "firebase/firestore";
 import { checkRateLimit, recordAction } from "@/lib/rateLimit";
@@ -58,6 +59,12 @@ const REPORT_REASONS = [
   { value: "other" as const, label: "Other" },
 ];
 
+const RANK_STYLES: Record<number, string> = {
+  1: "bg-gradient-to-br from-yellow-400 to-amber-500 text-black shadow-lg shadow-amber-500/20",
+  2: "bg-gradient-to-br from-gray-300 to-gray-400 text-black",
+  3: "bg-gradient-to-br from-amber-600 to-amber-700 text-white",
+};
+
 export default function PostCard({ post, rank, onDelete }: PostCardProps) {
   const { user } = useAuth();
   const router = useRouter();
@@ -72,6 +79,8 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
   const [reportSubmitting, setReportSubmitting] = useState(false);
   const [reportSuccess, setReportSuccess] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [voteAnimating, setVoteAnimating] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const isAuthor = user?.uid === post.authorId;
   const timeAgo = getTimeAgo(post.createdAt);
@@ -80,7 +89,6 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
     setUserVote(getLocalVote(post.id));
   }, [post.id]);
 
-  // Close menu on outside click
   useEffect(() => {
     if (!showMenu) return;
     const handler = () => setShowMenu(false);
@@ -95,6 +103,8 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
     if (!limit.allowed) return;
 
     setVoting(true);
+    setVoteAnimating(true);
+    setTimeout(() => setVoteAnimating(false), 350);
     recordAction("vote");
 
     const voterId = user?.uid || getAnonId();
@@ -220,67 +230,83 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
     }
   };
 
+  const handleShare = async () => {
+    const url = `${window.location.origin}/post/${post.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // fallback
+    }
+  };
+
   if (post.hidden) return null;
 
   return (
     <>
-      <div className="card-glow group rounded-2xl border border-card-border bg-card-bg">
-        <div className="flex gap-3 p-4 sm:p-5">
+      <div className="group rounded-2xl border border-card-border bg-card-bg transition-all duration-300 hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5">
+        <div className="flex gap-0 sm:gap-0">
           {/* Vote Column */}
-          <div className="flex flex-col items-center gap-1">
-            {rank && (
-              <span className={`mb-1 text-xs font-black ${rank <= 3 ? "text-accent-2" : "text-muted"}`}>
-                #{rank}
+          <div className="flex flex-col items-center gap-0.5 border-r border-card-border px-3 py-4 sm:px-4">
+            {rank && rank <= 3 && (
+              <span className={`mb-2 flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-black ${RANK_STYLES[rank]}`}>
+                {rank}
               </span>
+            )}
+            {rank && rank > 3 && (
+              <span className="mb-2 text-xs font-bold text-muted">#{rank}</span>
             )}
             <button
               onClick={() => handleVote("up")}
               disabled={voting}
-              className={`btn-bounce rounded-xl p-1.5 ${
+              className={`rounded-xl p-2 transition-all duration-200 ${
                 userVote === "up"
                   ? "bg-positive/20 text-positive shadow-sm shadow-positive/20"
                   : "text-muted hover:bg-positive/10 hover:text-positive disabled:opacity-30"
-              }`}
+              } ${voteAnimating && userVote === "up" ? "animate-vote-pop" : ""}`}
             >
-              <FiArrowUp size={20} />
+              <FiArrowUp size={20} strokeWidth={userVote === "up" ? 3 : 2} />
             </button>
             <span
-              className={`text-sm font-black ${
+              className={`stat-number text-sm font-black transition-all duration-200 ${
                 score > 0 ? "text-positive" : score < 0 ? "text-negative" : "text-subtext"
-              }`}
+              } ${voteAnimating ? "animate-score-bump" : ""}`}
             >
               {score}
             </span>
             <button
               onClick={() => handleVote("down")}
               disabled={voting}
-              className={`btn-bounce rounded-xl p-1.5 ${
+              className={`rounded-xl p-2 transition-all duration-200 ${
                 userVote === "down"
                   ? "bg-negative/20 text-negative shadow-sm shadow-negative/20"
                   : "text-muted hover:bg-negative/10 hover:text-negative disabled:opacity-30"
-              }`}
+              } ${voteAnimating && userVote === "down" ? "animate-vote-pop" : ""}`}
             >
-              <FiArrowDown size={20} />
+              <FiArrowDown size={20} strokeWidth={userVote === "down" ? 3 : 2} />
             </button>
           </div>
 
           {/* Content */}
-          <div className="min-w-0 flex-1">
-            <div className="mb-1.5 flex flex-wrap items-center gap-2">
+          <div className="min-w-0 flex-1 p-4 sm:p-5">
+            {/* Top row: badges + menu */}
+            <div className="mb-2 flex flex-wrap items-center gap-2">
               <span
-                className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                className={`inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider ${
                   post.sentiment === "positive"
                     ? "bg-positive/10 text-positive"
                     : "bg-negative/10 text-negative"
                 }`}
               >
+                <span className={`h-1.5 w-1.5 rounded-full ${post.sentiment === "positive" ? "bg-positive" : "bg-negative"}`} />
                 {post.sentiment === "positive" ? "Positive" : "Negative"}
               </span>
-              <span className="rounded-full bg-accent-3/10 px-2.5 py-0.5 text-xs font-medium text-accent-3">
+              <span className="rounded-lg bg-accent-3/10 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wider text-accent-3">
                 {post.targetType === "person" ? "Person" : "Brand"}
               </span>
               {post.editedAt && (
-                <span className="text-xs text-muted">(edited)</span>
+                <span className="text-[11px] italic text-muted">(edited)</span>
               )}
 
               {/* Actions menu */}
@@ -290,12 +316,12 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
                     e.stopPropagation();
                     setShowMenu(!showMenu);
                   }}
-                  className="rounded-lg p-1 text-muted transition-colors hover:bg-surface hover:text-subtext"
+                  className="rounded-lg p-1.5 text-muted opacity-0 transition-all group-hover:opacity-100 hover:bg-surface hover:text-subtext"
                 >
                   <FiMoreHorizontal size={16} />
                 </button>
                 {showMenu && (
-                  <div className="absolute right-0 top-8 z-30 min-w-[160px] rounded-xl border border-card-border bg-card-bg py-1 shadow-xl">
+                  <div className="animate-fade-in absolute right-0 top-8 z-30 min-w-[160px] rounded-xl border border-card-border bg-card-bg py-1 shadow-xl">
                     {isAuthor && (
                       <>
                         <button
@@ -303,7 +329,7 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
                             setShowMenu(false);
                             router.push(`/post/${post.id}/edit`);
                           }}
-                          className="flex w-full items-center gap-2 px-4 py-2 text-sm text-subtext hover:bg-surface hover:text-heading"
+                          className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-subtext hover:bg-surface hover:text-heading"
                         >
                           <FiEdit2 size={14} />
                           Edit Post
@@ -313,7 +339,7 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
                             setShowMenu(false);
                             setShowDeleteConfirm(true);
                           }}
-                          className="flex w-full items-center gap-2 px-4 py-2 text-sm text-negative hover:bg-negative/10"
+                          className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-negative hover:bg-negative/10"
                         >
                           <FiTrash2 size={14} />
                           Delete Post
@@ -326,7 +352,7 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
                           setShowMenu(false);
                           setShowReportModal(true);
                         }}
-                        className="flex w-full items-center gap-2 px-4 py-2 text-sm text-subtext hover:bg-surface hover:text-accent"
+                        className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-subtext hover:bg-surface hover:text-accent"
                       >
                         <FiFlag size={14} />
                         Report
@@ -337,42 +363,69 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
               </div>
             </div>
 
+            {/* Title */}
             <Link href={`/post/${post.id}`} className="block">
-              <h3 className="mb-1 text-lg font-bold leading-snug text-heading transition-colors group-hover:text-accent">
+              <h3 className="mb-1.5 text-base font-bold leading-snug text-heading transition-colors group-hover:text-accent sm:text-lg">
                 {post.title}
               </h3>
             </Link>
 
+            {/* Target */}
             <p className="mb-2 text-sm font-semibold text-accent-2">
               About: {post.targetName}
             </p>
 
+            {/* Content preview */}
             <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-subtext">
               {post.content}
             </p>
 
+            {/* Links */}
             {post.targetLinks.length > 0 && (
-              <div className="mb-3 flex flex-wrap gap-2">
+              <div className="mb-3 flex flex-wrap gap-1.5">
                 {post.targetLinks.map((link, i) => (
                   <a
                     key={i}
                     href={link.startsWith("http") ? link : `https://${link}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-bounce flex items-center gap-1 rounded-full bg-accent-3/10 px-2.5 py-1 text-xs text-accent-3 hover:bg-accent-3/20"
+                    className="flex items-center gap-1 rounded-lg bg-accent-3/8 px-2 py-1 text-xs text-accent-3 transition-colors hover:bg-accent-3/15"
                   >
-                    <FiExternalLink size={12} />
+                    <FiExternalLink size={11} />
                     {link.length > 30 ? link.substring(0, 30) + "..." : link}
                   </a>
                 ))}
               </div>
             )}
 
-            <div className="flex items-center gap-2 text-xs text-muted">
-              <FiUser size={12} />
-              <span>{post.isAnonymous ? "Anonymous" : post.authorName}</span>
-              <span className="text-accent-2">&middot;</span>
-              <span>{timeAgo}</span>
+            {/* Footer: author + engagement */}
+            <div className="flex items-center justify-between gap-2 border-t border-card-border/50 pt-3">
+              <div className="flex items-center gap-2 text-xs text-muted">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-surface">
+                  <FiUser size={10} className="text-subtext" />
+                </div>
+                <span className="font-medium">{post.isAnonymous ? "Anonymous" : post.authorName}</span>
+                <span className="text-card-border">&middot;</span>
+                <span>{timeAgo}</span>
+              </div>
+
+              {/* Engagement actions */}
+              <div className="flex items-center gap-1">
+                <Link
+                  href={`/post/${post.id}`}
+                  className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-muted transition-colors hover:bg-surface hover:text-accent-3"
+                >
+                  <FiMessageCircle size={13} />
+                  <span className="hidden sm:inline">Reply</span>
+                </Link>
+                <button
+                  onClick={handleShare}
+                  className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-muted transition-colors hover:bg-surface hover:text-accent"
+                >
+                  <FiShare2 size={13} />
+                  <span className="hidden sm:inline">{copied ? "Copied!" : "Share"}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -381,9 +434,12 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4" onClick={() => setShowDeleteConfirm(false)}>
-          <div className="w-full max-w-sm rounded-2xl border border-card-border bg-card-bg p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="mb-2 text-lg font-bold">Delete this post?</h3>
-            <p className="mb-5 text-sm text-subtext">
+          <div className="animate-slide-up w-full max-w-sm rounded-2xl border border-card-border bg-card-bg p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-negative/10">
+              <FiTrash2 size={20} className="text-negative" />
+            </div>
+            <h3 className="mb-2 text-center text-lg font-bold">Delete this post?</h3>
+            <p className="mb-5 text-center text-sm text-subtext">
               This action cannot be undone. Your post and all its votes will be permanently removed.
             </p>
             <div className="flex gap-3">
@@ -408,7 +464,7 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
       {/* Report Modal */}
       {showReportModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4" onClick={() => setShowReportModal(false)}>
-          <div className="w-full max-w-sm rounded-2xl border border-card-border bg-card-bg p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="animate-slide-up w-full max-w-sm rounded-2xl border border-card-border bg-card-bg p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             {reportSuccess ? (
               <div className="text-center">
                 <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-positive/20">
@@ -421,22 +477,22 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
               <>
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-lg font-bold">Report Post</h3>
-                  <button onClick={() => setShowReportModal(false)} className="text-muted hover:text-heading">
+                  <button onClick={() => setShowReportModal(false)} className="rounded-lg p-1 text-muted transition-colors hover:bg-surface hover:text-heading">
                     <FiX size={20} />
                   </button>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-subtle">Reason</label>
+                    <label className="mb-2 block text-sm font-medium text-subtle">Reason</label>
                     <div className="flex flex-wrap gap-2">
                       {REPORT_REASONS.map((r) => (
                         <button
                           key={r.value}
                           onClick={() => setReportReason(r.value)}
-                          className={`btn-bounce rounded-full border px-3 py-1.5 text-xs font-bold transition-all ${
+                          className={`rounded-lg border px-3 py-1.5 text-xs font-bold transition-all ${
                             reportReason === r.value
                               ? "border-accent bg-accent/10 text-accent"
-                              : "border-card-border text-subtext hover:border-zinc-500"
+                              : "border-card-border text-subtext hover:border-muted"
                           }`}
                         >
                           {r.label}
@@ -445,7 +501,7 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
                     </div>
                   </div>
                   <div>
-                    <label className="mb-1.5 block text-sm font-medium text-subtle">Details (optional)</label>
+                    <label className="mb-2 block text-sm font-medium text-subtle">Details (optional)</label>
                     <textarea
                       value={reportDetails}
                       onChange={(e) => setReportDetails(e.target.value)}

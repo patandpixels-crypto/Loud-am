@@ -45,13 +45,19 @@ export default function RootLayout({
           <AuthProvider>
             <Navbar />
             <main className="min-h-[calc(100vh-64px)]">{children}</main>
-            <footer className="border-t border-card-border py-8 text-center">
-              <p className="logo-text gradient-text inline-block text-sm">
-                LOUD-AM!
-              </p>
-              <p className="mt-1 text-xs text-muted">
-                &copy; {new Date().getFullYear()} &mdash; Insider company talk. Get paid to share.
-              </p>
+            <footer className="border-t border-card-border">
+              <div className="mx-auto max-w-6xl px-4 py-8">
+                <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+                  <div className="flex items-center gap-3">
+                    <span className="logo-text gradient-text text-lg">LOUD-AM!</span>
+                    <span className="hidden h-4 w-px bg-card-border sm:block" />
+                    <span className="hidden text-xs text-muted sm:block">Insider company talk. Get paid to share.</span>
+                  </div>
+                  <p className="text-xs text-muted">
+                    &copy; {new Date().getFullYear()} LOUD-AM. All rights reserved.
+                  </p>
+                </div>
+              </div>
             </footer>
           </AuthProvider>
         </ThemeProvider>

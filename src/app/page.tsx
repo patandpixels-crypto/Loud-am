@@ -11,6 +11,7 @@ import { useAuth } from "@/lib/AuthContext";
 import {
   FiTrendingUp, FiPlus, FiFilter, FiSearch, FiAward,
   FiBriefcase, FiDollarSign, FiUsers, FiLock, FiArrowRight,
+  FiClock, FiZap, FiStar,
 } from "react-icons/fi";
 
 type FilterType = "all" | "positive" | "negative";
@@ -37,7 +38,6 @@ export default function HomePage() {
         const earningsSnap = await getDocs(collection(db, "earnings"));
         const allEarnings = earningsSnap.docs.map((d) => d.data() as Earning);
 
-        // Total platform earnings (all time)
         const total = allEarnings.reduce((sum, e) => sum + e.amount, 0);
         setTotalPlatformEarnings(total);
 
@@ -78,12 +78,10 @@ export default function HomePage() {
     const fetchData = async () => {
       setLoading(true);
 
-      // Fetch sections separately so a failure here doesn't block posts
       try {
         const sectionsSnap = await getDocs(collection(db, "companySections"));
         const sectionsData = sectionsSnap.docs
           .map((doc) => ({ id: doc.id, ...doc.data() })) as CompanySection[];
-        // Only show approved sections on homepage, sort newest first client-side
         setSections(
           sectionsData
             .filter((s) => s.status === "approved" || !s.status)
@@ -93,7 +91,6 @@ export default function HomePage() {
         console.error("Error fetching sections:", err);
       }
 
-      // Fetch posts
       try {
         const postsRef = collection(db, "posts");
         const snapshot = await getDocs(postsRef);
@@ -125,77 +122,88 @@ export default function HomePage() {
   }, [filter, sort]);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-6">
-      {/* Hero */}
-      <div className="mb-10 text-center">
-        <h1 className="logo-text animate-float text-5xl sm:text-6xl">
-          <span className="gradient-text">LOUD</span>
-          <span className="text-foreground">-AM!</span>
-        </h1>
-        <p className="mt-3 text-lg text-subtext">
-          Insider company talk. <span className="font-bold text-accent-2">Get paid to share.</span>
-        </p>
-        {!user && (
-          <Link
-            href="/login"
-            className="btn-bounce mt-5 inline-block rounded-full bg-gradient-to-r from-accent to-accent-2 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-accent/20"
-          >
-            Join the Conversation
-          </Link>
-        )}
-      </div>
-
-      {/* Value Proposition Cards */}
-      <div className="mb-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border border-card-border bg-card-bg p-4 text-center">
-          <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-accent-2/20">
-            <FiLock size={18} className="text-accent-2" />
-          </div>
-          <p className="text-sm font-bold text-heading">Staff-Only Posting</p>
-          <p className="mt-1 text-xs text-muted">Only verified staff can post insider content</p>
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      {/* === HERO SECTION === */}
+      <div className="animate-slide-up mb-10">
+        {/* Logo + Tagline */}
+        <div className="mb-8 text-center">
+          <h1 className="logo-text text-5xl sm:text-7xl">
+            <span className="gradient-text">LOUD</span>
+            <span className="text-foreground">-AM!</span>
+          </h1>
+          <p className="mt-3 text-lg text-subtext">
+            Insider company talk. <span className="font-bold text-accent-2">Get paid to share.</span>
+          </p>
         </div>
-        <div className="rounded-xl border border-card-border bg-card-bg p-4 text-center">
-          <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-positive/20">
-            <FiDollarSign size={18} className="text-positive" />
-          </div>
-          <p className="text-sm font-bold text-heading">Earn 50% Revenue</p>
-          <p className="mt-1 text-xs text-muted">Every $3 reader pays, half goes to you</p>
-        </div>
-        <div className="rounded-xl border border-card-border bg-card-bg p-4 text-center">
-          <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-accent-3/20">
-            <FiUsers size={18} className="text-accent-3" />
-          </div>
-          <p className="text-sm font-bold text-heading">Anonymous Identity</p>
-          <p className="mt-1 text-xs text-muted">Post under a codename, stay protected</p>
-        </div>
-      </div>
 
-      {/* Platform Earnings Counter */}
-      <div className="mx-auto mb-6 max-w-md rounded-xl border border-positive/20 bg-positive/5 px-5 py-4 text-center">
-        <p className="text-xs font-medium text-subtext">Earned by insiders on LOUD-AM</p>
-        <p className="mt-1 text-3xl font-black text-positive">
-          ${totalPlatformEarnings.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </p>
-        <p className="mt-1 text-xs text-muted">and counting...</p>
-      </div>
-
-      {/* Top Earner Badge */}
-      {topEarner && (
-        <div className="mx-auto mb-8 flex max-w-md items-center gap-3 rounded-xl border border-accent-2/20 bg-accent-2/5 px-4 py-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-2/20">
-            <FiAward size={18} className="text-accent-2" />
+        {/* Bento Grid — Value Props + Stats */}
+        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {/* Staff-Only */}
+          <div className="bento-card flex flex-col items-center justify-center py-5 text-center">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-accent-2/15">
+              <FiLock size={20} className="text-accent-2" />
+            </div>
+            <p className="text-sm font-bold text-heading">Staff-Only</p>
+            <p className="mt-1 text-xs text-muted">Verified insider posts</p>
           </div>
-          <div className="text-left">
-            <p className="text-xs font-medium text-subtext">Top Earner This Month</p>
-            <p className="text-sm font-bold text-heading">
-              {topEarner.name}{" "}
-              <span className="text-accent-2">${topEarner.amount.toFixed(2)}</span>
+
+          {/* Earn Revenue */}
+          <div className="bento-card flex flex-col items-center justify-center py-5 text-center">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-positive/15">
+              <FiDollarSign size={20} className="text-positive" />
+            </div>
+            <p className="text-sm font-bold text-heading">50% Revenue</p>
+            <p className="mt-1 text-xs text-muted">Earn from every reader</p>
+          </div>
+
+          {/* Anonymous */}
+          <div className="bento-card flex flex-col items-center justify-center py-5 text-center">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-accent-3/15">
+              <FiUsers size={20} className="text-accent-3" />
+            </div>
+            <p className="text-sm font-bold text-heading">Anonymous</p>
+            <p className="mt-1 text-xs text-muted">Post under a codename</p>
+          </div>
+
+          {/* Platform Earnings — larger stat card */}
+          <div className="bento-card flex flex-col items-center justify-center py-5 text-center">
+            <p className="text-xs font-medium text-muted">Total Earned</p>
+            <p className="stat-number mt-1 text-2xl font-black text-positive sm:text-3xl">
+              ${totalPlatformEarnings.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
+            <p className="mt-1 text-xs text-muted">by insiders</p>
           </div>
         </div>
-      )}
 
-      {/* Unified Search Bar */}
+        {/* Top Earner + CTA row */}
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          {topEarner && (
+            <div className="flex items-center gap-3 rounded-xl border border-accent-2/20 bg-accent-2/5 px-4 py-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-2/20">
+                <FiAward size={18} className="text-accent-2" />
+              </div>
+              <div>
+                <p className="text-xs font-medium text-muted">Top Earner This Month</p>
+                <p className="text-sm font-bold text-heading">
+                  {topEarner.name}{" "}
+                  <span className="text-accent-2">${topEarner.amount.toFixed(2)}</span>
+                </p>
+              </div>
+            </div>
+          )}
+          {!user && (
+            <Link
+              href="/login"
+              className="btn-bounce inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-accent/20"
+            >
+              <FiZap size={16} />
+              Join the Conversation
+            </Link>
+          )}
+        </div>
+      </div>
+
+      {/* === SEARCH === */}
       <div className="relative mb-8">
         <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={16} />
         <input
@@ -203,22 +211,24 @@ export default function HomePage() {
           placeholder="Search companies, names, brands, or links..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-xl border border-card-border bg-input-bg py-3 pl-11 pr-4 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
+          className="w-full rounded-xl border border-card-border bg-input-bg py-3.5 pl-11 pr-4 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
         />
       </div>
 
-      {/* === SECTIONS (Primary Product) === */}
-      <div className="mb-10">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FiBriefcase size={20} className="text-accent-2" />
-            <h2 className="text-xl font-black">Company Sections</h2>
+      {/* === COMPANY SECTIONS === */}
+      <section className="mb-10">
+        <div className="mb-5 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-2/15">
+              <FiBriefcase size={16} className="text-accent-2" />
+            </div>
+            <h2 className="text-xl font-black text-heading">Company Sections</h2>
           </div>
           <div className="flex items-center gap-2">
             {user && (
               <Link
                 href="/sections/create"
-                className="btn-bounce flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-accent/20"
+                className="btn-bounce flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-accent/20"
               >
                 <FiPlus size={14} />
                 Create
@@ -226,7 +236,7 @@ export default function HomePage() {
             )}
             <Link
               href="/sections"
-              className="btn-bounce flex items-center gap-1 rounded-full border border-card-border px-3 py-2 text-xs font-bold text-subtext hover:bg-surface hover:text-heading"
+              className="btn-bounce flex items-center gap-1.5 rounded-xl border border-card-border px-3 py-2 text-xs font-bold text-subtext transition-colors hover:bg-surface hover:text-heading"
             >
               View All
               <FiArrowRight size={12} />
@@ -241,8 +251,10 @@ export default function HomePage() {
             : sections;
 
           return loading ? (
-            <div className="flex justify-center py-10">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-2/30 border-t-accent" />
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="skeleton h-36 rounded-2xl" />
+              ))}
             </div>
           ) : filteredSections.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-card-border bg-card-bg py-12 text-center">
@@ -263,7 +275,7 @@ export default function HomePage() {
                   {user && (
                     <Link
                       href="/sections/create"
-                      className="btn-bounce inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
+                      className="btn-bounce inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
                     >
                       <FiPlus size={16} />
                       Create Section
@@ -274,14 +286,16 @@ export default function HomePage() {
             </div>
           ) : (
             <>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {(sq ? filteredSections : filteredSections.slice(0, 4)).map((section) => (
-                  <SectionCard key={section.id} section={section} />
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {(sq ? filteredSections : filteredSections.slice(0, 6)).map((section, i) => (
+                  <div key={section.id} className={`animate-slide-up stagger-${Math.min(i + 1, 6)}`}>
+                    <SectionCard section={section} />
+                  </div>
                 ))}
               </div>
-              {!sq && sections.length > 4 && (
-                <div className="mt-3 text-center">
-                  <Link href="/sections" className="text-sm font-bold text-accent-3 hover:text-accent-3/80">
+              {!sq && sections.length > 6 && (
+                <div className="mt-4 text-center">
+                  <Link href="/sections" className="text-sm font-bold text-accent-3 transition-colors hover:text-accent-3/80">
                     See all {sections.length} sections &rarr;
                   </Link>
                 </div>
@@ -289,131 +303,129 @@ export default function HomePage() {
             </>
           );
         })()}
-      </div>
+      </section>
 
-      {/* === Divider === */}
-      <div className="mb-8 flex items-center gap-4">
-        <div className="h-px flex-1 bg-card-border" />
-        <span className="text-xs font-bold text-muted">PUBLIC REVIEWS</span>
-        <div className="h-px flex-1 bg-card-border" />
-      </div>
+      {/* === DIVIDER === */}
+      <div className="divider-gradient mb-8" />
 
-      {/* Leaderboard Header */}
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <FiTrendingUp className="text-accent" size={20} />
-          <h2 className="text-xl font-bold">
-            {sort === "score" ? "Top Posts" : "Recent Posts"}
-          </h2>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="flex overflow-hidden rounded-xl border border-card-border">
-            <button
-              onClick={() => setSort("score")}
-              className={`px-3 py-1.5 text-xs font-bold transition-all ${
-                sort === "score"
-                  ? "bg-gradient-to-r from-accent to-accent-2 text-white"
-                  : "text-subtext hover:text-heading"
-              }`}
-            >
-              Top
-            </button>
-            <button
-              onClick={() => setSort("recent")}
-              className={`px-3 py-1.5 text-xs font-bold transition-all ${
-                sort === "recent"
-                  ? "bg-gradient-to-r from-accent to-accent-2 text-white"
-                  : "text-subtext hover:text-heading"
-              }`}
-            >
-              New
-            </button>
+      {/* === REVIEWS FEED === */}
+      <section>
+        {/* Feed Header with Tabs */}
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/15">
+              <FiTrendingUp size={16} className="text-accent" />
+            </div>
+            <h2 className="text-xl font-black text-heading">
+              {sort === "score" ? "Top Reviews" : "Latest Reviews"}
+            </h2>
           </div>
 
-          <div className="flex items-center gap-1 overflow-hidden rounded-xl border border-card-border">
-            <FiFilter size={14} className="ml-2 text-muted" />
-            <button
-              onClick={() => setFilter("all")}
-              className={`px-2 py-1.5 text-xs font-bold transition-all ${
-                filter === "all"
-                  ? "bg-gradient-to-r from-accent to-accent-2 text-white"
-                  : "text-subtext hover:text-heading"
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setFilter("positive")}
-              className={`px-2 py-1.5 text-xs font-bold transition-all ${
-                filter === "positive"
-                  ? "bg-positive text-white"
-                  : "text-subtext hover:text-heading"
-              }`}
-            >
-              +
-            </button>
-            <button
-              onClick={() => setFilter("negative")}
-              className={`px-2 py-1.5 text-xs font-bold transition-all ${
-                filter === "negative"
-                  ? "bg-negative text-white"
-                  : "text-subtext hover:text-heading"
-              }`}
-            >
-              -
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Posts */}
-      {(() => {
-        const q = searchQuery.trim().toLowerCase();
-        const filtered = q
-          ? posts.filter((p) =>
-              p.targetName.toLowerCase().includes(q) ||
-              p.targetLinks.some((link) => link.toLowerCase().includes(q))
-            )
-          : posts;
-
-        return loading ? (
-          <div className="flex justify-center py-20">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent-2/30 border-t-accent" />
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-card-border bg-card-bg py-16 text-center">
-            <p className="mb-2 text-xl font-bold text-subtle">
-              {searchQuery.trim() ? "No results found" : "No posts yet"}
-            </p>
-            <p className="mb-4 text-muted">
-              {searchQuery.trim()
-                ? `Nothing about "${searchQuery}" yet. Be the first!`
-                : "Be the first to speak up!"}
-            </p>
-            {!searchQuery.trim() && user && (
-              <Link
-                href="/post/new"
-                className="btn-bounce inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
+          <div className="flex items-center gap-2">
+            {/* Sort Tabs */}
+            <div className="flex rounded-xl border border-card-border bg-card-bg p-0.5">
+              <button
+                onClick={() => setSort("score")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+                  sort === "score"
+                    ? "bg-gradient-to-r from-accent to-accent-2 text-white shadow-sm"
+                    : "text-subtext hover:text-heading"
+                }`}
               >
-                <FiPlus size={16} />
-                Create Post
-              </Link>
-            )}
+                <FiStar size={12} />
+                Top
+              </button>
+              <button
+                onClick={() => setSort("recent")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+                  sort === "recent"
+                    ? "bg-gradient-to-r from-accent to-accent-2 text-white shadow-sm"
+                    : "text-subtext hover:text-heading"
+                }`}
+              >
+                <FiClock size={12} />
+                New
+              </button>
+            </div>
+
+            {/* Sentiment Filter */}
+            <div className="flex items-center rounded-xl border border-card-border bg-card-bg p-0.5">
+              <FiFilter size={12} className="mx-1.5 text-muted" />
+              {(["all", "positive", "negative"] as FilterType[]).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`rounded-lg px-2.5 py-1.5 text-xs font-bold transition-all ${
+                    filter === f
+                      ? f === "positive"
+                        ? "bg-positive/20 text-positive"
+                        : f === "negative"
+                        ? "bg-negative/20 text-negative"
+                        : "bg-gradient-to-r from-accent to-accent-2 text-white shadow-sm"
+                      : "text-subtext hover:text-heading"
+                  }`}
+                >
+                  {f === "all" ? "All" : f === "positive" ? "+" : "-"}
+                </button>
+              ))}
+            </div>
           </div>
-        ) : (
-          <div className="space-y-3">
-            {filtered.map((post, index) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                rank={!searchQuery.trim() && sort === "score" ? index + 1 : undefined}
-                onDelete={(id) => setPosts((prev) => prev.filter((p) => p.id !== id))}
-              />
-            ))}
-          </div>
-        );
-      })()}
+        </div>
+
+        {/* Posts */}
+        {(() => {
+          const q = searchQuery.trim().toLowerCase();
+          const filtered = q
+            ? posts.filter((p) =>
+                p.targetName.toLowerCase().includes(q) ||
+                p.targetLinks.some((link) => link.toLowerCase().includes(q))
+              )
+            : posts;
+
+          return loading ? (
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="skeleton h-40 rounded-2xl" />
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-card-border bg-card-bg py-16 text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface">
+                <FiTrendingUp size={24} className="text-muted" />
+              </div>
+              <p className="mb-2 text-lg font-bold text-subtext">
+                {searchQuery.trim() ? "No results found" : "No reviews yet"}
+              </p>
+              <p className="mb-5 text-sm text-muted">
+                {searchQuery.trim()
+                  ? `Nothing about "${searchQuery}" yet. Be the first!`
+                  : "Be the first to speak up!"}
+              </p>
+              {!searchQuery.trim() && user && (
+                <Link
+                  href="/post/new"
+                  className="btn-bounce inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-5 py-2.5 font-bold text-white shadow-lg shadow-accent/20"
+                >
+                  <FiPlus size={16} />
+                  Create Review
+                </Link>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filtered.map((post, index) => (
+                <div key={post.id} className={`animate-slide-up stagger-${Math.min(index + 1, 6)}`}>
+                  <PostCard
+                    post={post}
+                    rank={!searchQuery.trim() && sort === "score" ? index + 1 : undefined}
+                    onDelete={(id) => setPosts((prev) => prev.filter((p) => p.id !== id))}
+                  />
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+      </section>
     </div>
   );
 }
