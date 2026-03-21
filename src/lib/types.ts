@@ -72,7 +72,7 @@ export interface SectionReply {
   content: string; // max 200 words
   authorId: string;
   authorName: string;
-  isPaidUser: boolean; // true if non-staff who paid $3
+  isPaidUser: boolean; // true if non-staff who paid for access
   createdAt: number;
 }
 
@@ -81,7 +81,7 @@ export interface SectionAccess {
   sectionId: string;
   userId: string;
   paidAt: number;
-  amount: number; // $3
+  amount: number; // payment amount in original currency
 }
 
 export interface Earning {

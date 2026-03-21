@@ -60,7 +60,7 @@ export default function SectionsPage() {
             Company <span className="gradient-text">Sections</span>
           </h1>
           <p className="mt-1 text-sm text-subtext">
-            Insider company talk. Staff-only posting. Pay $3 to read & reply.
+            Insider company talk. Staff-only posting. Pay to read & reply.
           </p>
         </div>
         {user && (

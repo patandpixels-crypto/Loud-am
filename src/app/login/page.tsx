@@ -164,7 +164,7 @@ function LoginContent() {
               </div>
               <div>
                 <p className="font-bold text-heading">Referral Bonuses</p>
-                <p className="text-sm text-subtext">Earn $0.50 for every friend who joins.</p>
+                <p className="text-sm text-subtext">Earn 10% of every friend&apos;s first purchase.</p>
               </div>
             </div>
           </div>

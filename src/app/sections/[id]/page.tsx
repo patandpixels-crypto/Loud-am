@@ -16,6 +16,7 @@ import { db, auth } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
 import { openPaystack, grantAccessServerSide } from "@/lib/paystack";
 import { CompanySection, SectionPost, SectionAccess } from "@/lib/types";
+import { getPaystackAmount, getDisplayPrice } from "@/lib/pricing";
 import {
   FiArrowLeft,
   FiBriefcase,
@@ -174,10 +175,9 @@ export default function SectionDetailPage() {
 
   const handlePayment = (currency: "NGN" | "USD") => {
     if (!user?.email) return;
-    const amount = currency === "NGN" ? 300 * 100 : 3 * 100; // 300 NGN in kobo or $3 in cents
     openPaystack({
       email: user.email,
-      amountInCents: amount,
+      amountInCents: getPaystackAmount(currency),
       currency,
       metadata: { sectionId, userId: user.uid },
       onSuccess: (reference) => {
@@ -392,14 +392,14 @@ export default function SectionDetailPage() {
                 className="btn-bounce flex items-center gap-2 rounded-full bg-gradient-to-r from-accent to-accent-2 px-6 py-3 text-sm font-black text-white shadow-lg shadow-accent/20"
               >
                 <FiDollarSign size={16} />
-                Pay &#8358;300 (NGN)
+                Pay {getDisplayPrice("NGN")} (NGN)
               </button>
               <button
                 onClick={() => handlePayment("USD")}
                 className="btn-bounce flex items-center gap-2 rounded-full border-2 border-accent px-6 py-3 text-sm font-bold text-accent transition-colors hover:bg-accent hover:text-white"
               >
                 <FiDollarSign size={16} />
-                Pay $3 (USD)
+                Pay {getDisplayPrice("USD")} (USD)
               </button>
             </div>
           )}

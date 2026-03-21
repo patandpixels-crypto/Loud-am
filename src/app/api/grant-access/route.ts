@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb, adminAuth } from "@/lib/firebaseAdmin";
 import { checkServerRateLimit } from "@/lib/serverRateLimit";
+import { PRICING } from "@/lib/pricing";
 
 // Expected amounts per currency (in smallest unit: kobo for NGN, cents for USD)
-const EXPECTED_AMOUNTS: Record<string, number> = {
-  NGN: 300_00, // 300 NGN in kobo
-  USD: 3_00, // $3 in cents
-};
+const EXPECTED_AMOUNTS = PRICING.expectedAmounts;
 
 export async function POST(request: NextRequest) {
   try {
@@ -191,7 +189,7 @@ export async function POST(request: NextRequest) {
       // Access was already granted — earnings distribution failure is non-fatal
     }
 
-    // 8. Referral bonus — award referrer $0.50 on the referred user's first payment
+    // 8. Referral bonus — award referrer 10% of payment on the referred user's first payment
     try {
       const payerDoc = await adminDb.collection("users").doc(uid).get();
       const payerData = payerDoc.data();
@@ -213,12 +211,14 @@ export async function POST(request: NextRequest) {
 
           if (!referrerSnap.empty) {
             const referrerId = referrerSnap.docs[0].id;
+            const referralBonus = Math.round(paidAmount / 100 * PRICING.referralBonusDecimal * 100) / 100;
             await adminDb.collection("earnings").add({
               userId: referrerId,
               sectionId,
               sectionPostId: "",
               fromPaymentBy: uid,
-              amount: 0.5,
+              amount: referralBonus,
+              currency: paidCurrency,
               type: "referral_bonus",
               createdAt: Date.now(),
             });

@@ -251,7 +251,7 @@ export default function ProfilePage() {
             <h3 className="text-lg font-bold text-heading">Invite Friends, Earn Rewards</h3>
           </div>
           <p className="mb-4 text-sm text-subtext">
-            Share your link. When someone signs up and makes their first purchase, you earn a <span className="font-bold text-accent-2">$0.50 bonus</span>.
+            Share your link. When someone signs up and makes their first purchase, you earn <span className="font-bold text-accent-2">10% of their payment</span> as a referral bonus.
           </p>
 
           <div className="mb-4 flex items-stretch gap-2">

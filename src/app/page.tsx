@@ -188,7 +188,7 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-lg font-bold text-heading">Get Paid</h3>
               <p className="text-sm text-subtext">
-                When readers pay $3 to access a section, <span className="font-bold text-positive">50% goes directly to you</span> — the content creators.
+                When readers pay to access a section, <span className="font-bold text-positive">50% goes directly to you</span> — the content creators.
               </p>
             </div>
           </div>
@@ -266,7 +266,7 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-lg font-bold text-heading">Referral Bonus</h3>
               <p className="text-sm leading-relaxed text-subtext">
-                Earn $0.50 for every user you refer who makes their first purchase. Share your link and grow.
+                Earn 10% of every referred user&apos;s first purchase. Share your link and grow.
               </p>
             </div>
           </div>
