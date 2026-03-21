@@ -18,10 +18,35 @@ const spaceGrotesk = Space_Grotesk({
   weight: ["500", "600", "700"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://breal.app";
+
 export const metadata: Metadata = {
-  title: "BREAL | Be Real. Get Paid.",
+  title: {
+    default: "BREAL | Be Real. Get Paid.",
+    template: "%s | BREAL",
+  },
   description:
     "Post anonymous organisation reviews. Staff-only sections. Earn money when readers unlock your content.",
+  metadataBase: new URL(siteUrl),
+  openGraph: {
+    title: "BREAL | Be Real. Get Paid.",
+    description:
+      "Post anonymous organisation reviews. Staff-only sections. Earn money when readers unlock your content.",
+    url: siteUrl,
+    siteName: "BREAL",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BREAL | Be Real. Get Paid.",
+    description:
+      "Post anonymous organisation reviews. Staff-only sections. Earn money when readers unlock your content.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
