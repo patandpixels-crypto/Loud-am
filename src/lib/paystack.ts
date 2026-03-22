@@ -1,16 +1,16 @@
 declare global {
   interface Window {
-    PaystackPop: {
-      setup(options: {
+    PaystackPop: new () => {
+      newTransaction(options: {
         key: string;
         email: string;
-        amount: number; // in kobo (NGN) or smallest currency unit
+        amount: number;
         currency?: string;
         ref?: string;
         metadata?: Record<string, unknown>;
         onClose: () => void;
         onSuccess: (response: { reference: string; trans: string; status: string; message: string }) => void;
-      }): { openIframe: () => void };
+      }): void;
     };
   }
 }
@@ -27,16 +27,17 @@ interface PaystackConfig {
 export function openPaystack({ email, amountInCents, currency = "NGN", metadata, onSuccess, onClose }: PaystackConfig) {
   const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
   if (!publicKey) {
-    console.error("Paystack public key is not configured");
+    alert("Payment is not configured yet. Please contact support.");
     return;
   }
 
   if (typeof window === "undefined" || !window.PaystackPop) {
-    console.error("Paystack script not loaded");
+    alert("Payment system is still loading. Please try again in a moment.");
     return;
   }
 
-  const handler = window.PaystackPop.setup({
+  const popup = new window.PaystackPop();
+  popup.newTransaction({
     key: publicKey,
     email,
     amount: amountInCents,
@@ -48,8 +49,6 @@ export function openPaystack({ email, amountInCents, currency = "NGN", metadata,
       onSuccess(response.reference);
     },
   });
-
-  handler.openIframe();
 }
 
 export async function verifyPayment(reference: string): Promise<{ verified: boolean; amount?: number }> {
