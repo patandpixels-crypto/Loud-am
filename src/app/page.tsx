@@ -155,40 +155,62 @@ export default function LandingPage() {
         <div className="mx-auto max-w-5xl">
           <div className="mb-14 text-center">
             <h2 className="text-3xl font-black text-heading sm:text-4xl">How It Works</h2>
-            <p className="mt-3 text-subtext">Three steps to start earning from what you know</p>
+            <p className="mt-3 text-subtext">Everything you can do on BREAL — in five simple steps</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {/* Step 1 */}
             <div className="step-connector bento-card text-center">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15">
                 <span className="text-2xl font-black text-accent">1</span>
               </div>
-              <h3 className="mb-2 text-lg font-bold text-heading">Create a Section</h3>
+              <h3 className="mb-2 text-lg font-bold text-heading">Sign Up Free</h3>
               <p className="text-sm text-subtext">
-                Start an organisation section for any organisation you work at. Invite verified staff to contribute.
+                Create an account and get a unique anonymous codename. Your real identity stays hidden — always.
               </p>
             </div>
 
             {/* Step 2 */}
             <div className="step-connector bento-card text-center">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-2/15">
-                <span className="text-2xl font-black text-accent-2">2</span>
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-3/15">
+                <span className="text-2xl font-black text-accent-3">2</span>
               </div>
-              <h3 className="mb-2 text-lg font-bold text-heading">Share Your Experience</h3>
+              <h3 className="mb-2 text-lg font-bold text-heading">Post Reviews</h3>
               <p className="text-sm text-subtext">
-                Write honest reviews about organisations, brands, or people — always under your anonymous codename.
+                Share honest reviews about any person, brand, or organisation in the public feed. No filter, no bias.
               </p>
             </div>
 
             {/* Step 3 */}
+            <div className="step-connector bento-card text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-2/15">
+                <span className="text-2xl font-black text-accent-2">3</span>
+              </div>
+              <h3 className="mb-2 text-lg font-bold text-heading">Vote &amp; Engage</h3>
+              <p className="text-sm text-subtext">
+                Upvote or downvote reviews to surface the most helpful content. Reply and discuss in organisation sections.
+              </p>
+            </div>
+
+            {/* Step 4 */}
+            <div className="step-connector bento-card text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-negative/15">
+                <span className="text-2xl font-black text-negative">4</span>
+              </div>
+              <h3 className="mb-2 text-lg font-bold text-heading">Create Sections</h3>
+              <p className="text-sm text-subtext">
+                Start a staff-only section for your organisation. Only verified employees can post — readers pay to unlock.
+              </p>
+            </div>
+
+            {/* Step 5 */}
             <div className="bento-card text-center">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-positive/15">
-                <span className="text-2xl font-black text-positive">3</span>
+                <span className="text-2xl font-black text-positive">5</span>
               </div>
               <h3 className="mb-2 text-lg font-bold text-heading">Get Paid</h3>
               <p className="text-sm text-subtext">
-                When readers pay to unlock a section, <span className="font-bold text-positive">50% goes directly to you</span> — the content creators.
+                Earn <span className="font-bold text-positive">50% of every unlock</span>. Refer friends for a 10% bonus on their first payment.
               </p>
             </div>
           </div>
