@@ -16,7 +16,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("breal_theme") as Theme | null;
+    const stored = localStorage.getItem("yarnam_theme") as Theme | null;
     if (stored === "light" || stored === "dark") {
       setTheme(stored);
     }
@@ -26,7 +26,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!mounted) return;
     document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("breal_theme", theme);
+    localStorage.setItem("yarnam_theme", theme);
   }, [theme, mounted]);
 
   const toggleTheme = () => {

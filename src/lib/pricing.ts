@@ -1,4 +1,4 @@
-// Centralized pricing configuration for BREAL
+// Centralized pricing configuration for Yarnam
 // All prices, revenue splits, and referral bonuses in one place.
 
 export const PRICING = {

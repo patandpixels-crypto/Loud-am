@@ -1,4 +1,4 @@
-# BREAL
+# Yarnam
 
 Be real. Get paid. An anonymous insider review platform where users post honest reviews about people, brands, and companies — and earn money doing it.
 

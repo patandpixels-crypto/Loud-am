@@ -100,8 +100,8 @@ export default function LandingPage() {
 
           {/* Logo */}
           <h1 className="animate-slide-up stagger-1 logo-text text-6xl leading-tight sm:text-8xl md:text-9xl">
-            <span className="gradient-text">BR</span>
-            <span className="text-foreground">EAL</span>
+            <span className="gradient-text">Yar</span>
+            <span className="text-foreground">nam</span>
           </h1>
 
           {/* Subtitle */}
@@ -155,7 +155,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-5xl">
           <div className="mb-14 text-center">
             <h2 className="text-3xl font-black text-heading sm:text-4xl">How It Works</h2>
-            <p className="mt-3 text-subtext">Everything you can do on BREAL — in five simple steps</p>
+            <p className="mt-3 text-subtext">Everything you can do on Yarnam — in five simple steps</p>
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
@@ -221,7 +221,7 @@ export default function LandingPage() {
       <section className="px-4 py-20">
         <div className="mx-auto max-w-5xl">
           <div className="mb-14 text-center">
-            <h2 className="text-3xl font-black text-heading sm:text-4xl">Why BREAL?</h2>
+            <h2 className="text-3xl font-black text-heading sm:text-4xl">Why Yarnam?</h2>
             <p className="mt-3 text-subtext">The platform where honesty pays</p>
           </div>
 

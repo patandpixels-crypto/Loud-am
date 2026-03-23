@@ -18,28 +18,28 @@ const spaceGrotesk = Space_Grotesk({
   weight: ["500", "600", "700"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://breal.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://yarnam.app";
 
 export const metadata: Metadata = {
   title: {
-    default: "BREAL | Be Real. Get Paid.",
-    template: "%s | BREAL",
+    default: "Yarnam | Be Real. Get Paid.",
+    template: "%s | Yarnam",
   },
   description:
     "Post anonymous organisation reviews. Staff-only sections. Earn money when readers unlock your content.",
   metadataBase: new URL(siteUrl),
   openGraph: {
-    title: "BREAL | Be Real. Get Paid.",
+    title: "Yarnam | Be Real. Get Paid.",
     description:
       "Post anonymous organisation reviews. Staff-only sections. Earn money when readers unlock your content.",
     url: siteUrl,
-    siteName: "BREAL",
+    siteName: "Yarnam",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "BREAL | Be Real. Get Paid.",
+    title: "Yarnam | Be Real. Get Paid.",
     description:
       "Post anonymous organisation reviews. Staff-only sections. Earn money when readers unlock your content.",
   },
@@ -74,12 +74,12 @@ export default function RootLayout({
               <div className="mx-auto max-w-6xl px-4 py-8">
                 <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
                   <div className="flex items-center gap-3">
-                    <span className="logo-text gradient-text text-lg">BREAL</span>
+                    <span className="logo-text gradient-text text-lg">Yarnam</span>
                     <span className="hidden h-4 w-px bg-card-border sm:block" />
                     <span className="hidden text-xs text-muted sm:block">Be real. Get paid.</span>
                   </div>
                   <p className="text-xs text-muted">
-                    &copy; {new Date().getFullYear()} BREAL. All rights reserved.
+                    &copy; {new Date().getFullYear()} Yarnam. All rights reserved.
                   </p>
                 </div>
               </div>

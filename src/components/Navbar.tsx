@@ -101,8 +101,8 @@ export default function Navbar() {
           {/* Logo */}
           <Link href={user ? "/feed" : "/"} className="group flex items-center gap-2" onClick={closeMobile}>
             <span className="logo-text text-2xl transition-transform duration-300 group-hover:scale-105">
-              <span className="gradient-text">BR</span>
-              <span className="text-foreground">EAL</span>
+              <span className="gradient-text">Yar</span>
+              <span className="text-foreground">nam</span>
             </span>
           </Link>
 

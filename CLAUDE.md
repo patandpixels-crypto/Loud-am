@@ -15,7 +15,7 @@ No test framework is configured.
 
 ## Architecture Overview
 
-BREAL is an anonymous review platform built on **Next.js 16 (App Router)** with **Firebase** (auth + Firestore) and **Paystack** (payments). Users post reviews about people/brands/organisations, vote on content, and earn money through organisation sections.
+Yarnam is an anonymous review platform built on **Next.js 16 (App Router)** with **Firebase** (auth + Firestore) and **Paystack** (payments). Users post reviews about people/brands/organisations, vote on content, and earn money through organisation sections.
 
 ### Tech Stack
 - Next.js 16.1.6 with Turbopack, React 19, TypeScript 5

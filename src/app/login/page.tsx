@@ -121,8 +121,8 @@ function LoginContent() {
         <div className="relative z-10 max-w-md px-12">
           {/* Logo */}
           <h1 className="logo-text mb-6 text-5xl">
-            <span className="gradient-text">BR</span>
-            <span className="text-foreground">EAL</span>
+            <span className="gradient-text">Yar</span>
+            <span className="text-foreground">nam</span>
           </h1>
 
           <p className="mb-10 text-lg leading-relaxed text-subtext">
@@ -183,8 +183,8 @@ function LoginContent() {
           {/* Mobile logo */}
           <div className="mb-8 lg:hidden">
             <h1 className="logo-text text-3xl">
-              <span className="gradient-text">BR</span>
-              <span className="text-foreground">EAL</span>
+              <span className="gradient-text">Yar</span>
+              <span className="text-foreground">nam</span>
             </h1>
             <p className="mt-1 text-sm text-subtext">
               Be real. Get paid.
