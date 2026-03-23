@@ -170,5 +170,13 @@ service cloud.firestore {
       allow update: if request.auth != null
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
+
+    // Waitlist — anyone can create (one entry per email), only admins can read
+    match /waitlist/{entryId} {
+      allow read: if true;
+      allow create: if request.resource.data.email is string
+        && request.resource.data.email.size() > 0
+        && request.resource.data.joinedAt is int;
+    }
   }
 }

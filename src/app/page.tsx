@@ -1,88 +1,53 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { useState, FormEvent } from "react";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { useAuth } from "@/lib/AuthContext";
-import { Earning } from "@/lib/types";
 import {
   FiLock, FiDollarSign, FiUsers, FiShield, FiArrowRight,
-  FiZap, FiAward, FiTrendingUp, FiMessageSquare, FiEye,
-  FiCheckCircle,
+  FiZap, FiTrendingUp, FiMessageSquare,
+  FiCheckCircle, FiMail,
 } from "react-icons/fi";
 
-export default function LandingPage() {
-  const { user } = useAuth();
-  const router = useRouter();
-  const [totalPlatformEarnings, setTotalPlatformEarnings] = useState(0);
-  const [topEarner, setTopEarner] = useState<{ name: string; amount: number } | null>(null);
-  const [postCount, setPostCount] = useState(0);
-  const [sectionCount, setSectionCount] = useState(0);
+export default function WaitlistPage() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "duplicate" | "error">("idle");
+  const [waitlistCount, setWaitlistCount] = useState<number | null>(null);
 
-  // Redirect logged-in users to feed
-  useEffect(() => {
-    if (user) {
-      router.push("/feed");
-    }
-  }, [user, router]);
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return;
 
-  // Fetch platform stats
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const earningsSnap = await getDocs(collection(db, "earnings"));
-        const allEarnings = earningsSnap.docs.map((d) => d.data() as Earning);
-        const total = allEarnings.reduce((sum, e) => sum + e.amount, 0);
-        setTotalPlatformEarnings(total);
+    setStatus("loading");
 
-        // Top earner this month
-        const now = new Date();
-        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-        const monthEarnings = allEarnings.filter((e) => e.createdAt >= monthStart);
-        if (monthEarnings.length > 0) {
-          const totals: Record<string, number> = {};
-          for (const e of monthEarnings) {
-            totals[e.userId] = (totals[e.userId] || 0) + e.amount;
-          }
-          let topUserId = "";
-          let topAmount = 0;
-          for (const [uid, amount] of Object.entries(totals)) {
-            if (amount > topAmount) { topUserId = uid; topAmount = amount; }
-          }
-          if (topUserId) {
-            const userDoc = await getDoc(doc(db, "users", topUserId));
-            const codeName = userDoc.exists()
-              ? (userDoc.data().codeName || userDoc.data().displayName)
-              : "Anonymous";
-            setTopEarner({ name: codeName, amount: topAmount });
-          }
-        }
-      } catch {
-        // silent
+    try {
+      // Check for duplicate
+      const q = query(collection(db, "waitlist"), where("email", "==", trimmed));
+      const existing = await getDocs(q);
+      if (!existing.empty) {
+        setStatus("duplicate");
+        return;
       }
 
-      try {
-        const postsSnap = await getDocs(collection(db, "posts"));
-        setPostCount(postsSnap.size);
-      } catch { /* silent */ }
+      await addDoc(collection(db, "waitlist"), {
+        email: trimmed,
+        joinedAt: Date.now(),
+      });
 
-      try {
-        const sectionsSnap = await getDocs(collection(db, "companySections"));
-        setSectionCount(sectionsSnap.size);
-      } catch { /* silent */ }
-    };
-    fetchStats();
-  }, []);
-
-  // Don't render landing for logged-in users
-  if (user) return null;
+      // Get total count for social proof
+      const allSnap = await getDocs(collection(db, "waitlist"));
+      setWaitlistCount(allSnap.size);
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    }
+  };
 
   return (
     <div className="relative overflow-hidden">
       {/* === HERO === */}
-      <section className="relative min-h-[85vh] flex items-center justify-center px-4">
+      <section className="relative flex min-h-[90vh] items-center justify-center px-4">
         {/* Background glows */}
         <div className="hero-glow hero-glow-1" />
         <div className="hero-glow hero-glow-2" />
@@ -91,11 +56,11 @@ export default function LandingPage() {
         {/* Grid pattern */}
         <div className="grid-pattern absolute inset-0" />
 
-        <div className="relative z-10 mx-auto max-w-4xl text-center">
+        <div className="relative z-10 mx-auto max-w-3xl text-center">
           {/* Badge */}
           <div className="animate-slide-up mb-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-4 py-1.5">
             <FiZap size={14} className="text-accent" />
-            <span className="text-xs font-bold text-accent">Anonymous. Honest. Rewarded.</span>
+            <span className="text-xs font-bold text-accent">Coming Soon</span>
           </div>
 
           {/* Logo */}
@@ -106,46 +71,77 @@ export default function LandingPage() {
 
           {/* Subtitle */}
           <p className="animate-slide-up stagger-2 mx-auto mt-6 max-w-xl text-lg text-subtext sm:text-xl">
-            Post <span className="font-bold text-heading">anonymous organisation reviews</span>.
-            Earn <span className="font-bold text-accent-2">money</span> when readers unlock your content.
+            The anonymous platform where you post <span className="font-bold text-heading">honest organisation reviews</span> and
+            earn <span className="font-bold text-accent-2">real money</span> when readers unlock your content.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="animate-slide-up stagger-3 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link
-              href="/login"
-              className="btn-bounce group flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-8 py-4 text-base font-bold text-white shadow-xl shadow-accent/25 transition-shadow hover:shadow-2xl hover:shadow-accent/30"
-            >
-              Get Started Free
-              <FiArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-            </Link>
-            <Link
-              href="/feed"
-              className="btn-bounce flex items-center gap-2 rounded-xl border border-card-border bg-card-bg/50 px-8 py-4 text-base font-bold text-subtext transition-colors hover:bg-surface hover:text-heading"
-            >
-              <FiEye size={18} />
-              Browse Reviews
-            </Link>
-          </div>
+          {/* Waitlist Form */}
+          <div className="animate-slide-up stagger-3 mx-auto mt-10 max-w-md">
+            {status === "success" ? (
+              <div className="rounded-2xl border border-positive/30 bg-positive/5 p-6">
+                <FiCheckCircle size={32} className="mx-auto mb-3 text-positive" />
+                <p className="text-lg font-bold text-heading">You&apos;re on the list!</p>
+                <p className="mt-1 text-sm text-subtext">
+                  We&apos;ll email you when Yarnam launches.
+                </p>
+                {waitlistCount && (
+                  <p className="mt-3 text-sm font-bold text-accent-2">
+                    #{waitlistCount} on the waitlist
+                  </p>
+                )}
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
+                <div className="relative flex-1">
+                  <FiMail
+                    size={18}
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted"
+                  />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (status === "error" || status === "duplicate") setStatus("idle");
+                    }}
+                    placeholder="Enter your email"
+                    required
+                    className="w-full rounded-xl border border-card-border bg-card-bg py-4 pl-11 pr-4 text-sm text-heading placeholder-muted outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/20"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={status === "loading"}
+                  className="btn-bounce group flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-6 py-4 text-sm font-bold text-white shadow-xl shadow-accent/25 transition-shadow hover:shadow-2xl hover:shadow-accent/30 disabled:opacity-60"
+                >
+                  {status === "loading" ? (
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  ) : (
+                    <>
+                      Join Waitlist
+                      <FiArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
 
-          {/* Social proof stats */}
-          <div className="animate-slide-up stagger-4 mx-auto mt-14 flex max-w-lg items-center justify-center gap-8 sm:gap-12">
-            <div className="text-center">
-              <p className="stat-number text-2xl font-black text-heading sm:text-3xl">{postCount}</p>
-              <p className="mt-1 text-xs text-muted">Reviews</p>
-            </div>
-            <div className="h-8 w-px bg-card-border" />
-            <div className="text-center">
-              <p className="stat-number text-2xl font-black text-heading sm:text-3xl">{sectionCount}</p>
-              <p className="mt-1 text-xs text-muted">Organisations</p>
-            </div>
-            <div className="h-8 w-px bg-card-border" />
-            <div className="text-center">
-              <p className="stat-number text-2xl font-black text-positive sm:text-3xl">
-                ${totalPlatformEarnings.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+            {status === "duplicate" && (
+              <p className="mt-3 text-sm font-medium text-accent-2">
+                You&apos;re already on the waitlist! We&apos;ll be in touch soon.
               </p>
-              <p className="mt-1 text-xs text-muted">Paid Out</p>
-            </div>
+            )}
+            {status === "error" && (
+              <p className="mt-3 text-sm font-medium text-negative">
+                Something went wrong. Please try again.
+              </p>
+            )}
+
+            {status === "idle" && (
+              <p className="mt-4 text-xs text-muted">
+                Be the first to know when we launch. No spam, ever.
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -295,23 +291,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* === TOP EARNER SPOTLIGHT === */}
-      {topEarner && (
-        <section className="px-4 py-16">
-          <div className="mx-auto max-w-md">
-            <div className="animate-float-slow rounded-2xl border border-accent-2/20 bg-gradient-to-br from-accent-2/5 to-positive/5 p-8 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent-2/20">
-                <FiAward size={28} className="text-accent-2" />
-              </div>
-              <p className="text-xs font-bold uppercase tracking-wider text-muted">Top Earner This Month</p>
-              <p className="mt-2 text-2xl font-black text-heading">{topEarner.name}</p>
-              <p className="stat-number mt-1 text-3xl font-black text-accent-2">${topEarner.amount.toFixed(2)}</p>
-              <p className="mt-3 text-sm text-subtext">This could be you. Share what you know and start earning.</p>
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* === TRUST SIGNALS === */}
       <section className="px-4 py-16">
         <div className="mx-auto max-w-3xl">
@@ -340,18 +319,22 @@ export default function LandingPage() {
             Ready to <span className="gradient-text">get real?</span>
           </h2>
           <p className="mt-4 text-lg text-subtext">
-            Join thousands sharing honest reviews and earning real money.
+            Be among the first to share honest reviews and earn real money.
           </p>
-          <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link
-              href="/login"
-              className="btn-bounce group flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-10 py-4 text-base font-bold text-white shadow-xl shadow-accent/25"
+          <div className="mt-8">
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className="btn-bounce group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-10 py-4 text-base font-bold text-white shadow-xl shadow-accent/25"
             >
-              Create Free Account
+              Join the Waitlist
               <FiArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-            </Link>
+            </a>
           </div>
-          <p className="mt-4 text-xs text-muted">Free to join. Start posting in under a minute.</p>
+          <p className="mt-4 text-xs text-muted">Launching soon. Free to join.</p>
         </div>
       </section>
     </div>
