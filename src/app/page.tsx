@@ -154,9 +154,9 @@ export default function WaitlistPage() {
             <p className="mt-3 text-subtext">Everything you can do on Yarnam — in five simple steps</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-            {/* Step 1 */}
-            <div className="step-connector bento-card text-center">
+          {/* Row 1: 3 steps */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+            <div className="bento-card text-center">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15">
                 <span className="text-2xl font-black text-accent">1</span>
               </div>
@@ -166,8 +166,7 @@ export default function WaitlistPage() {
               </p>
             </div>
 
-            {/* Step 2 */}
-            <div className="step-connector bento-card text-center">
+            <div className="bento-card text-center">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-3/15">
                 <span className="text-2xl font-black text-accent-3">2</span>
               </div>
@@ -177,8 +176,7 @@ export default function WaitlistPage() {
               </p>
             </div>
 
-            {/* Step 3 */}
-            <div className="step-connector bento-card text-center">
+            <div className="bento-card text-center">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent-2/15">
                 <span className="text-2xl font-black text-accent-2">3</span>
               </div>
@@ -187,9 +185,11 @@ export default function WaitlistPage() {
                 Upvote or downvote reviews to surface the most helpful content. Reply and discuss in organisation sections.
               </p>
             </div>
+          </div>
 
-            {/* Step 4 */}
-            <div className="step-connector bento-card text-center">
+          {/* Row 2: 2 steps centered */}
+          <div className="mx-auto mt-5 grid max-w-3xl grid-cols-1 gap-5 sm:grid-cols-2">
+            <div className="bento-card text-center">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-negative/15">
                 <span className="text-2xl font-black text-negative">4</span>
               </div>
@@ -199,7 +199,6 @@ export default function WaitlistPage() {
               </p>
             </div>
 
-            {/* Step 5 */}
             <div className="bento-card text-center">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-positive/15">
                 <span className="text-2xl font-black text-positive">5</span>

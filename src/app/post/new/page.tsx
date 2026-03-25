@@ -5,13 +5,15 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { FiX, FiPlus, FiEye, FiEyeOff, FiAlertCircle, FiMail } from "react-icons/fi";
+import { FiX, FiPlus, FiEye, FiEyeOff, FiAlertCircle, FiMail, FiArrowLeft } from "react-icons/fi";
 import { checkRateLimit, recordAction, formatRetryTime } from "@/lib/rateLimit";
+import { useToast } from "@/lib/ToastContext";
 import Link from "next/link";
 
 export default function NewPostPage() {
   const { user, userProfile, emailVerified, resendVerification } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [targetName, setTargetName] = useState("");
@@ -127,7 +129,8 @@ export default function NewPostPage() {
         createdAt: Date.now(),
       });
       recordAction("post_create");
-      router.push("/");
+      toast("Review published!", "success");
+      router.push("/feed");
     } catch {
       setError("Failed to create post. Please try again.");
     } finally {
@@ -137,8 +140,12 @@ export default function NewPostPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
+      <Link href="/feed" className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-heading">
+        <FiArrowLeft size={14} />
+        Back to feed
+      </Link>
       <h1 className="mb-6 text-2xl font-black">
-        <span className="gradient-text">Create a Post</span>
+        <span className="gradient-text">Create a Review</span>
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -278,9 +285,12 @@ export default function NewPostPage() {
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-subtle">
-                Title
-              </label>
+              <div className="mb-1.5 flex items-center justify-between">
+                <label className="block text-sm font-medium text-subtle">Title</label>
+                <span className={`text-xs ${title.length > 100 ? "text-negative" : "text-muted"}`}>
+                  {title.length}/120
+                </span>
+              </div>
               <input
                 type="text"
                 value={title}
@@ -292,15 +302,19 @@ export default function NewPostPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-subtle">
-                Your Experience
-              </label>
+              <div className="mb-1.5 flex items-center justify-between">
+                <label className="block text-sm font-medium text-subtle">Your Experience</label>
+                <span className={`text-xs ${content.length > 4500 ? "text-negative" : "text-muted"}`}>
+                  {content.length > 0 ? `${content.length}/5000` : ""}
+                </span>
+              </div>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="min-h-[150px] w-full resize-y rounded-xl border border-card-border bg-input-bg px-4 py-3 text-heading placeholder-muted outline-none transition-all focus:border-accent focus:shadow-lg focus:shadow-accent/10"
                 placeholder="Share the details. What happened, when, and how it affected you..."
                 required
+                maxLength={5000}
               />
             </div>
           </div>

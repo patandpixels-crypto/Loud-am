@@ -13,7 +13,8 @@ import {
   FiMessageCircle, FiShare2,
 } from "react-icons/fi";
 import { collection, query, where, getDocs, addDoc, deleteDoc } from "firebase/firestore";
-import { checkRateLimit, recordAction } from "@/lib/rateLimit";
+import { checkRateLimit, recordAction, formatRetryTime } from "@/lib/rateLimit";
+import { useToast } from "@/lib/ToastContext";
 
 interface PostCardProps {
   post: Post;
@@ -68,6 +69,7 @@ const RANK_STYLES: Record<number, string> = {
 export default function PostCard({ post, rank, onDelete }: PostCardProps) {
   const { user } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
   const [score, setScore] = useState(post.score || 0);
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
   const [voting, setVoting] = useState(false);
@@ -100,7 +102,10 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
     if (voting) return;
 
     const limit = checkRateLimit("vote");
-    if (!limit.allowed) return;
+    if (!limit.allowed) {
+      toast(`Too many votes. Try again in ${formatRetryTime(limit.retryAfterMs)}`, "error");
+      return;
+    }
 
     setVoting(true);
     setVoteAnimating(true);
@@ -192,7 +197,10 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
     if (!user || reportSubmitting) return;
 
     const limit = checkRateLimit("report");
-    if (!limit.allowed) return;
+    if (!limit.allowed) {
+      toast(`Too many reports. Try again in ${formatRetryTime(limit.retryAfterMs)}`, "error");
+      return;
+    }
 
     setReportSubmitting(true);
     try {
@@ -225,7 +233,9 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
     try {
       await firestoreDeleteDoc(doc(db, "posts", post.id));
       onDelete?.(post.id);
+      toast("Post deleted", "success");
     } catch {
+      toast("Failed to delete post", "error");
       setDeleting(false);
     }
   };
@@ -235,6 +245,7 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
+      toast("Link copied to clipboard", "success");
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // fallback
@@ -316,7 +327,7 @@ export default function PostCard({ post, rank, onDelete }: PostCardProps) {
                     e.stopPropagation();
                     setShowMenu(!showMenu);
                   }}
-                  className="rounded-lg p-1.5 text-muted opacity-0 transition-all group-hover:opacity-100 hover:bg-surface hover:text-subtext"
+                  className="rounded-lg p-1.5 text-muted transition-all sm:opacity-0 sm:group-hover:opacity-100 hover:bg-surface hover:text-subtext"
                 >
                   <FiMoreHorizontal size={16} />
                 </button>

@@ -4,6 +4,7 @@ import { Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/AuthContext";
 import { ThemeProvider } from "@/lib/ThemeContext";
+import { ToastProvider } from "@/lib/ToastContext";
 import Navbar from "@/components/Navbar";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -68,6 +69,7 @@ export default function RootLayout({
       <body className={`${jakarta.variable} ${spaceGrotesk.variable} antialiased`}>
         <ThemeProvider>
           <AuthProvider>
+            <ToastProvider>
             <Navbar />
             <main className="min-h-[calc(100vh-64px)]">{children}</main>
             <footer className="border-t border-card-border">
@@ -84,6 +86,7 @@ export default function RootLayout({
                 </div>
               </div>
             </footer>
+            </ToastProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

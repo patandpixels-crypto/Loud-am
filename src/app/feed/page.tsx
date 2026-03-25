@@ -279,12 +279,12 @@ export default function FeedPage() {
             </h2>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
             {/* Sort Tabs */}
-            <div className="flex rounded-xl border border-card-border bg-card-bg p-0.5">
+            <div className="flex shrink-0 rounded-xl border border-card-border bg-card-bg p-0.5">
               <button
                 onClick={() => setSort("score")}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all ${
                   sort === "score"
                     ? "bg-gradient-to-r from-accent to-accent-2 text-white shadow-sm"
                     : "text-subtext hover:text-heading"
@@ -295,7 +295,7 @@ export default function FeedPage() {
               </button>
               <button
                 onClick={() => setSort("recent")}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all ${
                   sort === "recent"
                     ? "bg-gradient-to-r from-accent to-accent-2 text-white shadow-sm"
                     : "text-subtext hover:text-heading"
@@ -307,13 +307,13 @@ export default function FeedPage() {
             </div>
 
             {/* Sentiment Filter */}
-            <div className="flex items-center rounded-xl border border-card-border bg-card-bg p-0.5">
+            <div className="flex shrink-0 items-center rounded-xl border border-card-border bg-card-bg p-0.5">
               <FiFilter size={12} className="mx-1.5 text-muted" />
               {(["all", "positive", "negative"] as FilterType[]).map((f) => (
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`rounded-lg px-2.5 py-1.5 text-xs font-bold transition-all ${
+                  className={`rounded-lg px-3 py-2 text-xs font-bold transition-all ${
                     filter === f
                       ? f === "positive"
                         ? "bg-positive/20 text-positive"
